@@ -11,7 +11,7 @@ export function RecentActivity({ userRole }: RecentActivityProps) {
   const activities = [
     {
       id: 1,
-      user: "John Doe",
+      user: "Charlie Brown Jr",
       action: "completou a tarefa",
       target: "Atualizar interface do usuário",
       time: "2 horas atrás",
@@ -19,7 +19,7 @@ export function RecentActivity({ userRole }: RecentActivityProps) {
     },
     {
       id: 2,
-      user: "Sarah Smith",
+      user: "Kanye West",
       action: "entrou na equipe",
       target: "Equipe de Desenvolvimento",
       time: "4 horas atrás",
@@ -27,7 +27,7 @@ export function RecentActivity({ userRole }: RecentActivityProps) {
     },
     {
       id: 3,
-      user: "Mike Johnson",
+      user: "SilkSong da Silva",
       action: "criou a tarefa",
       target: "Corrigir bug de login",
       time: "6 horas atrás",
@@ -35,7 +35,7 @@ export function RecentActivity({ userRole }: RecentActivityProps) {
     },
     {
       id: 4,
-      user: "Emily Davis",
+      user: "Franz Kafka",
       action: "enviou o relatório",
       target: "Desempenho Semanal",
       time: "1 dia atrás",
