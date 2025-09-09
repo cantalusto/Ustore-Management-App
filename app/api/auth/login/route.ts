@@ -7,11 +7,11 @@ export async function POST(request: NextRequest) {
 
     let user
     if (email.includes("admin")) {
-      user = { id: 1, email, role: "admin", name: "Admin User" }
+      user = { id: 1, email, role: "admin", name: "Dante Alighieri" }
     } else if (email.includes("manager")) {
-      user = { id: 2, email, role: "manager", name: "Manager User" }
+      user = { id: 2, email, role: "manager", name: "Gerente" }
     } else {
-      user = { id: 3, email, role: "member", name: "Team Member" }
+      user = { id: 3, email, role: "member", name: "Trabalhador" }
     }
 
     const cookieStore = await cookies()
