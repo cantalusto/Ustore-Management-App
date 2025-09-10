@@ -1,30 +1,74 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { cookies } from "next/headers"
 
+// Lista de usuários válidos (baseado nos seus dados de exemplo)
+// Em um aplicativo real, isso viria de um banco de dados.
+const validUsers = [
+  {
+    id: 1,
+    name: "Dante Alighieri",
+    email: "admin@company.com",
+    role: "admin" as const,
+  },
+  {
+    id: 2,
+    name: "Gerente de Projeto",
+    email: "manager@company.com",
+    role: "manager" as const,
+  },
+  {
+    id: 3,
+    name: "Membro da Equipe",
+    email: "member@company.com",
+    role: "member" as const,
+  },
+  {
+    id: 4,
+    name: "Kanye West",
+    email: "kan.ye@company.com",
+    role: "member" as const,
+  },
+  {
+    id: 5,
+    name: "Franz Kafa",
+    email: "franka@company.com",
+    role: "member" as const,
+  },
+]
+
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json()
 
-    let user
-    if (email.includes("admin")) {
-      user = { id: 1, email, role: "admin", name: "Dante Alighieri" }
-    } else if (email.includes("manager")) {
-      user = { id: 2, email, role: "manager", name: "Gerente" }
-    } else {
-      user = { id: 3, email, role: "member", name: "Trabalhador" }
+    // 1. Encontra o usuário na lista pelo e-mail
+    const foundUser = validUsers.find(user => user.email === email)
+
+    // NOTA: Neste exemplo, não estamos verificando a senha.
+    // Em um projeto real, você faria a verificação da senha aqui.
+    if (!foundUser) {
+      return NextResponse.json({ error: "E-mail ou senha inválidos." }, { status: 401 })
     }
 
+    // 2. Se o usuário for encontrado, cria um objeto para a sessão
+    const userForSession = {
+        id: foundUser.id,
+        email: foundUser.email,
+        role: foundUser.role,
+        name: foundUser.name
+    }
+
+    // 3. Salva as informações do usuário no cookie
     const cookieStore = await cookies()
-    cookieStore.set("auth-token", JSON.stringify(user), {
+    cookieStore.set("auth-token", JSON.stringify(userForSession), {
       httpOnly: true,
-      secure: false, // Allow for development
+      secure: false, // Mantenha como false para ambiente de desenvolvimento
       sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60, // 7 days
+      maxAge: 7 * 24 * 60 * 60, // 7 dias
     })
 
-    return NextResponse.json({ user })
+    return NextResponse.json({ user: userForSession })
   } catch (error) {
     console.log("[v0] Login error:", error)
-    return NextResponse.json({ error: "Login failed" }, { status: 500 })
+    return NextResponse.json({ error: "Falha no login" }, { status: 500 })
   }
 }
