@@ -5,67 +5,67 @@ import { getCurrentUser } from "@/lib/auth"
 const tasks = [
   {
     id: 1,
-    title: "Update user interface",
-    description: "Redesign the main dashboard to improve user experience",
-    status: "in-progress" as const,
-    priority: "high" as const,
+    title: "Atualizar interface do usuário",
+    description: "Redesenhar o painel principal para melhorar a experiência do usuário",
+    status: "em-progresso" as const,
+    priority: "alta" as const,
     assigneeId: 3,
-    assigneeName: "Team Member",
+    assigneeName: "Membro da Equipe",
     createdBy: 2,
-    createdByName: "Manager User",
+    createdByName: "Gerente de Projeto",
     dueDate: "2024-01-15",
     createdAt: "2024-01-01T10:00:00Z",
     updatedAt: "2024-01-05T14:30:00Z",
-    project: "Website Redesign",
+    project: "Redesenho do Site",
     tags: ["frontend", "ui", "design"],
   },
   {
     id: 2,
-    title: "Fix login bug",
-    description: "Users are unable to login with special characters in password",
-    status: "todo" as const,
-    priority: "urgent" as const,
+    title: "Corrigir bug de login",
+    description: "Usuários não conseguem fazer login com caracteres especiais na senha",
+    status: "a-fazer" as const,
+    priority: "urgente" as const,
     assigneeId: 4,
-    assigneeName: "John Doe",
+    assigneeName: "Kanye West",
     createdBy: 1,
-    createdByName: "Admin User",
+    createdByName: "Dante Alighieri",
     dueDate: "2024-01-10",
     createdAt: "2024-01-02T09:15:00Z",
     updatedAt: "2024-01-02T09:15:00Z",
-    project: "Bug Fixes",
-    tags: ["backend", "authentication", "bug"],
+    project: "Correção de Bugs",
+    tags: ["backend", "autenticação", "bug"],
   },
   {
     id: 3,
-    title: "Weekly performance report",
-    description: "Compile and analyze team performance metrics for the week",
-    status: "review" as const,
-    priority: "medium" as const,
+    title: "Relatório de desempenho semanal",
+    description: "Compilar e analisar as métricas de desempenho da equipe para a semana",
+    status: "revisao" as const,
+    priority: "media" as const,
     assigneeId: 5,
-    assigneeName: "Sarah Smith",
+    assigneeName: "Franz Kafka",
     createdBy: 2,
-    createdByName: "Manager User",
+    createdByName: "Gerente de Projeto",
     dueDate: "2024-01-12",
     createdAt: "2024-01-03T11:00:00Z",
     updatedAt: "2024-01-08T16:45:00Z",
-    project: "Analytics",
-    tags: ["reporting", "analytics"],
+    project: "Análises",
+    tags: ["relatórios", "análises"],
   },
   {
     id: 4,
-    title: "Setup CI/CD pipeline",
-    description: "Configure automated testing and deployment pipeline",
-    status: "completed" as const,
-    priority: "high" as const,
+    title: "Configurar pipeline de CI/CD",
+    description: "Configurar pipeline automatizado de testes e implantação",
+    status: "concluido" as const,
+    priority: "alta" as const,
     assigneeId: 3,
-    assigneeName: "Team Member",
+    assigneeName: "Membro da Equipe",
     createdBy: 1,
-    createdByName: "Admin User",
+    createdByName: "Dante Alighieri",
     dueDate: "2024-01-08",
     createdAt: "2023-12-28T14:20:00Z",
     updatedAt: "2024-01-07T10:30:00Z",
     project: "DevOps",
-    tags: ["devops", "automation", "testing"],
+    tags: ["devops", "automação", "testes"],
   },
 ]
 
@@ -90,8 +90,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   const canEdit =
     user.role === "admin" ||
     user.role === "manager" ||
-    task.createdBy === user.userId ||
-    task.assigneeId === user.userId
+    task.createdBy === user.id ||
+    task.assigneeId === user.id
 
   if (!canEdit) {
     return NextResponse.json({ error: "Insufficient permissions" }, { status: 403 })
@@ -131,7 +131,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   const task = tasks[taskIndex]
 
   // Only admins, managers, or task creators can delete tasks
-  const canDelete = user.role === "admin" || user.role === "manager" || task.createdBy === user.userId
+  const canDelete = user.role === "admin" || user.role === "manager" || task.createdBy === user.id
 
   if (!canDelete) {
     return NextResponse.json({ error: "Insufficient permissions" }, { status: 403 })

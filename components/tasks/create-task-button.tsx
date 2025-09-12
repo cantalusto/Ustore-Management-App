@@ -16,7 +16,7 @@ export function CreateTaskButton({ userRole }: CreateTaskButtonProps) {
     <>
       <Button onClick={() => setShowDialog(true)}>
         <Plus className="mr-2 h-4 w-4" />
-        Create Task
+        Criar Tarefa
       </Button>
 
       <CreateTaskDialog

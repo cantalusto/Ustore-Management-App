@@ -9,12 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar, User, Clock, Tag, Edit, MessageSquare } from "lucide-react"
 
+// Interface corrigida para corresponder ao task-board
 interface Task {
   id: number
   title: string
   description: string
-  status: "todo" | "in-progress" | "review" | "completed"
-  priority: "low" | "medium" | "high" | "urgent"
+  status: "a-fazer" | "em-progresso" | "revisao" | "concluido"
+  priority: "baixa" | "media" | "alta" | "urgente"
   assigneeId: number
   assigneeName: string
   createdBy: number
@@ -41,13 +42,13 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "urgent":
+      case "urgente":
         return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-      case "high":
+      case "alta":
         return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
-      case "medium":
+      case "media":
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-      case "low":
+      case "baixa":
         return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
@@ -56,13 +57,13 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "todo":
+      case "a-fazer":
         return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
-      case "in-progress":
+      case "em-progresso":
         return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-      case "review":
+      case "revisao":
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-      case "completed":
+      case "concluido":
         return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
@@ -82,7 +83,7 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
         onUpdate(data.task)
       }
     } catch (error) {
-      console.error("Failed to update task status:", error)
+      console.error("Falha ao atualizar o status da tarefa:", error)
     }
   }
 
@@ -90,7 +91,7 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
     return userRole === "admin" || userRole === "manager" || task.createdBy === userId || task.assigneeId === userId
   }
 
-  const isOverdue = new Date(task.dueDate) < new Date() && task.status !== "completed"
+  const isOverdue = new Date(task.dueDate) < new Date() && task.status !== "concluido"
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -107,7 +108,7 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Status and Priority */}
+          {/* Status e Prioridade */}
           <div className="flex items-center space-x-4">
             <div className="space-y-2">
               <label className="text-sm font-medium">Status</label>
@@ -117,10 +118,10 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="todo">To Do</SelectItem>
-                    <SelectItem value="in-progress">In Progress</SelectItem>
-                    <SelectItem value="review">Review</SelectItem>
-                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="a-fazer">A Fazer</SelectItem>
+                    <SelectItem value="em-progresso">Em Progresso</SelectItem>
+                    <SelectItem value="revisao">Revisão</SelectItem>
+                    <SelectItem value="concluido">Concluído</SelectItem>
                   </SelectContent>
                 </Select>
               ) : (
@@ -128,25 +129,25 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
               )}
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Priority</label>
+              <label className="text-sm font-medium">Prioridade</label>
               <Badge className={getPriorityColor(task.priority)}>{task.priority}</Badge>
             </div>
           </div>
 
-          {/* Description */}
+          {/* Descrição */}
           {task.description && (
             <div className="space-y-2">
-              <label className="text-sm font-medium">Description</label>
+              <label className="text-sm font-medium">Descrição</label>
               <p className="text-sm text-muted-foreground bg-muted p-3 rounded-md">{task.description}</p>
             </div>
           )}
 
-          {/* Task Details */}
+          {/* Detalhes da Tarefa */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-3">
               <div className="flex items-center space-x-2 text-sm">
                 <User className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Assigned to:</span>
+                <span className="font-medium">Atribuído a:</span>
                 <div className="flex items-center space-x-2">
                   <Avatar className="h-6 w-6">
                     <AvatarFallback className="text-xs">
@@ -162,7 +163,7 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
 
               <div className="flex items-center space-x-2 text-sm">
                 <User className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Created by:</span>
+                <span className="font-medium">Criado por:</span>
                 <span>{task.createdByName}</span>
               </div>
             </div>
@@ -170,28 +171,28 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
             <div className="space-y-3">
               <div className={`flex items-center space-x-2 text-sm ${isOverdue ? "text-red-600" : ""}`}>
                 <Calendar className="h-4 w-4" />
-                <span className="font-medium">Due date:</span>
+                <span className="font-medium">Data de vencimento:</span>
                 <span>{new Date(task.dueDate).toLocaleDateString()}</span>
                 {isOverdue && (
                   <Badge variant="destructive" className="text-xs">
-                    Overdue
+                    Atrasado
                   </Badge>
                 )}
               </div>
 
               <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Clock className="h-4 w-4" />
-                <span className="font-medium">Created:</span>
+                <span className="font-medium">Criado em:</span>
                 <span>{new Date(task.createdAt).toLocaleDateString()}</span>
               </div>
             </div>
           </div>
 
-          {/* Project and Tags */}
+          {/* Projeto e Tags */}
           <div className="space-y-3">
             {task.project && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">Project:</span>
+                <span className="text-sm font-medium">Projeto:</span>
                 <Badge variant="outline">{task.project}</Badge>
               </div>
             )}
@@ -210,20 +211,20 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
             )}
           </div>
 
-          {/* Comments Section */}
+          {/* Seção de Comentários */}
           <div className="space-y-3">
             <div className="flex items-center space-x-2">
               <MessageSquare className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Add Comment</span>
+              <span className="text-sm font-medium">Adicionar Comentário</span>
             </div>
             <Textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Add a comment..."
+              placeholder="Adicionar um comentário..."
               rows={3}
             />
             <Button size="sm" disabled={!comment.trim()}>
-              Add Comment
+              Adicionar Comentário
             </Button>
           </div>
         </div>

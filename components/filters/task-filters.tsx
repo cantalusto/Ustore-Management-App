@@ -69,7 +69,7 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
       <div className="relative flex-1 max-w-sm">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search tasks..."
+          placeholder="Buscar tarefas..."
           value={filters.search}
           onChange={(e) => updateFilter("search", e.target.value)}
           className="pl-10"
@@ -83,24 +83,24 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="todo">To Do</SelectItem>
-            <SelectItem value="in-progress">In Progress</SelectItem>
-            <SelectItem value="review">Review</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="all">Todos os Status</SelectItem>
+            <SelectItem value="a-fazer">A Fazer</SelectItem>
+            <SelectItem value="em-progresso">Em Progresso</SelectItem>
+            <SelectItem value="revisao">Revisão</SelectItem>
+            <SelectItem value="concluido">Concluído</SelectItem>
           </SelectContent>
         </Select>
 
         <Select value={filters.priority} onValueChange={(value) => updateFilter("priority", value)}>
           <SelectTrigger className="w-32">
-            <SelectValue placeholder="Priority" />
+            <SelectValue placeholder="Prioridade" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Priority</SelectItem>
-            <SelectItem value="low">Low</SelectItem>
-            <SelectItem value="medium">Medium</SelectItem>
-            <SelectItem value="high">High</SelectItem>
-            <SelectItem value="urgent">Urgent</SelectItem>
+            <SelectItem value="all">Todas as Prioridades</SelectItem>
+            <SelectItem value="baixa">Baixa</SelectItem>
+            <SelectItem value="media">Média</SelectItem>
+            <SelectItem value="alta">Alta</SelectItem>
+            <SelectItem value="urgente">Urgente</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -110,7 +110,7 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
         <PopoverTrigger asChild>
           <Button variant="outline" className="relative bg-transparent">
             <Filter className="h-4 w-4 mr-2" />
-            Filters
+            Filtros
             {activeFilterCount > 0 && (
               <Badge variant="secondary" className="ml-2 h-5 w-5 p-0 flex items-center justify-center">
                 {activeFilterCount}
@@ -121,21 +121,21 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
         <PopoverContent className="w-80" align="end">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h4 className="font-medium">Advanced Filters</h4>
+              <h4 className="font-medium">Filtros Avançados</h4>
               <Button variant="ghost" size="sm" onClick={clearFilters}>
-                Clear All
+                Limpar Tudo
               </Button>
             </div>
 
             <div className="space-y-3">
               <div>
-                <Label htmlFor="assignee">Assignee</Label>
+                <Label htmlFor="assignee">Responsável</Label>
                 <Select value={filters.assignee} onValueChange={(value) => updateFilter("assignee", value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select assignee" />
+                    <SelectValue placeholder="Selecione o responsável" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Assignees</SelectItem>
+                    <SelectItem value="all">Todos os Responsáveis</SelectItem>
                     {teamMembers.map((member) => (
                       <SelectItem key={member.id} value={member.id.toString()}>
                         {member.name}
@@ -146,13 +146,13 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
               </div>
 
               <div>
-                <Label htmlFor="project">Project</Label>
+                <Label htmlFor="project">Projeto</Label>
                 <Select value={filters.project} onValueChange={(value) => updateFilter("project", value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select project" />
+                    <SelectValue placeholder="Selecione o projeto" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Projects</SelectItem>
+                    <SelectItem value="all">Todos os Projetos</SelectItem>
                     {projects.map((project) => (
                       <SelectItem key={project} value={project}>
                         {project}
@@ -163,13 +163,13 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
               </div>
 
               <div>
-                <Label>Due Date Range</Label>
+                <Label>Intervalo de Datas de Vencimento</Label>
                 <div className="flex space-x-2">
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="flex-1 justify-start text-left font-normal bg-transparent">
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {filters.dueDateFrom ? format(filters.dueDateFrom, "PPP") : "From"}
+                        {filters.dueDateFrom ? format(filters.dueDateFrom, "PPP") : "De"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -185,7 +185,7 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
                     <PopoverTrigger asChild>
                       <Button variant="outline" className="flex-1 justify-start text-left font-normal bg-transparent">
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {filters.dueDateTo ? format(filters.dueDateTo, "PPP") : "To"}
+                        {filters.dueDateTo ? format(filters.dueDateTo, "PPP") : "Até"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -208,7 +208,7 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
                   onChange={(e) => updateFilter("overdue", e.target.checked)}
                   className="rounded border-gray-300"
                 />
-                <Label htmlFor="overdue">Show only overdue tasks</Label>
+                <Label htmlFor="overdue">Mostrar apenas tarefas atrasadas</Label>
               </div>
             </div>
           </div>
@@ -226,13 +226,13 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
           )}
           {filters.priority && filters.priority !== "all" && (
             <Badge variant="secondary" className="flex items-center space-x-1">
-              <span>Priority: {filters.priority}</span>
+              <span>Prioridade: {filters.priority}</span>
               <X className="h-3 w-3 cursor-pointer" onClick={() => updateFilter("priority", "")} />
             </Badge>
           )}
           {filters.overdue && (
             <Badge variant="destructive" className="flex items-center space-x-1">
-              <span>Overdue</span>
+              <span>Atrasado</span>
               <X className="h-3 w-3 cursor-pointer" onClick={() => updateFilter("overdue", false)} />
             </Badge>
           )}

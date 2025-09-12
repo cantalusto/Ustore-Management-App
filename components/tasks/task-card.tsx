@@ -8,8 +8,8 @@ interface Task {
   id: number
   title: string
   description: string
-  status: "todo" | "in-progress" | "review" | "completed"
-  priority: "low" | "medium" | "high" | "urgent"
+  status: "a-fazer" | "em-progresso" | "revisao" | "concluido"
+  priority: "baixa" | "media" | "alta" | "urgente"
   assigneeId: number
   assigneeName: string
   createdBy: number
@@ -32,20 +32,20 @@ interface TaskCardProps {
 export function TaskCard({ task, onClick, userRole, userId }: TaskCardProps) {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "urgent":
+      case "urgente":
         return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-      case "high":
+      case "alta":
         return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
-      case "medium":
+      case "media":
         return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-      case "low":
+      case "baixa":
         return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
       default:
         return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
     }
   }
 
-  const isOverdue = new Date(task.dueDate) < new Date() && task.status !== "completed"
+  const isOverdue = new Date(task.dueDate) < new Date() && task.status !== "concluido"
 
   return (
     <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={onClick}>

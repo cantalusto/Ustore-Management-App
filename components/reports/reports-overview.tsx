@@ -13,31 +13,31 @@ import { format } from "date-fns"
 const reportTypes = [
   {
     id: "team-performance",
-    title: "Team Performance Report",
-    description: "Comprehensive overview of team productivity and task completion rates",
+    title: "Relatório de Desempenho da Equipe",
+    description: "Visão geral abrangente da produtividade da equipe e taxas de conclusão de tarefas",
     icon: <FileText className="h-5 w-5" />,
     badge: "Popular",
   },
   {
     id: "task-summary",
-    title: "Task Summary Report",
-    description: "Detailed breakdown of tasks by status, priority, and assignee",
+    title: "Relatório de Resumo de Tarefas",
+    description: "Detalhamento de tarefas por status, prioridade e responsável",
     icon: <Table className="h-5 w-5" />,
-    badge: "Detailed",
+    badge: "Detalhado",
   },
   {
     id: "individual-performance",
-    title: "Individual Performance Report",
-    description: "Personal productivity metrics for team members",
+    title: "Relatório de Desempenho Individual",
+    description: "Métricas de produtividade pessoal para membros da equipe",
     icon: <FileText className="h-5 w-5" />,
-    badge: "Personal",
+    badge: "Pessoal",
   },
   {
     id: "project-status",
-    title: "Project Status Report",
-    description: "Progress tracking and milestone completion across projects",
+    title: "Relatório de Status do Projeto",
+    description: "Acompanhamento do progresso e conclusão de marcos em todos os projetos",
     icon: <Table className="h-5 w-5" />,
-    badge: "Overview",
+    badge: "Visão Geral",
   },
 ]
 
@@ -51,7 +51,7 @@ export function ReportsOverview() {
   const [selectedMember, setSelectedMember] = useState<string>("all")
   const [isGenerating, setIsGenerating] = useState<string | null>(null)
 
-  const handleGenerateReport = async (reportType: string, format: "pdf" | "excel") => {
+  const handleGenerateReport = async (reportType: string, format: "excel") => {
     setIsGenerating(`${reportType}-${format}`)
 
     console.log("[v0] Starting report generation:", { reportType, format, dateRange, selectedMember })
@@ -78,7 +78,7 @@ export function ReportsOverview() {
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement("a")
         a.href = url
-        a.download = `${reportType}-report.${format === "pdf" ? "pdf" : "xlsx"}`
+        a.download = `${reportType}-report.xlsx`
         document.body.appendChild(a)
         a.click()
         window.URL.revokeObjectURL(url)
@@ -103,20 +103,20 @@ export function ReportsOverview() {
       {/* Report Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Report Configuration</CardTitle>
-          <CardDescription>Configure date range and filters for your reports</CardDescription>
+          <CardTitle>Configuração de Relatórios</CardTitle>
+          <CardDescription>Configure o intervalo de datas e filtros para seus relatórios</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
-              <label className="text-sm font-medium mb-2 block">Date Range</label>
+              <label className="text-sm font-medium mb-2 block">Intervalo de Datas</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button variant="outline" className="w-full justify-start text-left font-normal bg-transparent">
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {dateRange.from && dateRange.to
                       ? `${format(dateRange.from, "MMM dd, yyyy")} - ${format(dateRange.to, "MMM dd, yyyy")}`
-                      : "Select date range"}
+                      : "Selecione o intervalo de datas"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -131,17 +131,18 @@ export function ReportsOverview() {
             </div>
 
             <div className="flex-1">
-              <label className="text-sm font-medium mb-2 block">Team Member</label>
+              <label className="text-sm font-medium mb-2 block">Membro da Equipe</label>
               <Select value={selectedMember} onValueChange={setSelectedMember}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select member" />
+                  <SelectValue placeholder="Selecione um membro" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Members</SelectItem>
-                  <SelectItem value="1">John Smith</SelectItem>
-                  <SelectItem value="2">Sarah Johnson</SelectItem>
-                  <SelectItem value="3">Mike Davis</SelectItem>
-                  <SelectItem value="4">Emily Brown</SelectItem>
+                  <SelectItem value="all">Todos os Membros</SelectItem>
+                  <SelectItem value="1">Dante Alighieri</SelectItem>
+                  <SelectItem value="2">Gerente de Projeto</SelectItem>
+                  <SelectItem value="3">Membro da Equipe</SelectItem>
+                  <SelectItem value="4">Kanye West</SelectItem>
+                  <SelectItem value="5">Franz Kafka</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -168,21 +169,13 @@ export function ReportsOverview() {
             <CardContent>
               <div className="flex gap-2">
                 <Button
-                  onClick={() => handleGenerateReport(report.id, "pdf")}
-                  disabled={isGenerating === `${report.id}-pdf`}
-                  className="flex-1"
-                >
-                  <Download className="mr-2 h-4 w-4" />
-                  {isGenerating === `${report.id}-pdf` ? "Generating..." : "Export PDF"}
-                </Button>
-                <Button
                   variant="outline"
                   onClick={() => handleGenerateReport(report.id, "excel")}
                   disabled={isGenerating === `${report.id}-excel`}
                   className="flex-1"
                 >
                   <Table className="mr-2 h-4 w-4" />
-                  {isGenerating === `${report.id}-excel` ? "Generating..." : "Export Excel"}
+                  {isGenerating === `${report.id}-excel` ? "Gerando..." : "Exportar Excel"}
                 </Button>
               </div>
             </CardContent>

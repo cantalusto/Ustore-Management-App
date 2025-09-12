@@ -30,7 +30,7 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    priority: "medium",
+    priority: "media",
     assigneeId: "",
     dueDate: "",
     project: "",
@@ -52,7 +52,7 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
       const data = await response.json()
       setTeamMembers(data.members || [])
     } catch (error) {
-      console.error("Failed to fetch team members:", error)
+      console.error("Falha ao buscar membros da equipe:", error)
     }
   }
 
@@ -80,10 +80,10 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
       if (response.ok) {
         onSuccess()
       } else {
-        setError(data.error || "Failed to create task")
+        setError(data.error || "Falha ao criar tarefa")
       }
     } catch (err) {
-      setError("Network error. Please try again.")
+      setError("Erro de rede. Por favor, tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -97,7 +97,7 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create New Task</DialogTitle>
+          <DialogTitle>Criar Nova Tarefa</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -108,7 +108,7 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="title">Task Title</Label>
+            <Label htmlFor="title">Título da Tarefa</Label>
             <Input
               id="title"
               value={formData.title}
@@ -119,7 +119,7 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Descrição</Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -131,25 +131,25 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="priority">Priority</Label>
+              <Label htmlFor="priority">Prioridade</Label>
               <Select value={formData.priority} onValueChange={(value) => handleChange("priority", value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
+                  <SelectItem value="baixa">Baixa</SelectItem>
+                  <SelectItem value="media">Média</SelectItem>
+                  <SelectItem value="alta">Alta</SelectItem>
+                  <SelectItem value="urgente">Urgente</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="assignee">Assign To</Label>
+              <Label htmlFor="assignee">Atribuir a</Label>
               <Select value={formData.assigneeId} onValueChange={(value) => handleChange("assigneeId", value)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select member" />
+                  <SelectValue placeholder="Selecione um membro" />
                 </SelectTrigger>
                 <SelectContent>
                   {teamMembers.map((member) => (
@@ -163,7 +163,7 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dueDate">Due Date</Label>
+            <Label htmlFor="dueDate">Data de Vencimento</Label>
             <Input
               id="dueDate"
               type="date"
@@ -175,34 +175,34 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="project">Project</Label>
+            <Label htmlFor="project">Projeto</Label>
             <Input
               id="project"
               value={formData.project}
               onChange={(e) => handleChange("project", e.target.value)}
-              placeholder="e.g., Website Redesign"
+              placeholder="ex: Redesenho do site"
               disabled={isLoading}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tags">Tags (comma-separated)</Label>
+            <Label htmlFor="tags">Tags (separadas por vírgula)</Label>
             <Input
               id="tags"
               value={formData.tags}
               onChange={(e) => handleChange("tags", e.target.value)}
-              placeholder="e.g., frontend, urgent, bug"
+              placeholder="ex: frontend, urgente, bug"
               disabled={isLoading}
             />
           </div>
 
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-              Cancel
+              Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Task
+              Criar Tarefa
             </Button>
           </div>
         </form>

@@ -7,8 +7,8 @@ interface Task {
   id: number
   title: string
   description: string
-  status: "todo" | "in-progress" | "review" | "completed"
-  priority: "low" | "medium" | "high" | "urgent"
+  status: "a-fazer" | "em-progresso" | "revisao" | "concluido"
+  priority: "baixa" | "media" | "alta" | "urgente"
   assigneeId: number
   assigneeName: string
   createdBy: number
@@ -33,13 +33,13 @@ interface TaskColumnProps {
 export function TaskColumn({ title, status, tasks, onTaskClick, onStatusChange, userRole, userId }: TaskColumnProps) {
   const getColumnColor = () => {
     switch (status) {
-      case "todo":
+      case "a-fazer":
         return "border-l-4 border-l-gray-400"
-      case "in-progress":
+      case "em-progresso":
         return "border-l-4 border-l-blue-500"
-      case "review":
+      case "revisao":
         return "border-l-4 border-l-yellow-500"
-      case "completed":
+      case "concluido":
         return "border-l-4 border-l-green-500"
       default:
         return ""
@@ -58,7 +58,7 @@ export function TaskColumn({ title, status, tasks, onTaskClick, onStatusChange, 
       </CardHeader>
       <CardContent className="space-y-3">
         {tasks.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">No tasks</p>
+          <p className="text-sm text-muted-foreground text-center py-4">Nenhuma tarefa</p>
         ) : (
           tasks.map((task) => (
             <TaskCard

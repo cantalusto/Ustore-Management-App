@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth"
 const teamMembers = [
   {
     id: 1,
-    name: "Admin User",
+    name: "Dante Alighieri",
     email: "admin@company.com",
     role: "admin" as const,
     department: "Management",
@@ -15,7 +15,7 @@ const teamMembers = [
   },
   {
     id: 2,
-    name: "Manager User",
+    name: "Gerente de Projeto",
     email: "manager@company.com",
     role: "manager" as const,
     department: "Development",
@@ -25,7 +25,7 @@ const teamMembers = [
   },
   {
     id: 3,
-    name: "Team Member",
+    name: "Membro da Equipe",
     email: "member@company.com",
     role: "member" as const,
     department: "Development",
@@ -35,8 +35,8 @@ const teamMembers = [
   },
   {
     id: 4,
-    name: "John Doe",
-    email: "john.doe@company.com",
+    name: "Kanye West",
+    email: "kan.ye@company.com",
     role: "member" as const,
     department: "Design",
     phone: "+1 (555) 456-7890",
@@ -45,8 +45,8 @@ const teamMembers = [
   },
   {
     id: 5,
-    name: "Sarah Smith",
-    email: "sarah.smith@company.com",
+    name: "Franz Kafka",
+    email: "franz@company.com",
     role: "member" as const,
     department: "Marketing",
     phone: "+1 (555) 567-8901",

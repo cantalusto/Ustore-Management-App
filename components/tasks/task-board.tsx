@@ -10,8 +10,8 @@ interface Task {
   id: number
   title: string
   description: string
-  status: "todo" | "in-progress" | "review" | "completed"
-  priority: "low" | "medium" | "high" | "urgent"
+  status: "a-fazer" | "em-progresso" | "revisao" | "concluido"
+  priority: "baixa" | "media" | "alta" | "urgente"
   assigneeId: number
   assigneeName: string
   createdBy: number
@@ -63,7 +63,7 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
       setTasks(data.tasks || [])
 
       // Extract unique projects
-      const uniqueProjects = [...new Set(data.tasks?.map((task: Task) => task.project).filter(Boolean) || [])]
+      const uniqueProjects = [...new Set(data.tasks?.map((task: Task) => task.project).filter(Boolean) || [])] as string[]
       setProjects(uniqueProjects)
     } catch (error) {
       console.error("Failed to fetch tasks:", error)
@@ -129,7 +129,7 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
     // Overdue filter
     if (filters.overdue) {
       const now = new Date()
-      filtered = filtered.filter((task) => new Date(task.dueDate) < now && task.status !== "completed")
+      filtered = filtered.filter((task) => new Date(task.dueDate) < now && task.status !== "concluido")
     }
 
     setFilteredTasks(filtered)
@@ -157,17 +157,17 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
   }
 
   const columns = [
-    { id: "todo", title: "To Do", status: "todo" as const },
-    { id: "in-progress", title: "In Progress", status: "in-progress" as const },
-    { id: "review", title: "Review", status: "review" as const },
-    { id: "completed", title: "Completed", status: "completed" as const },
+    { id: "a-fazer", title: "A Fazer", status: "a-fazer" as const },
+    { id: "em-progresso", title: "Em Progresso", status: "em-progresso" as const },
+    { id: "revisao", title: "Revisão", status: "revisao" as const },
+    { id: "concluido", title: "Concluído", status: "concluido" as const },
   ]
 
   if (loading) {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">Loading tasks...</div>
+          <div className="text-center">Carregando tarefas...</div>
         </CardContent>
       </Card>
     )

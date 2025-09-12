@@ -3,10 +3,11 @@
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { LogOut, Settings, User, BarChart3 } from "lucide-react"
+import { LogOut, Settings, User, Users, BarChart3, CheckSquare, TrendingUp, FileText } from "lucide-react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import type { User as UserType } from "@/lib/auth"
+// import { GlobalSearch } from "@/components/search/global-search"
 
 interface DashboardHeaderProps {
   user: UserType
@@ -38,10 +39,44 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
               <BarChart3 className="h-4 w-4" />
               <span>Painel</span>
             </Link>
+            <Link
+              href="/teams"
+              className="text-sm text-muted-foreground hover:text-foreground flex items-center space-x-1"
+            >
+              <Users className="h-4 w-4" />
+              <span>Equipes</span>
+            </Link>
+            <Link
+              href="/tasks"
+              className="text-sm text-muted-foreground hover:text-foreground flex items-center space-x-1"
+            >
+              <CheckSquare className="h-4 w-4" />
+              <span>Tarefas</span>
+            </Link>
+            {(user.role === "admin" || user.role === "manager") && (
+              <Link
+                href="/analytics"
+                className="text-sm text-muted-foreground hover:text-foreground flex items-center space-x-1"
+              >
+                <TrendingUp className="h-4 w-4" />
+                <span>Análises</span>
+              </Link>
+            )}
+            {(user.role === "admin" || user.role === "manager") && (
+              <Link
+                href="/reports"
+                className="text-sm text-muted-foreground hover:text-foreground flex items-center space-x-1"
+              >
+                <FileText className="h-4 w-4" />
+                <span>Relatórios</span>
+              </Link>
+            )}
           </nav>
         </div>
 
         <div className="flex items-center space-x-4">
+          {/* <GlobalSearch className="w-80" /> */}
+
           <span className="text-sm bg-accent text-accent-foreground px-2 py-1 rounded-md capitalize">{user.role}</span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
