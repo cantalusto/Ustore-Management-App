@@ -45,10 +45,10 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
       if (response.ok) {
         onSuccess()
       } else {
-        setError(data.error || "Failed to add member")
+        setError(data.error || "Falha ao adicionar membro")
       }
     } catch (err) {
-      setError("Network error. Please try again.")
+      setError("Erro de rede. Por favor, tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -62,7 +62,7 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Team Member</DialogTitle>
+          <DialogTitle>Adicionar Membro da Equipe</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -73,7 +73,7 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">Nome Completo</Label>
             <Input
               id="name"
               value={formData.name}
@@ -96,21 +96,21 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="role">Role</Label>
+            <Label htmlFor="role">Cargo</Label>
             <Select value={formData.role} onValueChange={(value) => handleChange("role", value)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="member">Member</SelectItem>
-                <SelectItem value="manager">Manager</SelectItem>
-                <SelectItem value="admin">Admin</SelectItem>
+                <SelectItem value="member">Membro</SelectItem>
+                <SelectItem value="manager">Gerente</SelectItem>
+                <SelectItem value="admin">Administrador</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="department">Department</Label>
+            <Label htmlFor="department">Departamento</Label>
             <Input
               id="department"
               value={formData.department}
@@ -121,7 +121,7 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone (Optional)</Label>
+            <Label htmlFor="phone">Telefone (Opcional)</Label>
             <Input
               id="phone"
               value={formData.phone}
@@ -132,11 +132,11 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
 
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-              Cancel
+              Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Add Member
+              Adicionar Membro
             </Button>
           </div>
         </form>

@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
-import { TaskBoard } from "@/components/tasks/task-board"
-import { CreateTaskButton } from "@/components/tasks/create-task-button"
+import { TeamMembersList } from "@/components/teams/team-members-list"
+import { AddMemberButton } from "@/components/teams/add-member-button"
 
-export default async function TasksPage() {
+export default async function TeamsPage() {
   const user = await getCurrentUser()
 
   if (!user) {
@@ -18,13 +18,13 @@ export default async function TasksPage() {
         <div className="space-y-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Gerenciamento de Tarefas</h1>
-              <p className="text-muted-foreground mt-2">Crie, atribua e acompanhe tarefas em sua equipe.</p>
+              <h1 className="text-3xl font-bold text-foreground">Gerenciamento de Equipes</h1>
+              <p className="text-muted-foreground mt-2">Gerencie os membros da sua equipe e suas funções.</p>
             </div>
-            <CreateTaskButton userRole={user.role} />
+            {(user.role === "admin" || user.role === "manager") && <AddMemberButton />}
           </div>
 
-          <TaskBoard userRole={user.role} userId={user.userId} />
+          <TeamMembersList userRole={user.role} />
         </div>
       </main>
     </div>

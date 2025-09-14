@@ -55,11 +55,11 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
       const data = await response.json()
       setMembers(data.members || [])
 
-      // Extract unique departments
+      // Extrai departamentos únicos
       const uniqueDepartments = [...new Set(data.members?.map((member: TeamMember) => member.department) || [])]
-      setDepartments(uniqueDepartments)
+      setDepartments(uniqueDepartments as string[])
     } catch (error) {
-      console.error("Failed to fetch members:", error)
+      console.error("Falha ao buscar membros:", error)
     } finally {
       setLoading(false)
     }
@@ -68,7 +68,7 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
   const applyFilters = () => {
     let filtered = [...members]
 
-    // Search filter
+    // Filtro de pesquisa
     if (filters.search) {
       const searchLower = filters.search.toLowerCase()
       filtered = filtered.filter(
@@ -80,17 +80,17 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
       )
     }
 
-    // Role filter
+    // Filtro de cargo
     if (filters.role) {
       filtered = filtered.filter((member) => member.role === filters.role)
     }
 
-    // Department filter
+    // Filtro de departamento
     if (filters.department) {
       filtered = filtered.filter((member) => member.department === filters.department)
     }
 
-    // Status filter
+    // Filtro de status
     if (filters.status) {
       filtered = filtered.filter((member) => member.status === filters.status)
     }
@@ -127,11 +127,30 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
     return userRole === "admin" && memberRole !== "admin"
   }
 
+  // Funções de tradução
+  const translateRole = (role: "admin" | "manager" | "member") => {
+    const roles = {
+      admin: "Administrador",
+      manager: "Gerente",
+      member: "Membro",
+    }
+    return roles[role] || role
+  }
+
+  const translateStatus = (status: "active" | "inactive") => {
+    const statuses = {
+      active: "Ativo",
+      inactive: "Inativo",
+    }
+    return statuses[status] || status
+  }
+
+
   if (loading) {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">Loading team members...</div>
+          <div className="text-center">Carregando membros da equipe...</div>
         </CardContent>
       </Card>
     )
@@ -173,13 +192,13 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
                       {canEditMember(member.role) && (
                         <DropdownMenuItem onClick={() => setEditingMember(member)}>
                           <Edit className="mr-2 h-4 w-4" />
-                          Edit
+                          Editar
                         </DropdownMenuItem>
                       )}
                       {canDeleteMember(member.role) && (
                         <DropdownMenuItem onClick={() => setDeletingMember(member)} className="text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
+                          Excluir
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
@@ -199,10 +218,10 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
                 </div>
               )}
               <div className="flex items-center justify-between">
-                <Badge className={getRoleBadgeColor(member.role)}>{member.role}</Badge>
-                <Badge className={getStatusBadgeColor(member.status)}>{member.status}</Badge>
+                <Badge className={getRoleBadgeColor(member.role)}>{translateRole(member.role)}</Badge>
+                <Badge className={getStatusBadgeColor(member.status)}>{translateStatus(member.status)}</Badge>
               </div>
-              <p className="text-xs text-muted-foreground">Joined {member.joinDate}</p>
+              <p className="text-xs text-muted-foreground">Entrou em {member.joinDate}</p>
             </CardContent>
           </Card>
         ))}
@@ -211,7 +230,7 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
       {filteredMembers.length === 0 && !loading && (
         <Card>
           <CardContent className="p-6">
-            <div className="text-center text-muted-foreground">No team members found matching your filters.</div>
+            <div className="text-center text-muted-foreground">Nenhum membro da equipe encontrado com os filtros aplicados.</div>
           </CardContent>
         </Card>
       )}

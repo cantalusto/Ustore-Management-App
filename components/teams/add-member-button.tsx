@@ -12,7 +12,7 @@ export function AddMemberButton() {
     <>
       <Button onClick={() => setShowDialog(true)}>
         <Plus className="mr-2 h-4 w-4" />
-        Add Member
+        Adicionar Membro
       </Button>
 
       <AddMemberDialog
@@ -20,7 +20,7 @@ export function AddMemberButton() {
         onClose={() => setShowDialog(false)}
         onSuccess={() => {
           setShowDialog(false)
-          window.location.reload() // Simple refresh - could be optimized
+          window.location.reload() // Recarregamento simples - pode ser otimizado
         }}
       />
     </>

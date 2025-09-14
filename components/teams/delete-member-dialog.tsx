@@ -42,10 +42,10 @@ export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteM
       if (response.ok) {
         onSuccess()
       } else {
-        setError(data.error || "Failed to delete member")
+        setError(data.error || "Falha ao excluir membro")
       }
     } catch (err) {
-      setError("Network error. Please try again.")
+      setError("Erro de rede. Por favor, tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -57,10 +57,10 @@ export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteM
         <DialogHeader>
           <div className="flex items-center space-x-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
-            <DialogTitle>Delete Team Member</DialogTitle>
+            <DialogTitle>Excluir Membro da Equipe</DialogTitle>
           </div>
           <DialogDescription>
-            Are you sure you want to delete <strong>{member.name}</strong>? This action cannot be undone.
+            Você tem certeza que deseja excluir <strong>{member.name}</strong>? Esta ação não pode ser desfeita.
           </DialogDescription>
         </DialogHeader>
 
@@ -73,11 +73,11 @@ export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteM
 
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-              Cancel
+              Cancelar
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Delete Member
+              Excluir Membro
             </Button>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getCurrentUser } from "@/lib/auth"
 
-// Mock team members database - replace with real database
+// Mock do banco de dados de membros da equipe - substitua por um banco de dados real
 const teamMembers = [
   {
     id: 1,
@@ -10,7 +10,7 @@ const teamMembers = [
     role: "admin" as const,
     department: "Management",
     phone: "+1 (555) 123-4567",
-    joinDate: "2023-01-15",
+    joinDate: "2025-01-15",
     status: "active" as const,
   },
   {
@@ -20,7 +20,7 @@ const teamMembers = [
     role: "manager" as const,
     department: "Development",
     phone: "+1 (555) 234-5678",
-    joinDate: "2023-02-20",
+    joinDate: "2025-02-20",
     status: "active" as const,
   },
   {
@@ -30,7 +30,7 @@ const teamMembers = [
     role: "member" as const,
     department: "Development",
     phone: "+1 (555) 345-6789",
-    joinDate: "2023-03-10",
+    joinDate: "2025-03-10",
     status: "active" as const,
   },
   {
@@ -40,7 +40,7 @@ const teamMembers = [
     role: "member" as const,
     department: "Design",
     phone: "+1 (555) 456-7890",
-    joinDate: "2023-04-05",
+    joinDate: "2025-04-05",
     status: "active" as const,
   },
   {
@@ -50,7 +50,7 @@ const teamMembers = [
     role: "member" as const,
     department: "Marketing",
     phone: "+1 (555) 567-8901",
-    joinDate: "2023-05-12",
+    joinDate: "2025-05-12",
     status: "active" as const,
   },
 ]
@@ -77,14 +77,14 @@ export async function POST(request: NextRequest) {
   try {
     const { name, email, role, department, phone } = await request.json()
 
-    // Check if email already exists
+    // Verifica se o email já existe
     if (teamMembers.find((member) => member.email === email)) {
-      return NextResponse.json({ error: "Email already exists" }, { status: 400 })
+      return NextResponse.json({ error: "Email já existe" }, { status: 400 })
     }
 
-    // Only admins can create admin users
+    // Apenas administradores podem criar usuários administradores
     if (role === "admin" && user.role !== "admin") {
-      return NextResponse.json({ error: "Only admins can create admin users" }, { status: 403 })
+      return NextResponse.json({ error: "Apenas administradores podem criar usuários administradores" }, { status: 403 })
     }
 
     const newMember = {
@@ -102,6 +102,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ member: newMember })
   } catch (error) {
-    return NextResponse.json({ error: "Invalid request data" }, { status: 400 })
+    return NextResponse.json({ error: "Dados da requisição inválidos" }, { status: 400 })
   }
 }

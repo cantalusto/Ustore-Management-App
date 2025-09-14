@@ -72,10 +72,10 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
       if (response.ok) {
         onSuccess()
       } else {
-        setError(data.error || "Failed to update member")
+        setError(data.error || "Falha ao atualizar membro")
       }
     } catch (err) {
-      setError("Network error. Please try again.")
+      setError("Erro de rede. Por favor, tente novamente.")
     } finally {
       setIsLoading(false)
     }
@@ -91,7 +91,7 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Team Member</DialogTitle>
+          <DialogTitle>Editar Membro da Equipe</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -102,7 +102,7 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name">Nome Completo</Label>
             <Input
               id="name"
               value={formData.name}
@@ -125,7 +125,7 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="role">Role</Label>
+            <Label htmlFor="role">Cargo</Label>
             <Select
               value={formData.role}
               onValueChange={(value) => handleChange("role", value)}
@@ -135,15 +135,15 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="member">Member</SelectItem>
-                <SelectItem value="manager">Manager</SelectItem>
-                {userRole === "admin" && <SelectItem value="admin">Admin</SelectItem>}
+                <SelectItem value="member">Membro</SelectItem>
+                <SelectItem value="manager">Gerente</SelectItem>
+                {userRole === "admin" && <SelectItem value="admin">Administrador</SelectItem>}
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="department">Department</Label>
+            <Label htmlFor="department">Departamento</Label>
             <Input
               id="department"
               value={formData.department}
@@ -154,7 +154,7 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
+            <Label htmlFor="phone">Telefone</Label>
             <Input
               id="phone"
               value={formData.phone}
@@ -170,19 +170,19 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="active">Ativo</SelectItem>
+                <SelectItem value="inactive">Inativo</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-              Cancel
+              Cancelar
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Update Member
+              Atualizar Membro
             </Button>
           </div>
         </form>

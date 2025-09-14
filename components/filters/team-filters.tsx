@@ -20,7 +20,8 @@ interface TeamFiltersProps {
 
 export function TeamFilters({ filters, onFiltersChange, departments }: TeamFiltersProps) {
   const updateFilter = (key: keyof TeamFilters, value: string) => {
-    onFiltersChange({ ...filters, [key]: value })
+    // Se o valor for "all", consideramos como limpar o filtro
+    onFiltersChange({ ...filters, [key]: value === "all" ? "" : value })
   }
 
   const clearFilters = () => {
@@ -43,39 +44,48 @@ export function TeamFilters({ filters, onFiltersChange, departments }: TeamFilte
 
   const activeFilterCount = getActiveFilterCount()
 
+  const translateRole = (role: string) => {
+    const roles: { [key: string]: string } = {
+      admin: "Administrador",
+      manager: "Gerente",
+      member: "Membro",
+    }
+    return roles[role] || role
+  }
+
   return (
     <div className="flex items-center space-x-4">
-      {/* Search Input */}
+      {/* Input de Pesquisa */}
       <div className="relative flex-1 max-w-sm">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Search team members..."
+          placeholder="Pesquisar membros da equipe..."
           value={filters.search}
           onChange={(e) => updateFilter("search", e.target.value)}
           className="pl-10"
         />
       </div>
 
-      {/* Filter Selects */}
+      {/* Seletores de Filtro */}
       <div className="flex items-center space-x-2">
-        <Select value={filters.role} onValueChange={(value) => updateFilter("role", value)}>
+        <Select value={filters.role || "all"} onValueChange={(value) => updateFilter("role", value)}>
           <SelectTrigger className="w-32">
-            <SelectValue placeholder="Role" />
+            <SelectValue placeholder="Cargo" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Roles</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="manager">Manager</SelectItem>
-            <SelectItem value="member">Member</SelectItem>
+            <SelectItem value="all">Cargos</SelectItem>
+            <SelectItem value="admin">Administrador</SelectItem>
+            <SelectItem value="manager">Gerente</SelectItem>
+            <SelectItem value="member">Membro</SelectItem>
           </SelectContent>
         </Select>
 
-        <Select value={filters.department} onValueChange={(value) => updateFilter("department", value)}>
+        <Select value={filters.department || "all"} onValueChange={(value) => updateFilter("department", value)}>
           <SelectTrigger className="w-40">
-            <SelectValue placeholder="Department" />
+            <SelectValue placeholder="Departamento" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Departments</SelectItem>
+            <SelectItem value="all">Departamentos</SelectItem>
             {departments.map((dept) => (
               <SelectItem key={dept} value={dept}>
                 {dept}
@@ -84,44 +94,44 @@ export function TeamFilters({ filters, onFiltersChange, departments }: TeamFilte
           </SelectContent>
         </Select>
 
-        <Select value={filters.status} onValueChange={(value) => updateFilter("status", value)}>
+        <Select value={filters.status || "all"} onValueChange={(value) => updateFilter("status", value)}>
           <SelectTrigger className="w-32">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="all">Status</SelectItem>
+            <SelectItem value="active">Ativo</SelectItem>
+            <SelectItem value="inactive">Inativo</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      {/* Clear Filters */}
+      {/* Limpar Filtros */}
       {activeFilterCount > 0 && (
         <Button variant="outline" size="sm" onClick={clearFilters}>
           <X className="h-4 w-4 mr-2" />
-          Clear ({activeFilterCount})
+          Limpar ({activeFilterCount})
         </Button>
       )}
 
-      {/* Active Filters Display */}
+      {/* Exibição de Filtros Ativos */}
       {activeFilterCount > 0 && (
         <div className="flex items-center space-x-2">
-          {filters.role && filters.role !== "all" && (
+          {filters.role && (
             <Badge variant="secondary" className="flex items-center space-x-1">
-              <span>Role: {filters.role}</span>
+              <span>Cargo: {translateRole(filters.role)}</span>
               <X className="h-3 w-3 cursor-pointer" onClick={() => updateFilter("role", "")} />
             </Badge>
           )}
-          {filters.department && filters.department !== "all" && (
+          {filters.department && (
             <Badge variant="secondary" className="flex items-center space-x-1">
-              <span>Dept: {filters.department}</span>
+              <span>Depto: {filters.department}</span>
               <X className="h-3 w-3 cursor-pointer" onClick={() => updateFilter("department", "")} />
             </Badge>
           )}
-          {filters.status && filters.status !== "all" && (
+          {filters.status && (
             <Badge variant="secondary" className="flex items-center space-x-1">
-              <span>Status: {filters.status}</span>
+              <span>Status: {filters.status === 'active' ? 'Ativo' : 'Inativo'}</span>
               <X className="h-3 w-3 cursor-pointer" onClick={() => updateFilter("status", "")} />
             </Badge>
           )}
