@@ -37,10 +37,28 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
       const data = await response.json()
       setProjects(data.projects || [])
     } catch (error) {
-      console.error("Failed to fetch project progress:", error)
+      console.error("Falha ao buscar progresso dos projetos:", error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const translateStatus = (status: string) => {
+    const statuses: { [key: string]: string } = {
+      "on-track": "Em dia",
+      "at-risk": "Em risco",
+      "delayed": "Atrasado",
+    }
+    return statuses[status] || status
+  }
+  
+  const translatePriority = (priority: string) => {
+    const priorities: { [key: string]: string } = {
+      "high": "Alta",
+      "medium": "Média",
+      "low": "Baixa",
+    }
+    return priorities[priority] || priority
   }
 
   const getStatusColor = (status: string) => {
@@ -73,7 +91,7 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">Loading project progress...</div>
+          <div className="text-center">Carregando progresso dos projetos...</div>
         </CardContent>
       </Card>
     )
@@ -82,7 +100,7 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Project Progress</CardTitle>
+        <CardTitle className="text-lg">Progresso dos Projetos</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {projects.map((project) => (
@@ -93,14 +111,14 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
                 <p className="text-sm text-muted-foreground">{project.description}</p>
               </div>
               <div className="flex space-x-2">
-                <Badge className={getPriorityColor(project.priority)}>{project.priority}</Badge>
-                <Badge className={getStatusColor(project.status)}>{project.status.replace("-", " ")}</Badge>
+                <Badge className={getPriorityColor(project.priority)}>{translatePriority(project.priority)}</Badge>
+                <Badge className={getStatusColor(project.status)}>{translateStatus(project.status)}</Badge>
               </div>
             </div>
 
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Progress</span>
+                <span>Progresso</span>
                 <span>{project.progress}%</span>
               </div>
               <Progress value={project.progress} className="h-2" />
@@ -110,16 +128,16 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
               <div className="flex items-center space-x-2">
                 <CheckSquare className="h-4 w-4 text-muted-foreground" />
                 <span>
-                  {project.completedTasks}/{project.totalTasks} tasks
+                  {project.completedTasks}/{project.totalTasks} tarefas
                 </span>
               </div>
               <div className="flex items-center space-x-2">
                 <Users className="h-4 w-4 text-muted-foreground" />
-                <span>{project.teamMembers} members</span>
+                <span>{project.teamMembers} membros</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>{new Date(project.dueDate).toLocaleDateString()}</span>
+                <span>Prazo: {new Date(project.dueDate).toLocaleDateString()}</span>
               </div>
             </div>
           </div>

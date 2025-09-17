@@ -37,7 +37,7 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
       const data = await response.json()
       setMembers(data.members || [])
     } catch (error) {
-      console.error("Failed to fetch team performance:", error)
+      console.error("Falha ao buscar desempenho da equipe:", error)
     } finally {
       setLoading(false)
     }
@@ -47,7 +47,7 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">Loading team performance...</div>
+          <div className="text-center">Carregando desempenho da equipe...</div>
         </CardContent>
       </Card>
     )
@@ -62,11 +62,11 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
       <CardHeader>
         <CardTitle className="text-lg flex items-center space-x-2">
           <Award className="h-5 w-5" />
-          <span>Team Performance</span>
+          <span>Desempenho da Equipe</span>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Top Performer Highlight */}
+        {/* Destaque de Melhor Desempenho */}
         <div className="bg-muted p-4 rounded-lg">
           <div className="flex items-center space-x-3">
             <Avatar className="h-10 w-10">
@@ -81,25 +81,25 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
               <div className="flex items-center space-x-2">
                 <h4 className="font-medium">{topPerformer.name}</h4>
                 <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
-                  Top Performer
+                  Melhor Desempenho
                 </Badge>
               </div>
               <p className="text-sm text-muted-foreground">
-                {topPerformer.completionRate}% completion rate • {topPerformer.department}
+                {topPerformer.completionRate}% de taxa de conclusão • {topPerformer.department}
               </p>
             </div>
             <div className="text-right">
               <div className="text-2xl font-bold text-green-600">{topPerformer.completionRate}%</div>
-              <div className="text-xs text-muted-foreground">completion rate</div>
+              <div className="text-xs text-muted-foreground">taxa de conclusão</div>
             </div>
           </div>
         </div>
 
-        {/* Team Members List */}
+        {/* Lista de Membros da Equipe */}
         <div className="space-y-4">
           <h4 className="font-medium flex items-center space-x-2">
             <Target className="h-4 w-4" />
-            <span>All Team Members</span>
+            <span>Todos os Membros da Equipe</span>
           </h4>
           {members.map((member) => (
             <div key={member.id} className="flex items-center space-x-4 p-3 border rounded-lg">
@@ -130,14 +130,14 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
                       <span className="text-sm font-medium">{member.completionRate}%</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {member.tasksCompleted}/{member.tasksAssigned} tasks
+                      {member.tasksCompleted}/{member.tasksAssigned} tarefas
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span>Completion Rate</span>
+                    <span>Taxa de Conclusão</span>
                     <span>{member.completionRate}%</span>
                   </div>
                   <Progress value={member.completionRate} className="h-2" />

@@ -45,7 +45,7 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
       const result = await response.json()
       setData(result.data)
     } catch (error) {
-      console.error("Failed to fetch task analytics:", error)
+      console.error("Falha ao buscar análise de tarefas:", error)
     } finally {
       setLoading(false)
     }
@@ -55,7 +55,7 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">Loading task analytics...</div>
+          <div className="text-center">Carregando análise de tarefas...</div>
         </CardContent>
       </Card>
     )
@@ -64,24 +64,24 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Task Analytics</h2>
+        <h2 className="text-xl font-semibold">Análise de Tarefas</h2>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-32">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="7d">7 days</SelectItem>
-            <SelectItem value="30d">30 days</SelectItem>
-            <SelectItem value="90d">90 days</SelectItem>
+            <SelectItem value="7d">7 dias</SelectItem>
+            <SelectItem value="30d">30 dias</SelectItem>
+            <SelectItem value="90d">90 dias</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Task Status Distribution */}
+        {/* Distribuição de Status de Tarefas */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Task Status Distribution</CardTitle>
+            <CardTitle className="text-lg">Distribuição por Status</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -92,7 +92,10 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
                   cy="50%"
                   outerRadius={100}
                   dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={(props) => {
+                    const { name, percent } = props as { name: string; percent: number }
+                    return `${name} ${(percent * 100).toFixed(0)}%`
+                  }}
                 >
                   {data.statusDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
@@ -104,10 +107,10 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
           </CardContent>
         </Card>
 
-        {/* Priority Distribution */}
+        {/* Distribuição de Prioridade */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Priority Distribution</CardTitle>
+            <CardTitle className="text-lg">Distribuição por Prioridade</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -116,7 +119,7 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="value" fill="#6366f1" />
+                <Bar dataKey="value" fill="#6366f1" name="Quantidade" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -124,10 +127,10 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Completion Trend */}
+        {/* Tendência de Conclusão */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Task Completion Trend</CardTitle>
+            <CardTitle className="text-lg">Tendência de Conclusão de Tarefas</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -137,17 +140,17 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="completed" stroke="#10b981" name="Completed" />
-                <Line type="monotone" dataKey="created" stroke="#3b82f6" name="Created" />
+                <Line type="monotone" dataKey="completed" stroke="#10b981" name="Concluídas" />
+                <Line type="monotone" dataKey="created" stroke="#3b82f6" name="Criadas" />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Department Performance */}
+        {/* Desempenho por Departamento */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Department Performance</CardTitle>
+            <CardTitle className="text-lg">Desempenho por Departamento</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -157,8 +160,8 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="completed" fill="#10b981" name="Completed" />
-                <Bar dataKey="pending" fill="#f59e0b" name="Pending" />
+                <Bar dataKey="completed" fill="#10b981" name="Concluídas" />
+                <Bar dataKey="pending" fill="#f59e0b" name="Pendentes" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>

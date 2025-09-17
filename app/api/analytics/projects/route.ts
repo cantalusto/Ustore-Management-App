@@ -5,15 +5,15 @@ export async function GET(request: NextRequest) {
   const user = await getCurrentUser()
 
   if (!user || user.role === "member") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+    return NextResponse.json({ error: "Não autorizado" }, { status: 403 })
   }
 
-  // Mock project data - replace with real database queries
+  // Mock de dados de projetos - substitua por consultas reais ao banco de dados
   const projects = [
     {
       id: 1,
-      name: "Website Redesign",
-      description: "Complete overhaul of company website with modern design",
+      name: "Redesenho do Site",
+      description: "Revisão completa do site da empresa com design moderno",
       progress: 75,
       totalTasks: 24,
       completedTasks: 18,
@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
     },
     {
       id: 2,
-      name: "Mobile App Development",
-      description: "Native mobile application for iOS and Android",
+      name: "Desenvolvimento de App Mobile",
+      description: "Aplicativo móvel nativo para iOS e Android",
       progress: 45,
       totalTasks: 32,
       completedTasks: 14,
@@ -36,8 +36,8 @@ export async function GET(request: NextRequest) {
     },
     {
       id: 3,
-      name: "Marketing Campaign",
-      description: "Q1 digital marketing campaign across all channels",
+      name: "Campanha de Marketing",
+      description: "Campanha de marketing digital do primeiro trimestre em todos os canais",
       progress: 90,
       totalTasks: 15,
       completedTasks: 13,
@@ -48,8 +48,8 @@ export async function GET(request: NextRequest) {
     },
     {
       id: 4,
-      name: "DevOps Infrastructure",
-      description: "Setup CI/CD pipeline and monitoring systems",
+      name: "Infraestrutura DevOps",
+      description: "Configuração de pipeline de CI/CD e sistemas de monitoramento",
       progress: 30,
       totalTasks: 18,
       completedTasks: 5,

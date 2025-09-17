@@ -38,7 +38,7 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
       const data = await response.json()
       setStats(data.stats)
     } catch (error) {
-      console.error("Failed to fetch overview stats:", error)
+      console.error("Falha ao buscar estatísticas gerais:", error)
     } finally {
       setLoading(false)
     }
@@ -48,7 +48,7 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">Loading analytics...</div>
+          <div className="text-center">Carregando análises...</div>
         </CardContent>
       </Card>
     )
@@ -56,32 +56,32 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
 
   const statCards = [
     {
-      title: "Total Tasks",
+      title: "Total de Tarefas",
       value: stats.totalTasks.toString(),
       icon: CheckSquare,
       trend: stats.trends.tasks,
-      description: "All tasks in system",
+      description: "no sistema",
     },
     {
-      title: "Completion Rate",
+      title: "Taxa de Conclusão",
       value: `${stats.completionRate}%`,
       icon: TrendingUp,
       trend: stats.trends.completion,
-      description: "Tasks completed on time",
+      description: "concluídas a tempo",
     },
     {
-      title: "Active Members",
+      title: "Membros Ativos",
       value: stats.activeMembers.toString(),
       icon: Users,
       trend: stats.trends.members,
-      description: "Team members with tasks",
+      description: "com tarefas",
     },
     {
-      title: "Overdue Tasks",
+      title: "Tarefas Atrasadas",
       value: stats.overdueTasks.toString(),
       icon: AlertTriangle,
       trend: -stats.overdueTasks,
-      description: "Tasks past due date",
+      description: "após o prazo",
       isNegative: true,
     },
   ]
@@ -89,15 +89,15 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Overview</h2>
+        <h2 className="text-xl font-semibold">Visão Geral</h2>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-32">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="7d">7 days</SelectItem>
-            <SelectItem value="30d">30 days</SelectItem>
-            <SelectItem value="90d">90 days</SelectItem>
+            <SelectItem value="7d">7 dias</SelectItem>
+            <SelectItem value="30d">30 dias</SelectItem>
+            <SelectItem value="90d">90 dias</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -112,13 +112,13 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
               <div className="flex items-center space-x-1 text-xs">
-                {stat.trend > 0 ? (
+                {stat.trend >= 0 ? (
                   <TrendingUp className={`h-3 w-3 ${stat.isNegative ? "text-red-500" : "text-green-500"}`} />
                 ) : (
                   <TrendingDown className={`h-3 w-3 ${stat.isNegative ? "text-green-500" : "text-red-500"}`} />
                 )}
-                <span className={stat.trend > 0 && !stat.isNegative ? "text-green-600" : "text-red-600"}>
-                  {Math.abs(stat.trend)}
+                <span className={stat.trend >= 0 && !stat.isNegative ? "text-green-600" : "text-red-600"}>
+                  {Math.abs(stat.trend)}%
                 </span>
                 <span className="text-muted-foreground">{stat.description}</span>
               </div>

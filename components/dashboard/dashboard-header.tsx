@@ -7,7 +7,6 @@ import { LogOut, Settings, User, Users, BarChart3, CheckSquare, TrendingUp, File
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import type { User as UserType } from "@/lib/auth"
-// import { GlobalSearch } from "@/components/search/global-search"
 
 interface DashboardHeaderProps {
   user: UserType
@@ -22,7 +21,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
     router.refresh()
   }
 
-  console.log("[v0] DashboardHeader rendering with user:", user)
+  console.log("[v0] DashboardHeader renderizando com o usuário:", user)
 
   return (
     <header className="border-b border-border bg-card">
@@ -47,7 +46,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
               <span>Equipes</span>
             </Link>
             <Link
-              href="/tasks"
+              href="/tasks" // <-- CORRIGIDO AQUI
               className="text-sm text-muted-foreground hover:text-foreground flex items-center space-x-1"
             >
               <CheckSquare className="h-4 w-4" />
@@ -75,8 +74,6 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
         </div>
 
         <div className="flex items-center space-x-4">
-          {/* <GlobalSearch className="w-80" /> */}
-
           <span className="text-sm bg-accent text-accent-foreground px-2 py-1 rounded-md capitalize">{user.role}</span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

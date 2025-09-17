@@ -8,24 +8,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Calendar, User, Clock, Tag, Edit, MessageSquare } from "lucide-react"
+import { EditTaskDialog } from "./edit-task-dialog"
+import type { Task } from "@/lib/types" // Importar a interface centralizada
 
-// Interface corrigida para corresponder ao task-board
-interface Task {
-  id: number
-  title: string
-  description: string
-  status: "a-fazer" | "em-progresso" | "revisao" | "concluido"
-  priority: "baixa" | "media" | "alta" | "urgente"
-  assigneeId: number
-  assigneeName: string
-  createdBy: number
-  createdByName: string
-  dueDate: string
-  createdAt: string
-  updatedAt: string
-  project: string
-  tags: string[]
-}
+// A interface local foi removida
 
 interface TaskDetailDialogProps {
   task: Task
@@ -36,6 +22,7 @@ interface TaskDetailDialogProps {
   userId: number
 }
 
+// O resto do componente continua como antes...
 export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, userId }: TaskDetailDialogProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [comment, setComment] = useState("")
@@ -86,6 +73,12 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
       console.error("Falha ao atualizar o status da tarefa:", error)
     }
   }
+  
+  const handleUpdateSuccess = (updatedTask: Task) => {
+    onUpdate(updatedTask);
+    setIsEditing(false);
+  };
+
 
   const canEditTask = () => {
     return userRole === "admin" || userRole === "manager" || task.createdBy === userId || task.assigneeId === userId
@@ -94,102 +87,98 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
   const isOverdue = new Date(task.dueDate) < new Date() && task.status !== "concluido"
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader>
-          <div className="flex items-start justify-between">
-            <DialogTitle className="text-xl">{task.title}</DialogTitle>
-            {canEditTask() && (
-              <Button variant="ghost" size="sm" onClick={() => setIsEditing(!isEditing)}>
-                <Edit className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        </DialogHeader>
-
-        <div className="space-y-6">
-          {/* Status e Prioridade */}
-          <div className="flex items-center space-x-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Status</label>
-              {canEditTask() ? (
-                <Select value={task.status} onValueChange={handleStatusChange}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="a-fazer">A Fazer</SelectItem>
-                    <SelectItem value="em-progresso">Em Progresso</SelectItem>
-                    <SelectItem value="revisao">Revisão</SelectItem>
-                    <SelectItem value="concluido">Concluído</SelectItem>
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Badge className={getStatusColor(task.status)}>{task.status.replace("-", " ")}</Badge>
+    <>
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <div className="flex items-start justify-between">
+              <DialogTitle className="text-xl">{task.title}</DialogTitle>
+              {canEditTask() && (
+                <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)}>
+                  <Edit className="h-4 w-4" />
+                </Button>
               )}
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Prioridade</label>
-              <Badge className={getPriorityColor(task.priority)}>{task.priority}</Badge>
-            </div>
-          </div>
+          </DialogHeader>
 
-          {/* Descrição */}
-          {task.description && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Descrição</label>
-              <p className="text-sm text-muted-foreground bg-muted p-3 rounded-md">{task.description}</p>
+          <div className="space-y-6">
+            <div className="flex items-center space-x-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Status</label>
+                {canEditTask() ? (
+                  <Select value={task.status} onValueChange={handleStatusChange}>
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="a-fazer">A Fazer</SelectItem>
+                      <SelectItem value="em-progresso">Em Progresso</SelectItem>
+                      <SelectItem value="revisao">Revisão</SelectItem>
+                      <SelectItem value="concluido">Concluído</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Badge className={getStatusColor(task.status)}>{task.status.replace("-", " ")}</Badge>
+                )}
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Prioridade</label>
+                <Badge className={getPriorityColor(task.priority)}>{task.priority}</Badge>
+              </div>
             </div>
-          )}
 
-          {/* Detalhes da Tarefa */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2 text-sm">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Atribuído a:</span>
-                <div className="flex items-center space-x-2">
-                  <Avatar className="h-6 w-6">
-                    <AvatarFallback className="text-xs">
-                      {task.assigneeName
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span>{task.assigneeName}</span>
+            {task.description && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Descrição</label>
+                <p className="text-sm text-muted-foreground bg-muted p-3 rounded-md">{task.description}</p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2 text-sm">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Atribuído a:</span>
+                  <div className="flex items-center space-x-2">
+                    <Avatar className="h-6 w-6">
+                      <AvatarFallback className="text-xs">
+                        {task.assigneeName
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span>{task.assigneeName}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2 text-sm">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Criado por:</span>
+                  <span>{task.createdByName}</span>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2 text-sm">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Criado por:</span>
-                <span>{task.createdByName}</span>
+              <div className="space-y-3">
+                <div className={`flex items-center space-x-2 text-sm ${isOverdue ? "text-red-600" : ""}`}>
+                  <Calendar className="h-4 w-4" />
+                  <span className="font-medium">Data de vencimento:</span>
+                  <span>{new Date(task.dueDate).toLocaleDateString()}</span>
+                  {isOverdue && (
+                    <Badge variant="destructive" className="text-xs">
+                      Atrasado
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  <span className="font-medium">Criado em:</span>
+                  <span>{new Date(task.createdAt).toLocaleDateString()}</span>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-3">
-              <div className={`flex items-center space-x-2 text-sm ${isOverdue ? "text-red-600" : ""}`}>
-                <Calendar className="h-4 w-4" />
-                <span className="font-medium">Data de vencimento:</span>
-                <span>{new Date(task.dueDate).toLocaleDateString()}</span>
-                {isOverdue && (
-                  <Badge variant="destructive" className="text-xs">
-                    Atrasado
-                  </Badge>
-                )}
-              </div>
-
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                <span className="font-medium">Criado em:</span>
-                <span>{new Date(task.createdAt).toLocaleDateString()}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Projeto e Tags */}
-          <div className="space-y-3">
             {task.project && (
               <div className="flex items-center space-x-2">
                 <span className="text-sm font-medium">Projeto:</span>
@@ -209,26 +198,34 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
                 </div>
               </div>
             )}
-          </div>
 
-          {/* Seção de Comentários */}
-          <div className="space-y-3">
-            <div className="flex items-center space-x-2">
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Adicionar Comentário</span>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">Adicionar Comentário</span>
+              </div>
+              <Textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Adicionar um comentário..."
+                rows={3}
+              />
+              <Button size="sm" disabled={!comment.trim()}>
+                Adicionar Comentário
+              </Button>
             </div>
-            <Textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Adicionar um comentário..."
-              rows={3}
-            />
-            <Button size="sm" disabled={!comment.trim()}>
-              Adicionar Comentário
-            </Button>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+      
+      {isEditing && (
+        <EditTaskDialog
+          task={task}
+          open={isEditing}
+          onClose={() => setIsEditing(false)}
+          onSuccess={handleUpdateSuccess}
+        />
+      )}
+    </>
   )
 }
