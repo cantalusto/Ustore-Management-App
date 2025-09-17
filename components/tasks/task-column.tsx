@@ -1,77 +1,69 @@
 "use client"
 
+import { useDroppable } from "@dnd-kit/core"
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TaskCard } from "./task-card"
-
-interface Task {
-  id: number
-  title: string
-  description: string
-  status: "a-fazer" | "em-progresso" | "revisao" | "concluido"
-  priority: "baixa" | "media" | "alta" | "urgente"
-  assigneeId: number
-  assigneeName: string
-  createdBy: number
-  createdByName: string
-  dueDate: string
-  createdAt: string
-  updatedAt: string
-  project: string
-  tags: string[]
-}
+import type { Task } from "@/lib/types"
 
 interface TaskColumnProps {
+  id: Task['status']
   title: string
-  status: Task["status"]
   tasks: Task[]
   onTaskClick: (task: Task) => void
-  onStatusChange: (taskId: number, newStatus: Task["status"]) => void
   userRole: string
   userId: number
 }
 
-export function TaskColumn({ title, status, tasks, onTaskClick, onStatusChange, userRole, userId }: TaskColumnProps) {
+export function TaskColumn({ id, title, tasks, onTaskClick, userRole, userId }: TaskColumnProps) {
+  const { setNodeRef } = useDroppable({
+    id,
+    data: {
+      type: 'Column',
+    }
+  });
+
   const getColumnColor = () => {
-    switch (status) {
-      case "a-fazer":
-        return "border-l-4 border-l-gray-400"
-      case "em-progresso":
-        return "border-l-4 border-l-blue-500"
-      case "revisao":
-        return "border-l-4 border-l-yellow-500"
-      case "concluido":
-        return "border-l-4 border-l-green-500"
-      default:
-        return ""
+    switch (id) {
+      case "a-fazer": return "border-t-4 border-t-gray-400";
+      case "em-progresso": return "border-t-4 border-t-blue-500";
+      case "revisao": return "border-t-4 border-t-yellow-500";
+      case "concluido": return "border-t-4 border-t-green-500";
+      default: return "";
     }
   }
 
   return (
-    <Card className={`h-fit ${getColumnColor()}`}>
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg flex items-center justify-between">
-          {title}
-          <span className="text-sm font-normal bg-muted text-muted-foreground px-2 py-1 rounded-full">
-            {tasks.length}
-          </span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {tasks.length === 0 ? (
-          <p className="text-sm text-muted-foreground text-center py-4">Nenhuma tarefa</p>
-        ) : (
-          tasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              onClick={() => onTaskClick(task)}
-              onStatusChange={onStatusChange}
-              userRole={userRole}
-              userId={userId}
-            />
-          ))
-        )}
-      </CardContent>
-    </Card>
+    <div ref={setNodeRef} className="h-full">
+      <Card className={`h-full ${getColumnColor()}`}>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center justify-between">
+            {title}
+            <span className="text-sm font-normal bg-muted text-muted-foreground px-2 py-1 rounded-full">
+              {tasks.length}
+            </span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+            {tasks.length === 0 ? (
+              <div className="h-20 flex items-center justify-center">
+                <p className="text-sm text-muted-foreground text-center">Arraste tarefas para cá</p>
+              </div>
+            ) : (
+              tasks.map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  onClick={() => onTaskClick(task)}
+                  userRole={userRole}
+                  userId={userId}
+                />
+              ))
+            )}
+          </SortableContext>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

@@ -1,97 +1,105 @@
 "use client"
 
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, User } from "lucide-react"
-
-interface Task {
-  id: number
-  title: string
-  description: string
-  status: "a-fazer" | "em-progresso" | "revisao" | "concluido"
-  priority: "baixa" | "media" | "alta" | "urgente"
-  assigneeId: number
-  assigneeName: string
-  createdBy: number
-  createdByName: string
-  dueDate: string
-  createdAt: string
-  updatedAt: string
-  project: string
-  tags: string[]
-}
+import type { Task } from "@/lib/types"
 
 interface TaskCardProps {
   task: Task
   onClick: () => void
-  onStatusChange: (taskId: number, newStatus: Task["status"]) => void
   userRole: string
   userId: number
+  isDragging?: boolean
 }
 
-export function TaskCard({ task, onClick, userRole, userId }: TaskCardProps) {
+export function TaskCard({ task, onClick, userRole, userId, isDragging }: TaskCardProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging: isSortableDragging } = useSortable({
+    id: task.id,
+    data: {
+        type: 'Task',
+        task, // Passa a tarefa inteira nos dados do evento
+    }
+  })
+
+  const style = {
+    transition,
+    transform: CSS.Transform.toString(transform),
+  }
+
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "urgente":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-      case "alta":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
-      case "media":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-      case "baixa":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+      case "urgente": return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+      case "alta": return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+      case "media": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+      case "baixa": return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+      default: return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
     }
   }
 
   const isOverdue = new Date(task.dueDate) < new Date() && task.status !== "concluido"
 
+  if (isDragging) {
+    return (
+        <Card ref={setNodeRef} style={style} className="ring-2 ring-primary opacity-80" />
+    )
+  }
+
   return (
-    <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={onClick}>
-      <CardContent className="p-4 space-y-3">
-        <div className="space-y-2">
-          <div className="flex items-start justify-between">
-            <h4 className="font-medium text-sm leading-tight">{task.title}</h4>
-            <Badge className={getPriorityColor(task.priority)} variant="secondary">
-              {task.priority}
+    <Card 
+      ref={setNodeRef} 
+      style={style} 
+      {...attributes} 
+      {...listeners} 
+      className={`cursor-grab hover:shadow-md transition-shadow active:cursor-grabbing ${isSortableDragging ? 'opacity-50' : ''}`}
+    >
+      <div onClick={onClick} className="cursor-pointer">
+        <CardContent className="p-4 space-y-3">
+          <div className="space-y-2">
+            <div className="flex items-start justify-between">
+              <h4 className="font-medium text-sm leading-tight">{task.title}</h4>
+              <Badge className={getPriorityColor(task.priority)} variant="secondary">
+                {task.priority}
+              </Badge>
+            </div>
+            {task.description && <p className="text-xs text-muted-foreground line-clamp-2">{task.description}</p>}
+          </div>
+
+          <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center space-x-1">
+              <User className="h-3 w-3" />
+              <span>{task.assigneeName}</span>
+            </div>
+            <div className={`flex items-center space-x-1 ${isOverdue ? "text-red-600" : "text-muted-foreground"}`}>
+              <Calendar className="h-3 w-3" />
+              <span>{new Date(task.dueDate).toLocaleDateString()}</span>
+            </div>
+          </div>
+
+          {task.project && (
+            <Badge variant="outline" className="text-xs">
+              {task.project}
             </Badge>
-          </div>
-          {task.description && <p className="text-xs text-muted-foreground line-clamp-2">{task.description}</p>}
-        </div>
+          )}
 
-        <div className="flex items-center justify-between text-xs">
-          <div className="flex items-center space-x-1">
-            <User className="h-3 w-3" />
-            <span>{task.assigneeName}</span>
-          </div>
-          <div className={`flex items-center space-x-1 ${isOverdue ? "text-red-600" : "text-muted-foreground"}`}>
-            <Calendar className="h-3 w-3" />
-            <span>{new Date(task.dueDate).toLocaleDateString()}</span>
-          </div>
-        </div>
-
-        {task.project && (
-          <Badge variant="outline" className="text-xs">
-            {task.project}
-          </Badge>
-        )}
-
-        {task.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {task.tags.slice(0, 2).map((tag, index) => (
-              <Badge key={index} variant="secondary" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-            {task.tags.length > 2 && (
-              <Badge variant="secondary" className="text-xs">
-                +{task.tags.length - 2}
-              </Badge>
-            )}
-          </div>
-        )}
-      </CardContent>
+          {task.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {task.tags.slice(0, 2).map((tag, index) => (
+                <Badge key={index} variant="secondary" className="text-xs">
+                  {tag}
+                </Badge>
+              ))}
+              {task.tags.length > 2 && (
+                <Badge variant="secondary" className="text-xs">
+                  +{task.tags.length - 2}
+                </Badge>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </div>
     </Card>
   )
 }
