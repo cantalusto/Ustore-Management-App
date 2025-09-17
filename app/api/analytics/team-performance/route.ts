@@ -12,9 +12,9 @@ export async function GET(request: NextRequest) {
   const members = [
     {
       id: 1,
-      name: "Admin User",
+      name: "Dante Alighieri",
       role: "admin",
-      department: "Management",
+      department: "Gestão",
       tasksCompleted: 15,
       tasksAssigned: 18,
       completionRate: 83,
@@ -23,9 +23,9 @@ export async function GET(request: NextRequest) {
     },
     {
       id: 2,
-      name: "Manager User",
+      name: "Gerente de Projeto",
       role: "manager",
-      department: "Development",
+      department: "Desenvolvimento",
       tasksCompleted: 22,
       tasksAssigned: 25,
       completionRate: 88,
@@ -34,9 +34,9 @@ export async function GET(request: NextRequest) {
     },
     {
       id: 3,
-      name: "Team Member",
+      name: "Membro da Equipe",
       role: "member",
-      department: "Development",
+      department: "Desenvolvimento",
       tasksCompleted: 18,
       tasksAssigned: 20,
       completionRate: 90,
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
     },
     {
       id: 4,
-      name: "John Doe",
+      name: "Kanye West",
       role: "member",
       department: "Design",
       tasksCompleted: 12,
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     },
     {
       id: 5,
-      name: "Sarah Smith",
+      name: "Franz Kafka",
       role: "member",
       department: "Marketing",
       tasksCompleted: 14,
