@@ -16,8 +16,8 @@
   --secondary-foreground: #ffffff;
   --muted: #f8fafc;
   --muted-foreground: #374151;
-  --accent: #6366f1;
-  --accent-foreground: #ffffff;
+  --accent: #F7941E; /* Laranja da uStore para destaque */
+  --accent-foreground: #ffffff; /* Texto branco para bom contraste com laranja */
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
   --border: #e5e7eb;
@@ -52,7 +52,7 @@
   --secondary-foreground: #ffffff;
   --muted: #4b5563;
   --muted-foreground: #d1d5db;
-  --accent: #4f46e5;
+  --accent: #2f66fc; /* Laranja da uStore para destaque no modo escuro */
   --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
@@ -123,3 +123,4 @@
     @apply bg-background text-foreground;
   }
 }
+

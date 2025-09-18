@@ -9,41 +9,40 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CalendarIcon, Download, FileText, Table } from "lucide-react"
 import { format } from "date-fns"
+import { ptBR } from "date-fns/locale"
 
 const reportTypes = [
   {
     id: "team-performance",
     title: "Relatório de Desempenho da Equipe",
-    description: "Visão geral abrangente da produtividade da equipe e taxas de conclusão de tarefas",
+    description: "Visão geral da produtividade e taxas de conclusão de tarefas da equipe.",
     icon: <FileText className="h-5 w-5" />,
     badge: "Popular",
   },
   {
     id: "task-summary",
     title: "Relatório de Resumo de Tarefas",
-    description: "Detalhamento de tarefas por status, prioridade e responsável",
+    description: "Detalhamento de tarefas por status, prioridade e responsável.",
     icon: <Table className="h-5 w-5" />,
     badge: "Detalhado",
   },
   {
     id: "individual-performance",
     title: "Relatório de Desempenho Individual",
-    description: "Métricas de produtividade pessoal para membros da equipe",
+    description: "Métricas de produtividade para membros específicos da equipe.",
     icon: <FileText className="h-5 w-5" />,
-    badge: "Pessoal",
+    badge: "Específico",
   },
   {
     id: "project-status",
     title: "Relatório de Status do Projeto",
-    description: "Acompanhamento do progresso e conclusão de marcos em todos os projetos",
+    description: "Acompanhe o progresso e os marcos em todos os projetos.",
     icon: <Table className="h-5 w-5" />,
-    badge: "Visão Geral",
+    badge: "Gerencial",
   },
 ]
 
 export function ReportsOverview() {
-  console.log("[v0] ReportsOverview component rendering")
-
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),
@@ -53,8 +52,6 @@ export function ReportsOverview() {
 
   const handleGenerateReport = async (reportType: string, format: "excel") => {
     setIsGenerating(`${reportType}-${format}`)
-
-    console.log("[v0] Starting report generation:", { reportType, format, dateRange, selectedMember })
 
     try {
       const response = await fetch("/api/reports/generate", {
@@ -68,31 +65,22 @@ export function ReportsOverview() {
         }),
       })
 
-      console.log("[v0] API response status:", response.status)
-      console.log("[v0] API response headers:", Object.fromEntries(response.headers.entries()))
-
       if (response.ok) {
         const blob = await response.blob()
-        console.log("[v0] Blob created, size:", blob.size, "type:", blob.type)
-
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement("a")
         a.href = url
-        a.download = `${reportType}-report.xlsx`
+        a.download = `relatorio-${reportType}.xlsx`
         document.body.appendChild(a)
         a.click()
         window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
-
-        console.log("[v0] Download triggered successfully")
       } else {
-        const errorText = await response.text()
-        console.error("[v0] API error response:", errorText)
-        alert(`Failed to generate report: ${response.status} ${response.statusText}`)
+        alert(`Falha ao gerar o relatório: ${response.statusText}`)
       }
     } catch (error) {
-      console.error("[v0] Error generating report:", error)
-      alert("Failed to generate report. Please try again.")
+      console.error("Erro ao gerar relatório:", error)
+      alert("Falha ao gerar o relatório. Por favor, tente novamente.")
     } finally {
       setIsGenerating(null)
     }
@@ -100,11 +88,11 @@ export function ReportsOverview() {
 
   return (
     <div className="space-y-6">
-      {/* Report Filters */}
+      {/* Filtros de Relatório */}
       <Card>
         <CardHeader>
           <CardTitle>Configuração de Relatórios</CardTitle>
-          <CardDescription>Configure o intervalo de datas e filtros para seus relatórios</CardDescription>
+          <CardDescription>Configure o intervalo de datas e outros filtros para seus relatórios.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex flex-col sm:flex-row gap-4">
@@ -115,8 +103,8 @@ export function ReportsOverview() {
                   <Button variant="outline" className="w-full justify-start text-left font-normal bg-transparent">
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {dateRange.from && dateRange.to
-                      ? `${format(dateRange.from, "MMM dd, yyyy")} - ${format(dateRange.to, "MMM dd, yyyy")}`
-                      : "Selecione o intervalo de datas"}
+                      ? `${format(dateRange.from, "dd 'de' LLL, y", { locale: ptBR })} - ${format(dateRange.to, "dd 'de' LLL, y", { locale: ptBR })}`
+                      : "Selecione o intervalo"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -125,6 +113,7 @@ export function ReportsOverview() {
                     selected={{ from: dateRange.from, to: dateRange.to }}
                     onSelect={(range) => range && setDateRange(range as { from: Date; to: Date })}
                     numberOfMonths={2}
+                    locale={ptBR}
                   />
                 </PopoverContent>
               </Popover>
@@ -150,7 +139,7 @@ export function ReportsOverview() {
         </CardContent>
       </Card>
 
-      {/* Report Types */}
+      {/* Tipos de Relatório */}
       <div className="grid gap-6 md:grid-cols-2">
         {reportTypes.map((report) => (
           <Card key={report.id} className="relative">
@@ -174,8 +163,8 @@ export function ReportsOverview() {
                   disabled={isGenerating === `${report.id}-excel`}
                   className="flex-1"
                 >
-                  <Table className="mr-2 h-4 w-4" />
-                  {isGenerating === `${report.id}-excel` ? "Gerando..." : "Exportar Excel"}
+                  <Download className="mr-2 h-4 w-4" />
+                  {isGenerating === `${report.id}-excel` ? "Gerando..." : "Exportar para Excel"}
                 </Button>
               </div>
             </CardContent>

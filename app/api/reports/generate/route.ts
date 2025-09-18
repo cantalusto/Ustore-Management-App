@@ -1,38 +1,38 @@
 import { type NextRequest, NextResponse } from "next/server"
 import ExcelJS from "exceljs"
 
-// Mock data - in real app, this would come from your database
+// Mock de dados - em um app real, isso viria do seu banco de dados
 const mockData = {
   teamMembers: [
-    { id: 1, name: "Dante Alighieri", role: "admin", tasksCompleted: 45, tasksInProgress: 3, efficiency: 92 },
-    { id: 2, name: "Gerente de Projeto", role: "manager", tasksCompleted: 38, tasksInProgress: 5, efficiency: 88 },
-    { id: 3, name: "Membro da Equipe", role: "member", tasksCompleted: 32, tasksInProgress: 4, efficiency: 85 },
-    { id: 4, name: "Kanye West", role: "member", tasksCompleted: 28, tasksInProgress: 2, efficiency: 90 },
-    { id: 5, name: "Franz Kafka", role: "member", tasksCompleted: 35, tasksInProgress: 1, efficiency: 95 },
+    { id: 1, name: "Dante Alighieri", role: "Administrador", tasksCompleted: 45, tasksInProgress: 3, efficiency: 92 },
+    { id: 2, name: "Gerente de Projeto", role: "Gerente", tasksCompleted: 38, tasksInProgress: 5, efficiency: 88 },
+    { id: 3, name: "Membro da Equipe", role: "Membro", tasksCompleted: 32, tasksInProgress: 4, efficiency: 85 },
+    { id: 4, name: "Kanye West", role: "Membro", tasksCompleted: 28, tasksInProgress: 2, efficiency: 90 },
+    { id: 5, name: "Franz Kafka", role: "Membro", tasksCompleted: 35, tasksInProgress: 1, efficiency: 95 },
   ],
   tasks: [
     {
       id: 1,
       title: "Redesenho do Site",
-      status: "concluido",
-      priority: "alta",
+      status: "Concluído",
+      priority: "Alta",
       assignee: "Kanye West",
       project: "Marketing",
     },
     {
       id: 2,
       title: "Integração de API",
-      status: "em-progresso",
-      priority: "media",
+      status: "Em Progresso",
+      priority: "Média",
       assignee: "Membro da Equipe",
       project: "Desenvolvimento",
     },
-    { id: 3, title: "Teste de Usuário", status: "a-fazer", priority: "baixa", assignee: "Franz Kafka", project: "Pesquisa" },
+    { id: 3, title: "Teste de Usuário", status: "A Fazer", priority: "Baixa", assignee: "Franz Kafka", project: "Pesquisa" },
     {
       id: 4,
       title: "Migração de Banco de Dados",
-      status: "concluido",
-      priority: "urgente",
+      status: "Concluído",
+      priority: "Urgente",
       assignee: "Dante Alighieri",
       project: "Infraestrutura",
     },
@@ -47,21 +47,17 @@ const mockData = {
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("[v0] Report generation API called")
     const body = await request.json()
-    console.log("[v0] Request body:", body)
-
     const { type, format, dateRange, memberId } = body
 
     if (format === "excel") {
-      console.log("[v0] Generating Excel report")
       return generateExcelReport(type, dateRange, memberId)
     }
 
-    return NextResponse.json({ error: "Invalid format" }, { status: 400 })
+    return NextResponse.json({ error: "Formato inválido" }, { status: 400 })
   } catch (error) {
-    console.error("[v0] Error generating report:", error)
-    return NextResponse.json({ error: "Failed to generate report" }, { status: 500 })
+    console.error("Erro ao gerar relatório:", error)
+    return NextResponse.json({ error: "Falha ao gerar relatório" }, { status: 500 })
   }
 }
 
@@ -69,16 +65,16 @@ async function generateExcelReport(type: string, dateRange: any, memberId: strin
   const workbook = new ExcelJS.Workbook()
   const worksheet = workbook.addWorksheet("Relatório")
 
-  // Excel Header
+  // Cabeçalho do Excel
   worksheet.addRow(["Relatório do Sistema de Gestão de Equipes"])
   worksheet.addRow([`Tipo de Relatório: ${type.replace("-", " ").toUpperCase()}`])
-  worksheet.addRow([`Gerado em: ${new Date().toLocaleDateString()}`])
+  worksheet.addRow([`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`])
   worksheet.addRow([
-    `Intervalo de Datas: ${new Date(dateRange.from).toLocaleDateString()} - ${new Date(dateRange.to).toLocaleDateString()}`,
+    `Período: ${new Date(dateRange.from).toLocaleDateString("pt-BR")} - ${new Date(dateRange.to).toLocaleDateString("pt-BR")}`,
   ])
-  worksheet.addRow([]) // Empty row
+  worksheet.addRow([]) // Linha vazia
 
-  // Report Content based on type
+  // Conteúdo do relatório baseado no tipo
   switch (type) {
     case "team-performance":
       generateTeamPerformanceExcel(worksheet)
@@ -94,7 +90,7 @@ async function generateExcelReport(type: string, dateRange: any, memberId: strin
       break
   }
 
-  // Style the header
+  // Estiliza o cabeçalho
   worksheet.getRow(1).font = { bold: true, size: 16 }
   worksheet.getRow(2).font = { bold: true }
 
@@ -102,14 +98,14 @@ async function generateExcelReport(type: string, dateRange: any, memberId: strin
   return new NextResponse(buffer, {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "Content-Disposition": `attachment; filename="${type}-report.xlsx"`,
+      "Content-Disposition": `attachment; filename="relatorio-${type}.xlsx"`,
     },
   })
 }
 
 function generateTeamPerformanceExcel(worksheet: ExcelJS.Worksheet) {
   worksheet.addRow(["Visão Geral do Desempenho da Equipe"])
-  worksheet.addRow(["Nome", "Cargo", "Tarefas Concluídas", "Tarefas em Progresso", "Eficiência %"])
+  worksheet.addRow(["Nome", "Cargo", "Tarefas Concluídas", "Tarefas em Progresso", "Eficiência (%)"])
 
   mockData.teamMembers.forEach((member) => {
     worksheet.addRow([member.name, member.role, member.tasksCompleted, member.tasksInProgress, member.efficiency])
@@ -127,7 +123,7 @@ function generateTaskSummaryExcel(worksheet: ExcelJS.Worksheet) {
 
 function generateIndividualPerformanceExcel(worksheet: ExcelJS.Worksheet, memberId: string | null) {
   worksheet.addRow(["Desempenho Individual"])
-  worksheet.addRow(["Nome", "Cargo", "Tarefas Concluídas", "Tarefas em Progresso", "Eficiência %"])
+  worksheet.addRow(["Nome", "Cargo", "Tarefas Concluídas", "Tarefas em Progresso", "Eficiência (%)"])
 
   const members = memberId ? mockData.teamMembers.filter((m) => m.id.toString() === memberId) : mockData.teamMembers
 
@@ -138,7 +134,7 @@ function generateIndividualPerformanceExcel(worksheet: ExcelJS.Worksheet, member
 
 function generateProjectStatusExcel(worksheet: ExcelJS.Worksheet) {
   worksheet.addRow(["Visão Geral do Status dos Projetos"])
-  worksheet.addRow(["Nome do Projeto", "Progresso %", "Tarefas Concluídas", "Total de Tarefas"])
+  worksheet.addRow(["Nome do Projeto", "Progresso (%)", "Tarefas Concluídas", "Total de Tarefas"])
 
   mockData.projects.forEach((project) => {
     worksheet.addRow([project.name, project.progress, project.tasksCompleted, project.tasksTotal])

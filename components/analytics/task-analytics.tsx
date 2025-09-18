@@ -51,6 +51,16 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
     }
   }
 
+  // Estilo customizado para o tooltip
+  const tooltipStyle = {
+    backgroundColor: '#ffffff', // Fundo branco
+    color: '#000000',          // Texto preto
+    border: '1px solid #cccccc',
+    borderRadius: '0.5rem',
+    padding: '8px',
+  };
+
+
   if (loading || !data) {
     return (
       <Card>
@@ -92,16 +102,13 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
                   cy="50%"
                   outerRadius={100}
                   dataKey="value"
-                  label={(props) => {
-                    const { name, percent } = props as { name: string; percent: number }
-                    return `${name} ${(percent * 100).toFixed(0)}%`
-                  }}
+                  label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
                 >
                   {data.statusDistribution.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip contentStyle={tooltipStyle} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
@@ -118,7 +125,7 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip contentStyle={tooltipStyle} cursor={{fill: 'rgba(200, 200, 200, 0.2)'}} />
                 <Bar dataKey="value" fill="#6366f1" name="Quantidade" />
               </BarChart>
             </ResponsiveContainer>
@@ -138,7 +145,7 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip contentStyle={tooltipStyle} />
                 <Legend />
                 <Line type="monotone" dataKey="completed" stroke="#10b981" name="Concluídas" />
                 <Line type="monotone" dataKey="created" stroke="#3b82f6" name="Criadas" />
@@ -158,7 +165,7 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="department" />
                 <YAxis />
-                <Tooltip />
+                <Tooltip contentStyle={tooltipStyle} cursor={{fill: 'rgba(200, 200, 200, 0.2)'}} />
                 <Legend />
                 <Bar dataKey="completed" fill="#10b981" name="Concluídas" />
                 <Bar dataKey="pending" fill="#f59e0b" name="Pendentes" />
