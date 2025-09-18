@@ -36,24 +36,26 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
               <span className="text-xs -mt-1 leading-tight opacity-90">Gerenciamento de Equipe</span>
             </div>
           </Link>
-          <nav className="hidden md:flex items-center space-x-4">
+
+          {/* Navegação arrastável no mobile */}
+          <nav className="flex md:flex hidden items-center space-x-4 overflow-x-auto scrollbar-none">
             <Link
               href="/dashboard"
-              className="text-sm text-white/90 hover:text-white flex items-center space-x-1"
+              className="flex-shrink-0 text-sm text-white/90 hover:text-white flex items-center space-x-1"
             >
               <BarChart3 className="h-4 w-4 text-white" />
               <span>Painel</span>
             </Link>
             <Link
               href="/teams"
-              className="text-sm text-white/90 hover:text-white flex items-center space-x-1"
+              className="flex-shrink-0 text-sm text-white/90 hover:text-white flex items-center space-x-1"
             >
               <Users className="h-4 w-4 text-white" />
               <span>Equipes</span>
             </Link>
             <Link
               href="/tasks"
-              className="text-sm text-white/90 hover:text-white flex items-center space-x-1"
+              className="flex-shrink-0 text-sm text-white/90 hover:text-white flex items-center space-x-1"
             >
               <CheckSquare className="h-4 w-4 text-white" />
               <span>Tarefas</span>
@@ -61,7 +63,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             {(user.role === "admin" || user.role === "manager") && (
               <Link
                 href="/analytics"
-                className="text-sm text-white/90 hover:text-white flex items-center space-x-1"
+                className="flex-shrink-0 text-sm text-white/90 hover:text-white flex items-center space-x-1"
               >
                 <TrendingUp className="h-4 w-4 text-white" />
                 <span>Análises</span>
@@ -70,7 +72,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             {(user.role === "admin" || user.role === "manager") && (
               <Link
                 href="/reports"
-                className="text-sm text-white/90 hover:text-white flex items-center space-x-1"
+                className="flex-shrink-0 text-sm text-white/90 hover:text-white flex items-center space-x-1"
               >
                 <FileText className="h-4 w-4 text-white" />
                 <span>Relatórios</span>
@@ -120,4 +122,3 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
     </header>
   )
 }
-import { useEffect, useState } from "react"
