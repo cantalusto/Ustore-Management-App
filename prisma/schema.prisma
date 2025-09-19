@@ -1,0 +1,34 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            Int    @id @default(autoincrement())
+  name          String
+  role          String
+  assignedTasks Task[] @relation("AssigneeTasks")   // sem fields/references
+  createdTasks  Task[] @relation("CreatedTasks")    // sem fields/references
+}
+
+model Task {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  status      String
+  priority    String
+  assigneeId  Int
+  assignee    User     @relation("AssigneeTasks", fields: [assigneeId], references: [id])
+  createdById Int
+  createdBy   User     @relation("CreatedTasks", fields: [createdById], references: [id])
+  dueDate     DateTime
+  project     String?
+  tags        String?   // agora é String simples, armazene CSV
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

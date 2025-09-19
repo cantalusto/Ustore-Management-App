@@ -1,138 +1,82 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { getCurrentUser } from "@/lib/auth"
+// app/api/tasks/route.ts
 
-// Mock tasks database - replace with real database
-const tasks = [
-  {
-    id: 1,
-    title: "Atualizar interface do usuário",
-    description: "Redesenhar o painel principal para melhorar a experiência do usuário",
-    status: "em-progresso" as const,
-    priority: "alta" as const,
-    assigneeId: 3,
-    assigneeName: "Membro da Equipe",
-    createdBy: 2,
-    createdByName: "Gerente de Projeto",
-    dueDate: "2024-01-15",
-    createdAt: "2024-01-01T10:00:00Z",
-    updatedAt: "2024-01-05T14:30:00Z",
-    project: "Redesenho do Site",
-    tags: ["frontend", "ui", "design"],
-  },
-  {
-    id: 2,
-    title: "Corrigir bug de login",
-    description: "Usuários não conseguem fazer login com caracteres especiais na senha",
-    status: "a-fazer" as const,
-    priority: "urgente" as const,
-    assigneeId: 4,
-    assigneeName: "Kanye West",
-    createdBy: 1,
-    createdByName: "Dante Alighieri",
-    dueDate: "2024-01-10",
-    createdAt: "2024-01-02T09:15:00Z",
-    updatedAt: "2024-01-02T09:15:00Z",
-    project: "Correção de Bugs",
-    tags: ["backend", "autenticação", "bug"],
-  },
-  {
-    id: 3,
-    title: "Relatório de desempenho semanal",
-    description: "Compilar e analisar as métricas de desempenho da equipe para a semana",
-    status: "revisao" as const,
-    priority: "media" as const,
-    assigneeId: 5,
-    assigneeName: "Franz Kafka",
-    createdBy: 2,
-    createdByName: "Gerente de Projeto",
-    dueDate: "2024-01-12",
-    createdAt: "2024-01-03T11:00:00Z",
-    updatedAt: "2024-01-08T16:45:00Z",
-    project: "Análises",
-    tags: ["relatórios", "análises"],
-  },
-  {
-    id: 4,
-    title: "Configurar pipeline de CI/CD",
-    description: "Configurar pipeline automatizado de testes e implantação",
-    status: "concluido" as const,
-    priority: "alta" as const,
-    assigneeId: 3,
-    assigneeName: "Membro da Equipe",
-    createdBy: 1,
-    createdByName: "Dante Alighieri",
-    dueDate: "2024-01-08",
-    createdAt: "2023-12-28T14:20:00Z",
-    updatedAt: "2024-01-07T10:30:00Z",
-    project: "DevOps",
-    tags: ["devops", "automação", "testes"],
-  },
-]
+import { NextRequest, NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { PrismaClient } from "@prisma/client";
 
-let nextId = 5
+const prisma = new PrismaClient();
 
 export async function GET() {
-  const user = await getCurrentUser()
+  const user = await getCurrentUser();
 
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
-  // Filter tasks based on user role
-  let filteredTasks = tasks
-  if (user.role === "member") {
-    // Members can only see tasks assigned to them or created by them
-    filteredTasks = tasks.filter((task) => task.assigneeId === user.id || task.createdBy === user.id)
-  }
-
-  return NextResponse.json({ tasks: filteredTasks })
-}
-
-export async function POST(request: NextRequest) {
-  const user = await getCurrentUser()
-
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const { title, description, priority, assigneeId, dueDate, project, tags } = await request.json()
+    // Busca as tarefas do banco de dados, incluindo os dados do responsável e do criador
+    const dbTasks = await prisma.task.findMany({
+      include: {
+        assignee: true, // Inclui o objeto User relacionado via assigneeId
+        createdBy: true,  // Inclui o objeto User relacionado via createdById
+      },
+      orderBy: {
+        createdAt: 'desc' // Ordena as tarefas mais recentes primeiro
+      }
+    });
 
-    // Find assignee name
-    const teamMembers = [
-        { id: 1, name: "Dante Alighieri" },
-        { id: 2, name: "Gerente de Projeto" },
-        { id: 3, name: "Membro da Equipe" },
-        { id: 4, name: "Kanye West" },
-        { id: 5, name: "Franz Kafka" },
-    ]
+    // Formata os dados para corresponder à interface `Task` que o frontend espera
+    let tasks = dbTasks.map(task => ({
+      ...task,
+      dueDate: task.dueDate.toISOString().split('T')[0], // Formata a data
+      assigneeName: task.assignee.name, // Adiciona o nome do responsável
+      createdByName: task.createdBy.name, // Adiciona o nome do criador
+      tags: task.tags ? task.tags.split(',') : [], // Converte a string de tags em um array
+    }));
 
-    const assignee = teamMembers.find((member) => member.id === assigneeId)
-    if (!assignee) {
-      return NextResponse.json({ error: "Invalid assignee" }, { status: 400 })
+    // Aplica o filtro de permissão como antes
+    if (user.role === "member") {
+      tasks = tasks.filter((task) => task.assigneeId === user.id || task.createdById === user.id);
     }
 
-    const newTask = {
-      id: nextId++,
-      title,
-      description: description || "",
-      status: "a-fazer" as const,
-      priority,
-      assigneeId,
-      assigneeName: assignee.name,
-      createdBy: user.id,
-      createdByName: user.name,
-      dueDate,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      project: project || "",
-      tags: tags || [],
-    }
+    return NextResponse.json({ tasks });
 
-    tasks.push(newTask)
-
-    return NextResponse.json({ task: newTask })
   } catch (error) {
-    return NextResponse.json({ error: "Invalid request data" }, { status: 400 })
+    console.error("Falha ao buscar tarefas:", error);
+    return NextResponse.json({ error: "Não foi possível buscar as tarefas." }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const body = await request.json();
+
+    // Converte o array de tags em uma string CSV para salvar no banco
+    const tagsCSV = Array.isArray(body.tags) ? body.tags.join(',') : null;
+
+    const newTask = await prisma.task.create({
+      data: {
+        title: body.title,
+        description: body.description || "",
+        status: "a-fazer",
+        priority: body.priority,
+        assigneeId: body.assigneeId,
+        createdById: user.id, // Usa o ID do usuário logado
+        dueDate: new Date(body.dueDate),
+        project: body.project || "",
+        tags: tagsCSV,
+      },
+    });
+
+    return NextResponse.json({ task: newTask }, { status: 201 });
+  } catch (error) {
+    console.error("Falha ao criar tarefa:", error);
+    return NextResponse.json({ error: "Dados inválidos para criar a tarefa." }, { status: 400 });
   }
 }
