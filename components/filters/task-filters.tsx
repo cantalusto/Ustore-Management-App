@@ -84,7 +84,7 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos os Status</SelectItem>
+            <SelectItem value="all">Status</SelectItem>
             <SelectItem value="a-fazer">A Fazer</SelectItem>
             <SelectItem value="em-progresso">Em Progresso</SelectItem>
             <SelectItem value="revisao">Revisão</SelectItem>
@@ -97,7 +97,7 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
             <SelectValue placeholder="Prioridade" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todas as Prioridades</SelectItem>
+            <SelectItem value="all">Prioridades</SelectItem>
             <SelectItem value="baixa">Baixa</SelectItem>
             <SelectItem value="media">Média</SelectItem>
             <SelectItem value="alta">Alta</SelectItem>
