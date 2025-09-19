@@ -80,7 +80,7 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
             <div className="flex-1">
               <div className="flex items-center space-x-2">
                 <h4 className="font-medium">{topPerformer.name}</h4>
-                <Badge variant="secondary" className="bg-yellow-100 text-orange-800">
+                <Badge variant="secondary" className="bg-white text-black">
                   Melhor Desempenho
                 </Badge>
               </div>
@@ -89,7 +89,7 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
               </p>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-orange-600">{topPerformer.completionRate}%</div>
+              <div className="text-2xl font-bold text-green-700">{topPerformer.completionRate}%</div>
               <div className="text-xs text-muted-foreground">taxa de conclusão</div>
             </div>
           </div>

@@ -51,8 +51,8 @@ ${teamMemberList}
 
 Regras importantes:
 - A descrição deve ser detalhada.
-- O campo project deve ser preenchido.
-- Devem existir pelo menos 3 tags relacionadas ao projeto.
+- O campo project deve ser preenchido mas com no maximo duas palavras.
+- Devem existir 3 tags relacionadas ao projeto.
 - Se algum dos campos obrigatórios estiver ausente, gere-os automaticamente.
 - Retorne **apenas JSON válido**.
 
