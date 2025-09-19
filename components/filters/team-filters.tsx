@@ -1,9 +1,8 @@
 "use client"
-import { Button } from "@/components/ui/button"
+
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { X, Search } from "lucide-react"
+import { Search } from "lucide-react"
 
 export interface TeamFilters {
   search: string
@@ -23,8 +22,6 @@ export function TeamFilters({ filters, onFiltersChange, departments }: TeamFilte
     onFiltersChange({ ...filters, [key]: value === "all" ? "" : value })
   }
 
-  // ... (outras funções permanecem iguais)
-
   return (
     <div className="flex flex-col md:flex-row md:items-center gap-4">
       {/* Input de Pesquisa */}
@@ -40,25 +37,45 @@ export function TeamFilters({ filters, onFiltersChange, departments }: TeamFilte
 
       {/* Seletores de Filtro */}
       <div className="flex flex-col sm:flex-row gap-2">
+        {/* Cargo */}
         <Select value={filters.role || "all"} onValueChange={(value) => updateFilter("role", value)}>
           <SelectTrigger className="w-full sm:w-32">
             <SelectValue placeholder="Cargo" />
           </SelectTrigger>
-          {/* ... */}
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="manager">Gerente</SelectItem>
+            <SelectItem value="member">Membro</SelectItem>
+          </SelectContent>
         </Select>
 
+        {/* Departamento */}
         <Select value={filters.department || "all"} onValueChange={(value) => updateFilter("department", value)}>
           <SelectTrigger className="w-full sm:w-40">
             <SelectValue placeholder="Departamento" />
           </SelectTrigger>
-          {/* ... */}
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            {departments.map((dept) => (
+              <SelectItem key={dept} value={dept}>
+                {dept}
+              </SelectItem>
+            ))}
+          </SelectContent>
         </Select>
 
+        {/* Status */}
         <Select value={filters.status || "all"} onValueChange={(value) => updateFilter("status", value)}>
           <SelectTrigger className="w-full sm:w-32">
             <SelectValue placeholder="Status" />
           </SelectTrigger>
-          {/* ... */}
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="active">Ativo</SelectItem>
+            <SelectItem value="inactive">Inativo</SelectItem>
+            <SelectItem value="pending">Pendente</SelectItem>
+          </SelectContent>
         </Select>
       </div>
     </div>

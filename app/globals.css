@@ -16,7 +16,7 @@
   --secondary-foreground: #ffffff;
   --muted: #f8fafc;
   --muted-foreground: #374151;
-  --accent: #F7941E; /* Laranja da uStore para destaque */
+  --accent: #262c36 ; /* Laranja da uStore para destaque */
   --accent-foreground: #ffffff; /* Texto branco para bom contraste com laranja */
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
@@ -43,21 +43,21 @@
   --background: #1f2937;
   --foreground: #f9fafb;
   --card: #374151;
-  --card-foreground: #f9fafb;
+  --card-foreground: #f8fafc;
   --popover: #374151;
   --popover-foreground: #f9fafb;
   --primary: #f9fafb;
   --primary-foreground: #374151;
   --secondary: #4f46e5;
-  --secondary-foreground: #ffffff;
-  --muted: #4b5563;
+  --secondary-foreground: #f8fafc;
+  --muted: #373f4b;
   --muted-foreground: #d1d5db;
-  --accent: #4b66b3; /* Laranja da uStore para destaque no modo escuro */
+  --accent: #262c36      ; /* Laranja da uStore para destaque no modo escuro */
   --accent-foreground: #ffffff;
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #4b5563;
-  --input: #4b5563;
+  --border: #374151;
+  --input: #374151;
   --ring: rgba(79, 70, 229, 0.5);
   --chart-1: #6366f1;
   --chart-2: #3b82f6;
