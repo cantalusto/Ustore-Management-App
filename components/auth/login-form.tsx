@@ -1,7 +1,7 @@
+// components/auth/login-form.tsx
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -23,29 +23,20 @@ export function LoginForm() {
     setError("")
 
     try {
-      console.log("[v0] Attempting login with:", { email, password })
-
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       })
 
-      console.log("[v0] Login response status:", response.status)
       const data = await response.json()
-      console.log("[v0] Login response data:", data)
 
       if (response.ok) {
-        console.log("[v0] Login successful, redirecting to dashboard")
-        // Small delay to ensure cookie is set
-        setTimeout(() => {
-          window.location.href = "/dashboard"
-        }, 100)
+        window.location.href = "/dashboard"
       } else {
         setError(data.error || "Falha no login")
       }
     } catch (err) {
-      console.log("[v0] Login network error:", err)
       setError("Erro de rede. Por favor, tente novamente.")
     } finally {
       setIsLoading(false)
@@ -61,7 +52,8 @@ export function LoginForm() {
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="email">E-mail</Label>
+        {/* 1. Adicionar className para a cor do texto */}
+        <Label htmlFor="email" className="text-white">E-mail</Label>
         <Input
           id="email"
           type="email"
@@ -73,7 +65,8 @@ export function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Senha</Label>
+        {/* 2. Adicionar className para a cor do texto */}
+        <Label htmlFor="password" className="text-white">Senha</Label>
         <Input
           id="password"
           type="password"
