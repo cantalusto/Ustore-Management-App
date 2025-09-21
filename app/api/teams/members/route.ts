@@ -3,7 +3,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 const saltRounds = 10; // Fator de complexidade para o hash

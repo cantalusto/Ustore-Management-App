@@ -5,47 +5,44 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // prisma/seed.ts
 const client_1 = require("@prisma/client");
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs")); // Alterado para bcryptjs
 const prisma = new client_1.PrismaClient();
 const saltRounds = 10;
 async function main() {
     console.log('Start seeding...');
-    const users = [
-        {
+    const passwordAdmin = await bcryptjs_1.default.hash('admin123', saltRounds);
+    const passwordManager = await bcryptjs_1.default.hash('manager123', saltRounds);
+    const passwordMember = await bcryptjs_1.default.hash('member123', saltRounds);
+    await prisma.user.create({
+        data: {
             email: 'admin@company.com',
             name: 'Dante Alighieri',
-            password: 'admin123',
+            password: passwordAdmin,
             role: 'admin',
             department: 'Management',
+            status: 'active',
         },
-        {
+    });
+    await prisma.user.create({
+        data: {
             email: 'manager@company.com',
             name: 'Gerente de Projeto',
-            password: 'manager123',
+            password: passwordManager,
             role: 'manager',
             department: 'Development',
+            status: 'active',
         },
-        {
+    });
+    await prisma.user.create({
+        data: {
             email: 'member@company.com',
             name: 'Membro da Equipe',
-            password: 'member123',
+            password: passwordMember,
             role: 'member',
             department: 'Development',
+            status: 'active',
         },
-    ];
-    for (const u of users) {
-        const hashedPassword = await bcrypt_1.default.hash(u.password, saltRounds);
-        await prisma.user.create({
-            data: {
-                email: u.email,
-                name: u.name,
-                password: hashedPassword,
-                role: u.role,
-                department: u.department,
-                status: 'active',
-            },
-        });
-    }
+    });
     console.log('Seeding finished.');
 }
 main()

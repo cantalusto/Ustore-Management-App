@@ -59,7 +59,7 @@ export function AiCreateTaskDialog({ open, onClose, onSuccess }: AiCreateTaskDia
           <DialogDescription>
             Descreva a tarefa que você quer criar em linguagem natural. A IA irá extrair os detalhes para você.
             <br />
-            Ex: "Criar tarefa para Kanye West sobre o novo logo para sexta-feira, prioridade alta."
+            Ex: "Criar tarefa para Johan Liebert sobre o novo logo para 10/10/2010, prioridade alta."
           </DialogDescription>
         </DialogHeader>
 
