@@ -1,136 +1,52 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { getCurrentUser } from "@/lib/auth"
+// app/api/teams/members/[id]/route.ts
 
-// Em um app real, isso seria importado do arquivo de rota principal
-const teamMembers = [
-  {
-    id: 1,
-    name: "Admin User",
-    email: "admin@company.com",
-    role: "admin" as const,
-    department: "Management",
-    phone: "+1 (555) 123-4567",
-    joinDate: "2025-01-15",
-    status: "active" as const,
-  },
-  {
-    id: 2,
-    name: "Manager User",
-    email: "manager@company.com",
-    role: "manager" as const,
-    department: "Development",
-    phone: "+1 (555) 234-5678",
-    joinDate: "2025-02-20",
-    status: "active" as const,
-  },
-  {
-    id: 3,
-    name: "Team Member",
-    email: "member@company.com",
-    role: "member" as const,
-    department: "Development",
-    phone: "+1 (555) 345-6789",
-    joinDate: "2025-03-10",
-    status: "active" as const,
-  },
-  {
-    id: 4,
-    name: "John Doe",
-    email: "john.doe@company.com",
-    role: "member" as const,
-    department: "Design",
-    phone: "+1 (555) 456-7890",
-    joinDate: "2025-04-05",
-    status: "active" as const,
-  },
-  {
-    id: 5,
-    name: "Sarah Smith",
-    email: "sarah.smith@company.com",
-    role: "member" as const,
-    department: "Marketing",
-    phone: "+1 (555) 567-8901",
-    joinDate: "2025-05-12",
-    status: "active" as const,
-  },
-]
+import { type NextRequest, NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const user = await getCurrentUser()
-  const { id } = await params
+const prisma = new PrismaClient();
+const saltRounds = 10;
 
+// Rota para ATUALIZAR (Editar) um membro
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 
-  const memberId = Number.parseInt(id)
-  const memberIndex = teamMembers.findIndex((member) => member.id === memberId)
-
-  if (memberIndex === -1) {
-    return NextResponse.json({ error: "Membro não encontrado" }, { status: 404 })
+  const memberId = parseInt(params.id, 10);
+  if (isNaN(memberId)) {
+    return NextResponse.json({ error: "ID de membro inválido" }, { status: 400 });
   }
-
-  const member = teamMembers[memberIndex]
-
-  // Verifica permissões
-  if (user.role !== "admin" && !(user.role === "manager" && member.role === "member")) {
-    return NextResponse.json({ error: "Permissões insuficientes" }, { status: 403 })
+  
+  // Um usuário só pode editar o próprio perfil (a menos que seja admin/manager)
+  if (user.role !== 'admin' && user.role !== 'manager' && user.id !== memberId) {
+      return NextResponse.json({ error: "Permissões insuficientes" }, { status: 403 });
   }
 
   try {
-    const { name, email, role, department, phone, status } = await request.json()
-
-    // Verifica se o email já existe (excluindo o membro atual)
-    if (teamMembers.find((m) => m.email === email && m.id !== memberId)) {
-      return NextResponse.json({ error: "Email já existe" }, { status: 400 })
+    const updates = await request.json();
+    
+    // Se uma nova senha foi enviada, criptografa-a
+    if (updates.password && updates.password.trim() !== "") {
+      updates.password = await bcrypt.hash(updates.password, saltRounds);
+    } else {
+      delete updates.password; // Garante que a senha não seja sobrescrita com um valor vazio
     }
 
-    // Apenas administradores podem alterar cargos para administrador
-    if (role === "admin" && user.role !== "admin") {
-      return NextResponse.json({ error: "Apenas administradores podem atribuir o cargo de administrador" }, { status: 403 })
-    }
+    const updatedMember = await prisma.user.update({
+      where: { id: memberId },
+      data: updates,
+    });
 
-    // Atualiza o membro
-    teamMembers[memberIndex] = {
-      ...member,
-      name,
-      email,
-      role,
-      department,
-      phone: phone || undefined,
-      status,
-    }
+    const { password, ...memberWithoutPassword } = updatedMember;
+    return NextResponse.json({ member: memberWithoutPassword });
 
-    return NextResponse.json({ member: teamMembers[memberIndex] })
   } catch (error) {
-    return NextResponse.json({ error: "Dados da requisição inválidos" }, { status: 400 })
+    console.error("Falha ao atualizar membro:", error);
+    return NextResponse.json({ error: "Falha ao atualizar membro." }, { status: 500 });
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const user = await getCurrentUser()
-  const { id } = await params
-
-  if (!user || user.role !== "admin") {
-    return NextResponse.json({ error: "Apenas administradores podem excluir membros" }, { status: 403 })
-  }
-
-  const memberId = Number.parseInt(id)
-  const memberIndex = teamMembers.findIndex((member) => member.id === memberId)
-
-  if (memberIndex === -1) {
-    return NextResponse.json({ error: "Membro não encontrado" }, { status: 404 })
-  }
-
-  const member = teamMembers[memberIndex]
-
-  // Impede a exclusão de usuários administradores
-  if (member.role === "admin") {
-    return NextResponse.json({ error: "Não é possível excluir usuários administradores" }, { status: 403 })
-  }
-
-  // Remove o membro
-  teamMembers.splice(memberIndex, 1)
-
-  return NextResponse.json({ success: true })
-}
+// ... Sua função DELETE permanece aqui ...

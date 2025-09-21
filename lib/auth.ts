@@ -7,6 +7,7 @@ export interface User {
   email: string
   role: "admin" | "manager" | "member"
   name: string
+  image?: string // Adicionar este campo opcional
 }
 
 export interface Task {

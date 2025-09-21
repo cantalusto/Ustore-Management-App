@@ -1,7 +1,7 @@
+// components/teams/edit-member-dialog.tsx
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
 
+// A interface TeamMember pode ser importada ou definida aqui
 interface TeamMember {
   id: number
   name: string
@@ -34,10 +35,11 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    role: "member",
+    password: "", // 1. Adicionar o campo de senha ao estado
+    role: "member" as "admin" | "manager" | "member",
     department: "",
     phone: "",
-    status: "active",
+    status: "active" as "active" | "inactive",
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -47,6 +49,7 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
       setFormData({
         name: member.name,
         email: member.email,
+        password: "", // Inicia vazio por segurança
         role: member.role,
         department: member.department,
         phone: member.phone || "",
@@ -103,37 +106,24 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
 
           <div className="space-y-2">
             <Label htmlFor="name">Nome Completo</Label>
-            <Input
-              id="name"
-              value={formData.name}
-              onChange={(e) => handleChange("name", e.target.value)}
-              required
-              disabled={isLoading}
-            />
+            <Input id="name" value={formData.name} onChange={(e) => handleChange("name", e.target.value)} required disabled={isLoading} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleChange("email", e.target.value)}
-              required
-              disabled={isLoading}
-            />
+            <Input id="email" type="email" value={formData.email} onChange={(e) => handleChange("email", e.target.value)} required disabled={isLoading} />
+          </div>
+
+          {/* 2. Adicionar o campo de senha no formulário */}
+          <div className="space-y-2">
+            <Label htmlFor="password">Nova Senha (opcional)</Label>
+            <Input id="password" type="password" value={formData.password} onChange={(e) => handleChange("password", e.target.value)} placeholder="Deixe em branco para não alterar" disabled={isLoading} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="role">Cargo</Label>
-            <Select
-              value={formData.role}
-              onValueChange={(value) => handleChange("role", value)}
-              disabled={!canEditRole}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+            <Select value={formData.role} onValueChange={(value) => handleChange("role", value)} disabled={!canEditRole}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="member">Membro</SelectItem>
                 <SelectItem value="manager">Gerente</SelectItem>
@@ -144,31 +134,18 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
 
           <div className="space-y-2">
             <Label htmlFor="department">Departamento</Label>
-            <Input
-              id="department"
-              value={formData.department}
-              onChange={(e) => handleChange("department", e.target.value)}
-              required
-              disabled={isLoading}
-            />
+            <Input id="department" value={formData.department} onChange={(e) => handleChange("department", e.target.value)} required disabled={isLoading} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="phone">Telefone</Label>
-            <Input
-              id="phone"
-              value={formData.phone}
-              onChange={(e) => handleChange("phone", e.target.value)}
-              disabled={isLoading}
-            />
+            <Input id="phone" value={formData.phone} onChange={(e) => handleChange("phone", e.target.value)} disabled={isLoading} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="status">Status</Label>
             <Select value={formData.status} onValueChange={(value) => handleChange("status", value)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="active">Ativo</SelectItem>
                 <SelectItem value="inactive">Inativo</SelectItem>

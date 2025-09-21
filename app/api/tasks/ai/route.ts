@@ -7,15 +7,6 @@ import { PrismaClient } from "@prisma/client"
 
 const prisma = new PrismaClient()
 
-// Membros da equipe (mock)
-const teamMembers = [
-  { id: 1, name: "Dante Alighieri", role: "admin" },
-  { id: 2, name: "Gerente de Projeto", role: "manager" },
-  { id: 3, name: "Membro da Equipe", role: "member" },
-  { id: 4, name: "Kanye West", role: "member" },
-  { id: 5, name: "Franz Kafka", role: "member" },
-]
-
 export async function POST(request: NextRequest) {
   const user = await getCurrentUser()
   if (!user) {
@@ -23,13 +14,25 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    // 1. BUSCAR USUÁRIOS REAIS DO BANCO DE DADOS
+    //    Esta é a correção principal: removemos o mock e usamos dados reais.
+    const teamMembersFromDB = await prisma.user.findMany({
+      select: { id: true, name: true },
+    });
+
+    if (!teamMembersFromDB || teamMembersFromDB.length === 0) {
+        return NextResponse.json({ error: "Nenhum membro de equipe encontrado no banco de dados." }, { status: 500 });
+    }
+
     const { prompt } = await request.json()
     if (!prompt) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 })
     }
 
+    // --- SEÇÃO DO GEMINI (INTOCADA, CONFORME SOLICITADO) ---
     const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" })
-    const teamMemberList = teamMembers.map((m) => `- ${m.name} (id: ${m.id})`).join("\n")
+    // Usar a lista de usuários reais no prompt para a IA
+    const teamMemberList = teamMembersFromDB.map((m) => `- ${m.name}`).join("\n")
 
     const aiPrompt = `
 Você é um assistente inteligente para um sistema de gerenciamento de tarefas.
@@ -70,7 +73,6 @@ Texto: "${prompt}"
       return NextResponse.json({ error: "Nenhuma resposta da IA" }, { status: 500 })
     }
 
-    // Limpeza do JSON
     const jsonMatch = text.replace(/```json/g, "").replace(/```/g, "").match(/\{[\s\S]*\}/)
     const jsonString = jsonMatch ? jsonMatch[0] : ""
     if (!jsonString) {
@@ -86,54 +88,35 @@ Texto: "${prompt}"
       console.error("Texto bruto da IA:", text)
       return NextResponse.json({ error: "Resposta da IA não é um JSON válido" }, { status: 500 })
     }
+    // --- FIM DA SEÇÃO DO GEMINI ---
 
-    // --- VALIDAÇÃO DE CAMPOS OBRIGATÓRIOS ---
-    if (!taskData.description) {
-      taskData.description = "Descrição automática gerada pela IA para a tarefa."
+    // 2. VALIDAÇÃO ROBUSTA DA RESPOSTA DA IA
+    if (!taskData.description?.trim() || !taskData.project?.trim() || !Array.isArray(taskData.tags) || taskData.tags.length < 3) {
+      return NextResponse.json({ error: "A IA não gerou todos os campos obrigatórios (descrição, projeto, 3+ tags). Tente ser mais específico." }, { status: 500 });
     }
 
-    if (!taskData.project) {
-      taskData.project = "Projeto padrão da equipe"
-    }
-
-    if (!Array.isArray(taskData.tags) || taskData.tags.length < 3) {
-      taskData.tags = ["tag1", "tag2", "tag3"]
-    }
-
-    const assignee = teamMembers.find(
+    // 3. VALIDAÇÃO DO RESPONSÁVEL USANDO A LISTA REAL DO BANCO
+    const assignee = teamMembersFromDB.find(
       (m) => m.name.toLowerCase() === taskData.assigneeName?.toLowerCase()
     )
     if (!assignee) {
       return NextResponse.json({ error: `Membro da equipe '${taskData.assigneeName}' não encontrado.` }, { status: 400 })
     }
 
-    // --- GARANTIR USUÁRIOS NO BANCO ---
-    let dbUser = await prisma.user.findUnique({ where: { id: user.id } })
-    if (!dbUser) {
-      dbUser = await prisma.user.create({
-        data: { id: user.id, name: user.name, role: user.role || "member" },
-      })
-    }
+    // 4. REMOÇÃO DA LÓGICA INSEGURA DE CRIAÇÃO DE USUÁRIOS
+    //    O código que estava aqui foi removido.
 
-    let dbAssignee = await prisma.user.findUnique({ where: { id: assignee.id } })
-    if (!dbAssignee) {
-      dbAssignee = await prisma.user.create({
-        data: { id: assignee.id, name: assignee.name, role: assignee.role || "member" },
-      })
-    }
-
-    // Converte tags em CSV
     const tagsCSV = taskData.tags.join(",")
 
-    // --- CRIAÇÃO DA TASK ---
+    // 5. CRIAÇÃO DA TAREFA COM IDs VÁLIDOS
     const newTask = await prisma.task.create({
       data: {
         title: taskData.title,
         description: taskData.description,
         status: "a-fazer",
         priority: taskData.priority || "media",
-        assigneeId: dbAssignee.id,
-        createdById: dbUser.id,
+        assigneeId: assignee.id, // ID Válido do banco de dados
+        createdById: user.id,   // ID Válido do usuário logado
         dueDate: new Date(taskData.dueDate),
         project: taskData.project,
         tags: tagsCSV,

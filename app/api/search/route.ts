@@ -1,109 +1,93 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { getCurrentUser } from "@/lib/auth"
+// app/api/search/route.ts
+
+import { type NextRequest, NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
-  const user = await getCurrentUser()
-
+  const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { searchParams } = new URL(request.url)
-  const query = searchParams.get("q")?.toLowerCase() || ""
+  const { searchParams } = new URL(request.url);
+  const query = searchParams.get("q") || "";
 
   if (!query.trim()) {
-    return NextResponse.json({ results: [] })
+    return NextResponse.json({ results: [] });
   }
 
-  // Mock data - replace with real database searches
-  const tasks = [
-    {
-      id: 1,
-      title: "Update user interface",
-      description: "Redesign the main dashboard to improve user experience",
-      assigneeName: "Team Member",
-      project: "Website Redesign",
-      tags: ["frontend", "ui", "design"],
+  const results = [];
+
+  // Buscar tarefas
+  const tasks = await prisma.task.findMany({
+    where: {
+      OR: [
+        { title: { contains: query } },
+        { description: { contains: query } },
+        { project: { contains: query } },
+        { tags: { contains: query } },
+      ],
     },
-    {
-      id: 2,
-      title: "Fix login bug",
-      description: "Users are unable to login with special characters in password",
-      assigneeName: "John Doe",
-      project: "Bug Fixes",
-      tags: ["backend", "authentication", "bug"],
-    },
-  ]
+    include: { assignee: true }, // Incluir dados do usuário responsável
+    take: 5,
+  });
 
-  const members = [
-    { id: 1, name: "Admin User", email: "admin@company.com", department: "Management" },
-    { id: 2, name: "Manager User", email: "manager@company.com", department: "Development" },
-    { id: 3, name: "Team Member", email: "member@company.com", department: "Development" },
-    { id: 4, name: "John Doe", email: "john.doe@company.com", department: "Design" },
-    { id: 5, name: "Sarah Smith", email: "sarah.smith@company.com", department: "Marketing" },
-  ]
-
-  const projects = [
-    { id: 1, name: "Website Redesign", description: "Complete overhaul of company website" },
-    { id: 2, name: "Mobile App Development", description: "Native mobile application" },
-    { id: 3, name: "Marketing Campaign", description: "Q1 digital marketing campaign" },
-  ]
-
-  const results = []
-
-  // Search tasks
   for (const task of tasks) {
-    if (
-      task.title.toLowerCase().includes(query) ||
-      task.description.toLowerCase().includes(query) ||
-      task.assigneeName.toLowerCase().includes(query) ||
-      task.project.toLowerCase().includes(query) ||
-      task.tags.some((tag) => tag.toLowerCase().includes(query))
-    ) {
-      results.push({
-        id: `task-${task.id}`,
-        type: "task",
-        title: task.title,
-        subtitle: `Assigned to ${task.assigneeName}`,
-        description: task.description,
-        metadata: task.project,
-      })
-    }
+    results.push({
+      id: `task-${task.id}`,
+      type: "task",
+      title: task.title,
+      subtitle: `Atribuído a ${task.assignee.name}`,
+      description: task.description,
+      metadata: task.project,
+    });
   }
 
-  // Search members (only if user has permission)
+  // Buscar membros (se tiver permissão)
   if (user.role === "admin" || user.role === "manager") {
+    const members = await prisma.user.findMany({
+        where: {
+            OR: [
+                { name: { contains: query } },
+                { email: { contains: query } },
+                { department: { contains: query } },
+            ]
+        },
+        take: 5,
+    });
+
     for (const member of members) {
-      if (
-        member.name.toLowerCase().includes(query) ||
-        member.email.toLowerCase().includes(query) ||
-        member.department.toLowerCase().includes(query)
-      ) {
-        results.push({
-          id: `member-${member.id}`,
-          type: "member",
-          title: member.name,
-          subtitle: member.email,
-          description: member.department,
-          metadata: "",
-        })
-      }
-    }
-  }
-
-  // Search projects
-  for (const project of projects) {
-    if (project.name.toLowerCase().includes(query) || project.description.toLowerCase().includes(query)) {
       results.push({
-        id: `project-${project.id}`,
-        type: "project",
-        title: project.name,
-        subtitle: project.description,
-        description: "",
-        metadata: "",
-      })
+        id: `member-${member.id}`,
+        type: "member",
+        title: member.name,
+        subtitle: member.email,
+        description: member.department,
+      });
     }
   }
 
-  return NextResponse.json({ results: results.slice(0, 10) }) // Limit to 10 results
+  // A busca por projetos pode ser feita agregando as tarefas
+  const projectTasks = await prisma.task.findMany({
+      where: { project: { contains: query, not: null } },
+      select: { project: true },
+      distinct: ['project']
+  });
+
+  for (const task of projectTasks) {
+      if (task.project) {
+        results.push({
+            id: `project-${task.project.replace(/\s+/g, '-')}`,
+            type: "project",
+            title: task.project,
+            subtitle: `Todas as tarefas do projeto ${task.project}`,
+        });
+      }
+  }
+
+
+  return NextResponse.json({ results: results.slice(0, 10) });
 }

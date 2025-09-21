@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "target": "es2017",
+    "esModuleInterop": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "outDir": "dist-script",
+    "rootDir": "."
+  },
+  "include": ["prisma/seed.ts"]
+}

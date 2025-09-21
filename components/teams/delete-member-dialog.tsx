@@ -1,7 +1,8 @@
+// components/teams/delete-member-dialog.tsx
 "use client"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, AlertTriangle } from "lucide-react"
@@ -21,7 +22,7 @@ interface DeleteMemberDialogProps {
   member: TeamMember
   open: boolean
   onClose: () => void
-  onSuccess: () => void
+  onSuccess: () => void // Esta prop já existe, vamos usá-la
 }
 
 export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteMemberDialogProps) {
@@ -40,7 +41,9 @@ export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteM
       const data = await response.json()
 
       if (response.ok) {
-        onSuccess()
+        // A função onSuccess será chamada aqui,
+        // e ela é responsável por recarregar a página
+        onSuccess() 
       } else {
         setError(data.error || "Falha ao excluir membro")
       }
@@ -60,7 +63,7 @@ export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteM
             <DialogTitle>Excluir Membro da Equipe</DialogTitle>
           </div>
           <DialogDescription>
-            Você tem certeza que deseja excluir <strong>{member.name}</strong>? Esta ação não pode ser desfeita.
+            Você tem certeza que deseja excluir <strong>{member.name}</strong>? Esta ação não pode ser desfeita e todas as suas tarefas serão reatribuídas.
           </DialogDescription>
         </DialogHeader>
 
@@ -70,8 +73,9 @@ export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteM
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-
-          <div className="flex justify-end space-x-2">
+        </div>
+        
+        <DialogFooter className="pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
               Cancelar
             </Button>
@@ -79,8 +83,7 @@ export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteM
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Excluir Membro
             </Button>
-          </div>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

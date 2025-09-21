@@ -1,3 +1,5 @@
+// components/teams/add-member-dialog.tsx
+
 "use client"
 
 import type React from "react"
@@ -21,6 +23,7 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    password: "", // Campo de senha incluído
     role: "member",
     department: "",
     phone: "",
@@ -90,6 +93,18 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
               type="email"
               value={formData.email}
               onChange={(e) => handleChange("email", e.target.value)}
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">Senha</Label>
+            <Input
+              id="password"
+              type="password"
+              value={formData.password}
+              onChange={(e) => handleChange("password", e.target.value)}
               required
               disabled={isLoading}
             />

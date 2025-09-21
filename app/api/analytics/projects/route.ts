@@ -1,64 +1,64 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { getCurrentUser } from "@/lib/auth"
+// app/api/analytics/projects/route.ts
 
-export async function GET(request: NextRequest) {
-  const user = await getCurrentUser()
+import { NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
+import { PrismaClient, Task } from "@prisma/client";
 
+const prisma = new PrismaClient();
+
+export async function GET() {
+  const user = await getCurrentUser();
   if (!user || user.role === "member") {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 403 })
+    return NextResponse.json({ error: "Não autorizado" }, { status: 403 });
   }
 
-  // Mock de dados de projetos - substitua por consultas reais ao banco de dados
-  const projects = [
-    {
-      id: 1,
-      name: "Redesenho do Site",
-      description: "Revisão completa do site da empresa com design moderno",
-      progress: 75,
-      totalTasks: 24,
-      completedTasks: 18,
-      teamMembers: 6,
-      dueDate: "2024-02-15",
-      status: "on-track" as const,
-      priority: "high" as const,
-    },
-    {
-      id: 2,
-      name: "Desenvolvimento de App Mobile",
-      description: "Aplicativo móvel nativo para iOS e Android",
-      progress: 45,
-      totalTasks: 32,
-      completedTasks: 14,
-      teamMembers: 4,
-      dueDate: "2024-03-30",
-      status: "at-risk" as const,
-      priority: "high" as const,
-    },
-    {
-      id: 3,
-      name: "Campanha de Marketing",
-      description: "Campanha de marketing digital do primeiro trimestre em todos os canais",
-      progress: 90,
-      totalTasks: 15,
-      completedTasks: 13,
-      teamMembers: 3,
-      dueDate: "2024-01-31",
-      status: "on-track" as const,
-      priority: "medium" as const,
-    },
-    {
-      id: 4,
-      name: "Infraestrutura DevOps",
-      description: "Configuração de pipeline de CI/CD e sistemas de monitoramento",
-      progress: 30,
-      totalTasks: 18,
-      completedTasks: 5,
-      teamMembers: 2,
-      dueDate: "2024-02-28",
-      status: "delayed" as const,
-      priority: "medium" as const,
-    },
-  ]
+  try {
+    const tasks = await prisma.task.findMany({
+        where: { project: { not: null } }
+    });
 
-  return NextResponse.json({ projects })
+    const projectsMap = new Map<string, { totalTasks: number; completedTasks: number; tasks: Task[] }>();
+
+    tasks.forEach(task => {
+        if (task.project) {
+            if (!projectsMap.has(task.project)) {
+                projectsMap.set(task.project, { totalTasks: 0, completedTasks: 0, tasks: [] });
+            }
+            const projectData = projectsMap.get(task.project)!;
+            projectData.totalTasks++;
+            if (task.status === 'concluido') {
+                projectData.completedTasks++;
+            }
+            projectData.tasks.push(task);
+        }
+    });
+
+    let idCounter = 1;
+    const projects = Array.from(projectsMap.entries()).map(([name, data]) => {
+        const progress = data.totalTasks > 0 ? Math.round((data.completedTasks / data.totalTasks) * 100) : 0;
+        const dueDate = data.tasks.reduce((latest, task) => new Date(task.dueDate) > latest ? new Date(task.dueDate) : latest, new Date(0));
+        
+        let status: "on-track" | "at-risk" | "delayed" = "on-track";
+        if (progress < 50 && new Date() > new Date(dueDate.getTime() - 15 * 24 * 60 * 60 * 1000)) status = "at-risk";
+        if (progress < 80 && new Date() > dueDate) status = "delayed";
+
+        return {
+            id: idCounter++,
+            name,
+            description: `Projeto ${name}`,
+            progress,
+            totalTasks: data.totalTasks,
+            completedTasks: data.completedTasks,
+            teamMembers: new Set(data.tasks.map(t => t.assigneeId)).size,
+            dueDate: dueDate.toISOString(),
+            status,
+            priority: "medium" as const, // Lógica de prioridade pode ser adicionada
+        };
+    });
+
+    return NextResponse.json({ projects });
+  } catch (error) {
+    console.error("[PROJECT_PROGRESS_ERROR]", error);
+    return NextResponse.json({ error: "Falha ao buscar dados de progresso dos projetos." }, { status: 500 });
+  }
 }

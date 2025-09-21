@@ -8,11 +8,19 @@ generator client {
 }
 
 model User {
-  id            Int    @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
   name          String
+  password      String   // Campo obrigatório para a senha
   role          String
-  assignedTasks Task[] @relation("AssigneeTasks")   // sem fields/references
-  createdTasks  Task[] @relation("CreatedTasks")    // sem fields/references
+  department    String?
+  phone         String?
+  image         String?  // Adicionar este campo opcional
+  joinDate      DateTime @default(now())
+  status        String   @default("active")
+
+  assignedTasks Task[]   @relation("AssigneeTasks")
+  createdTasks  Task[]   @relation("CreatedTasks")
 }
 
 model Task {
