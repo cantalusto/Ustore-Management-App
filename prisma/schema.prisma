@@ -1,16 +1,14 @@
-// prisma/schema.prisma
-
-datasource db {
-  provider = "postgresql" // Mude de "sqlite" para "postgresql"
-  url      = env("DATABASE_URL")
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-// Seus modelos User e Task permanecem exatamente os mesmos.
-// Nenhuma alteração é necessária neles.
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")   // pooler, para produção (Vercel)
+  directUrl  = env("DIRECT_URL")     // host direto, para migrações/seed local
+}
+
+
 model User {
   id            Int      @id @default(autoincrement())
   email         String   @unique
@@ -22,7 +20,6 @@ model User {
   image         String?
   joinDate      DateTime @default(now())
   status        String   @default("active")
-
   assignedTasks Task[]   @relation("AssigneeTasks")
   createdTasks  Task[]   @relation("CreatedTasks")
 }
@@ -34,13 +31,12 @@ model Task {
   status      String
   priority    String
   assigneeId  Int
-  assignee    User     @relation("AssigneeTasks", fields: [assigneeId], references: [id])
   createdById Int
-  createdBy   User     @relation("CreatedTasks", fields: [createdById], references: [id])
   dueDate     DateTime
   project     String?
   tags        String?
-
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  assignee    User     @relation("AssigneeTasks", fields: [assigneeId], references: [id])
+  createdBy   User     @relation("CreatedTasks", fields: [createdById], references: [id])
 }
