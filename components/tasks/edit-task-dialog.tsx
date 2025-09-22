@@ -1,3 +1,5 @@
+// components/tasks/edit-task-dialog.tsx
+
 "use client"
 
 import type React from "react"
@@ -10,9 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
-import type { Task, TeamMember } from "@/lib/types" // 1. Importar de @/lib/types
-
-// 2. A interface local foi removida daqui
+import type { Task, TeamMember } from "@/lib/types"
 
 interface EditTaskDialogProps {
   task: Task

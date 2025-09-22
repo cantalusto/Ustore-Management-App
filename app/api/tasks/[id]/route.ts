@@ -85,4 +85,4 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       console.error("Falha ao excluir a tarefa:", error)
       return NextResponse.json({ error: "Tarefa não encontrada ou falha ao excluir." }, { status: 404 })
     }
-  }
+}
