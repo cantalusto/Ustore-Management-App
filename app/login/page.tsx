@@ -9,7 +9,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-[#1f2937] p-4">
       <Card 
         className="w-full max-w-md border-none" 
-        style={{ backgroundColor: '#f8fafc', color: 'white' }}
+        style={{ backgroundColor: '#f8fafc', color: 'grey' }}
       >
         {/* --- CORREÇÃO AQUI --- */}
         {/* Forçamos o layout para flex, coluna e centralizado */}

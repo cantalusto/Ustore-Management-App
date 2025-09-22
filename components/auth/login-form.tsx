@@ -53,7 +53,7 @@ export function LoginForm() {
 
       <div className="space-y-2">
         {/* 1. Adicionar className para a cor do texto */}
-        <Label htmlFor="email" className="text-white">E-mail</Label>
+        <Label htmlFor="email" className="text-gray-600">E-mail</Label>
         <Input
           id="email"
           type="email"
@@ -66,7 +66,7 @@ export function LoginForm() {
 
       <div className="space-y-2">
         {/* 2. Adicionar className para a cor do texto */}
-        <Label htmlFor="password" className="text-white">Senha</Label>
+        <Label htmlFor="password" className="text-gray-600">Senha</Label>
         <Input
           id="password"
           type="password"
