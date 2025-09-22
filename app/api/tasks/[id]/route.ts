@@ -6,7 +6,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// Esta função ATUALIZA uma tarefa. É usada pelo Drag & Drop.
+// Esta função ATUALIZA uma tarefa. É usada pelo Drag & Drop e pelo formulário de edição.
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   const user = await getCurrentUser();
   if (!user) {
@@ -36,6 +36,11 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     const updates = await request.json();
+
+    // **CORREÇÃO AQUI:** Converte a string de data para um objeto Date
+    if (updates.dueDate) {
+      updates.dueDate = new Date(updates.dueDate);
+    }
 
     // Se as tags forem um array (vindo do formulário de edição), converta para CSV
     if (Array.isArray(updates.tags)) {

@@ -15,7 +15,7 @@ import { Loader2 } from "lucide-react"
 import type { Task, TeamMember } from "@/lib/types"
 
 interface EditTaskDialogProps {
-  task: Task
+  task: Task | null; // <-- Alterado para aceitar null
   open: boolean
   onClose: () => void
   onSuccess: (updatedTask: Task) => void
@@ -37,15 +37,16 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
   const [error, setError] = useState("")
 
   useEffect(() => {
+    // Preenche o formulário apenas se a tarefa existir
     if (task) {
       setFormData({
         title: task.title,
-        description: task.description,
+        description: task.description || "",
         priority: task.priority,
         assigneeId: task.assigneeId.toString(),
         dueDate: new Date(task.dueDate).toISOString().split("T")[0],
-        project: task.project,
-        tags: task.tags.join(", "),
+        project: task.project || "",
+        tags: task.tags ? task.tags.join(", ") : "",
       })
     }
     if (open) {
@@ -65,6 +66,8 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!task) return; // Garante que não há envio sem tarefa
+
     setIsLoading(true)
     setError("")
 
@@ -100,6 +103,11 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
+  // Não renderiza nada se a tarefa ainda não foi carregada
+  if (!task) {
+    return null;
+  }
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
@@ -108,7 +116,6 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* O resto do formulário JSX permanece o mesmo */}
           {error && (
             <Alert variant="destructive">
               <AlertDescription>{error}</AlertDescription>
