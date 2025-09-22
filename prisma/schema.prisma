@@ -5,7 +5,6 @@ generator client {
 datasource db {
   provider   = "postgresql"
   url        = env("DATABASE_URL")   // pooler, para produção (Vercel)
-  directUrl  = env("DIRECT_URL")     // host direto, para migrações/seed local
 }
 
 
