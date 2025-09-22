@@ -1,5 +1,7 @@
+// prisma/schema.prisma
+
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql" // Mude de "sqlite" para "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -7,15 +9,17 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// Seus modelos User e Task permanecem exatamente os mesmos.
+// Nenhuma alteração é necessária neles.
 model User {
   id            Int      @id @default(autoincrement())
   email         String   @unique
   name          String
-  password      String   // Campo obrigatório para a senha
+  password      String
   role          String
   department    String?
   phone         String?
-  image         String?  // Adicionar este campo opcional
+  image         String?
   joinDate      DateTime @default(now())
   status        String   @default("active")
 
@@ -35,7 +39,7 @@ model Task {
   createdBy   User     @relation("CreatedTasks", fields: [createdById], references: [id])
   dueDate     DateTime
   project     String?
-  tags        String?   // agora é String simples, armazene CSV
+  tags        String?
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
