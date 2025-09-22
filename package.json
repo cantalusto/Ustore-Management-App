@@ -11,7 +11,7 @@
     "db:seed": "pnpm run build:seed && pnpm run start:seed",
     "build:seed": "tsc --project tsconfig.script.json",
     "start:seed": "node dist-script/prisma/seed.js",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate && pnpm run db:seed"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

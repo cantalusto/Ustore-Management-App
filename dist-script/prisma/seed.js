@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // prisma/seed.ts
 const client_1 = require("@prisma/client");
-const bcryptjs_1 = __importDefault(require("bcryptjs")); // Alterado para bcryptjs
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const prisma = new client_1.PrismaClient();
 const saltRounds = 10;
 async function main() {
@@ -13,8 +13,10 @@ async function main() {
     const passwordAdmin = await bcryptjs_1.default.hash('admin123', saltRounds);
     const passwordManager = await bcryptjs_1.default.hash('manager123', saltRounds);
     const passwordMember = await bcryptjs_1.default.hash('member123', saltRounds);
-    await prisma.user.create({
-        data: {
+    await prisma.user.upsert({
+        where: { email: 'admin@company.com' },
+        update: {}, // não atualiza nada se já existir
+        create: {
             email: 'admin@company.com',
             name: 'Dante Alighieri',
             password: passwordAdmin,
@@ -23,8 +25,10 @@ async function main() {
             status: 'active',
         },
     });
-    await prisma.user.create({
-        data: {
+    await prisma.user.upsert({
+        where: { email: 'manager@company.com' },
+        update: {},
+        create: {
             email: 'manager@company.com',
             name: 'Gerente de Projeto',
             password: passwordManager,
@@ -33,8 +37,10 @@ async function main() {
             status: 'active',
         },
     });
-    await prisma.user.create({
-        data: {
+    await prisma.user.upsert({
+        where: { email: 'member@company.com' },
+        update: {},
+        create: {
             email: 'member@company.com',
             name: 'Membro da Equipe',
             password: passwordMember,
