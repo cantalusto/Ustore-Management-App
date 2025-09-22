@@ -1,93 +1,88 @@
-// app/api/tasks/[id]/route.ts
-
-import { type NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// Esta função ATUALIZA uma tarefa. É usada pelo Drag & Drop e pelo formulário de edição.
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
-  }
-
+// GET tarefa por ID
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
   const taskId = parseInt(params.id, 10);
   if (isNaN(taskId)) {
-    return NextResponse.json({ error: "ID da tarefa inválido" }, { status: 400 });
+    return NextResponse.json({ error: "ID inválido" }, { status: 400 });
   }
 
   try {
-    const currentTask = await prisma.task.findUnique({ where: { id: taskId } });
-    if (!currentTask) {
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+      include: { assignee: true, createdBy: true }, // inclua relações
+    });
+
+    if (!task) {
       return NextResponse.json({ error: "Tarefa não encontrada" }, { status: 404 });
     }
 
-    // Lógica de permissão para edição
-    const canEdit =
-      user.role === "admin" ||
-      user.role === "manager" ||
-      currentTask.createdById === user.id ||
-      currentTask.assigneeId === user.id;
-
-    if (!canEdit) {
-      return NextResponse.json({ error: "Permissões insuficientes" }, { status: 403 });
-    }
-
-    const updates = await request.json();
-
-    // **CORREÇÃO AQUI:** Converte a string de data para um objeto Date
-    if (updates.dueDate) {
-      updates.dueDate = new Date(updates.dueDate);
-    }
-
-    // Se as tags forem um array (vindo do formulário de edição), converta para CSV
-    if (Array.isArray(updates.tags)) {
-      updates.tags = updates.tags.join(',');
-    }
-
-    const updatedTask = await prisma.task.update({
-      where: { id: taskId },
-      data: {
-        ...updates,
-        updatedAt: new Date(), // Garante que a data de atualização seja sempre nova
+    return NextResponse.json({
+      task: {
+        ...task,
+        dueDate: task.dueDate?.toISOString().split("T")[0] || null,
+        tags: task.tags ? task.tags.split(",") : [],
+        assigneeName: task.assignee?.name || null,
+        createdByName: task.createdBy?.name || null,
       },
     });
-
-    return NextResponse.json({ task: updatedTask });
   } catch (error) {
-    console.error("Falha ao atualizar a tarefa:", error);
-    return NextResponse.json({ error: "Dados da requisição inválidos ou falha no servidor." }, { status: 400 });
+    console.error("Erro ao buscar tarefa:", error);
+    return NextResponse.json({ error: "Erro ao buscar tarefa" }, { status: 500 });
   }
 }
 
-// Esta função EXCLUI uma tarefa.
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
-    const user = await getCurrentUser()
-  
-    if (!user) {
-      return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
+// PATCH (editar tarefa)
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const taskId = parseInt(params.id, 10);
+  if (isNaN(taskId)) {
+    return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+  }
+
+  try {
+    const updates = await req.json();
+
+    if (updates.tags) {
+      if (Array.isArray(updates.tags)) {
+        updates.tags = updates.tags.join(",");
+      } else if (typeof updates.tags === "string") {
+        updates.tags = updates.tags
+          .split(",")
+          .map((tag: string) => tag.trim())
+          .filter(Boolean)
+          .join(",");
+      }
     }
-  
-    if (user.role !== "admin") {
-      return NextResponse.json({ error: "Permissões insuficientes" }, { status: 403 })
-    }
-  
-    const taskId = parseInt(params.id, 10)
-  
-    if (isNaN(taskId)) {
-      return NextResponse.json({ error: "ID da tarefa inválido" }, { status: 400 })
-    }
-  
-    try {
-      await prisma.task.delete({
-        where: { id: taskId },
-      })
-  
-      return NextResponse.json({ success: true })
-    } catch (error) {
-      console.error("Falha ao excluir a tarefa:", error)
-      return NextResponse.json({ error: "Tarefa não encontrada ou falha ao excluir." }, { status: 404 })
-    }
+
+    const updatedTask = await prisma.task.update({
+      where: { id: taskId }, // ✅ number
+      data: {
+        ...updates,
+        updatedAt: new Date(),
+      },
+      include: { assignee: true, createdBy: true },
+    });
+
+    return NextResponse.json({
+      task: {
+        ...updatedTask,
+        dueDate: updatedTask.dueDate?.toISOString().split("T")[0] || null,
+        tags: updatedTask.tags ? updatedTask.tags.split(",") : [],
+        assigneeName: updatedTask.assignee?.name || null,
+        createdByName: updatedTask.createdBy?.name || null,
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao atualizar tarefa:", error);
+    return NextResponse.json({ error: "Erro ao atualizar tarefa" }, { status: 500 });
+  }
 }

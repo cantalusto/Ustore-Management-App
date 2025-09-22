@@ -15,7 +15,7 @@ import { Loader2 } from "lucide-react"
 import type { Task, TeamMember } from "@/lib/types"
 
 interface EditTaskDialogProps {
-  task: Task | null; // <-- Alterado para aceitar null
+  task: Task | null
   open: boolean
   onClose: () => void
   onSuccess: (updatedTask: Task) => void
@@ -37,21 +37,18 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
   const [error, setError] = useState("")
 
   useEffect(() => {
-    // Preenche o formulário apenas se a tarefa existir
     if (task) {
       setFormData({
         title: task.title,
         description: task.description || "",
         priority: task.priority,
         assigneeId: task.assigneeId.toString(),
-        dueDate: new Date(task.dueDate).toISOString().split("T")[0],
+        dueDate: task.dueDate ? new Date(task.dueDate).toISOString().split("T")[0] : "",
         project: task.project || "",
         tags: task.tags ? task.tags.join(", ") : "",
       })
     }
-    if (open) {
-      fetchTeamMembers()
-    }
+    if (open) fetchTeamMembers()
   }, [task, open])
 
   const fetchTeamMembers = async () => {
@@ -59,14 +56,18 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
       const response = await fetch("/api/teams/members")
       const data = await response.json()
       setTeamMembers(data.members || [])
-    } catch (error) {
-      console.error("Falha ao buscar membros da equipe:", error)
+    } catch (err) {
+      console.error("Falha ao buscar membros da equipe:", err)
     }
+  }
+
+  const handleChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!task) return; // Garante que não há envio sem tarefa
+    if (!task) return
 
     setIsLoading(true)
     setError("")
@@ -76,11 +77,15 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...formData,
-          assigneeId: Number.parseInt(formData.assigneeId),
+          title: formData.title,
+          description: formData.description,
+          priority: formData.priority,
+          assigneeId: Number(formData.assigneeId),
+          dueDate: formData.dueDate ? new Date(formData.dueDate) : null,
+          project: formData.project || null,
           tags: formData.tags
             .split(",")
-            .map((tag) => tag.trim())
+            .map(tag => tag.trim())
             .filter(Boolean),
         }),
       })
@@ -89,24 +94,19 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
 
       if (response.ok) {
         onSuccess(data.task)
+        onClose()
       } else {
         setError(data.error || "Falha ao atualizar a tarefa")
       }
     } catch (err) {
+      console.error("Erro de rede:", err)
       setError("Erro de rede. Por favor, tente novamente.")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
-
-  // Não renderiza nada se a tarefa ainda não foi carregada
-  if (!task) {
-    return null;
-  }
+  if (!task) return null
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -124,19 +124,33 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
 
           <div className="space-y-2">
             <Label htmlFor="title">Título da Tarefa</Label>
-            <Input id="title" value={formData.title} onChange={(e) => handleChange("title", e.target.value)} required disabled={isLoading} />
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={e => handleChange("title", e.target.value)}
+              required
+              disabled={isLoading}
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="description">Descrição</Label>
-            <Textarea id="description" value={formData.description} onChange={(e) => handleChange("description", e.target.value)} rows={3} disabled={isLoading} />
+            <Textarea
+              id="description"
+              value={formData.description}
+              onChange={e => handleChange("description", e.target.value)}
+              rows={3}
+              disabled={isLoading}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="priority">Prioridade</Label>
-              <Select value={formData.priority} onValueChange={(value) => handleChange("priority", value)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select value={formData.priority} onValueChange={v => handleChange("priority", v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="baixa">Baixa</SelectItem>
                   <SelectItem value="media">Média</SelectItem>
@@ -145,12 +159,15 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
                 </SelectContent>
               </Select>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="assignee">Atribuir a</Label>
-              <Select value={formData.assigneeId} onValueChange={(value) => handleChange("assigneeId", value)}>
-                <SelectTrigger><SelectValue placeholder="Selecione um membro" /></SelectTrigger>
+              <Select value={formData.assigneeId} onValueChange={v => handleChange("assigneeId", v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione um membro" />
+                </SelectTrigger>
                 <SelectContent>
-                  {teamMembers.map((member) => (
+                  {teamMembers.map(member => (
                     <SelectItem key={member.id} value={member.id.toString()}>
                       {member.name}
                     </SelectItem>
@@ -162,21 +179,42 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
 
           <div className="space-y-2">
             <Label htmlFor="dueDate">Data de Vencimento</Label>
-            <Input id="dueDate" type="date" value={formData.dueDate} onChange={(e) => handleChange("dueDate", e.target.value)} required disabled={isLoading} />
+            <Input
+              id="dueDate"
+              type="date"
+              value={formData.dueDate}
+              onChange={e => handleChange("dueDate", e.target.value)}
+              required
+              disabled={isLoading}
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="project">Projeto</Label>
-            <Input id="project" value={formData.project} onChange={(e) => handleChange("project", e.target.value)} placeholder="ex: Redesenho do site" disabled={isLoading} />
+            <Input
+              id="project"
+              value={formData.project}
+              onChange={e => handleChange("project", e.target.value)}
+              placeholder="ex: Redesenho do site"
+              disabled={isLoading}
+            />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="tags">Tags (separadas por vírgula)</Label>
-            <Input id="tags" value={formData.tags} onChange={(e) => handleChange("tags", e.target.value)} placeholder="ex: frontend, urgente, bug" disabled={isLoading} />
+            <Input
+              id="tags"
+              value={formData.tags}
+              onChange={e => handleChange("tags", e.target.value)}
+              placeholder="ex: frontend, urgente, bug"
+              disabled={isLoading}
+            />
           </div>
 
           <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>Cancelar</Button>
+            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+              Cancelar
+            </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Salvar Alterações
