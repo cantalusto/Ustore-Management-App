@@ -4,9 +4,8 @@ generator client {
 
 datasource db {
   provider   = "postgresql"
-  url        = env("DATABASE_URL")   // pooler, para produção (Vercel)
+  url        = env("DATABASE_URL")
 }
-
 
 model User {
   id            Int      @id @default(autoincrement())
@@ -21,6 +20,7 @@ model User {
   status        String   @default("active")
   assignedTasks Task[]   @relation("AssigneeTasks")
   createdTasks  Task[]   @relation("CreatedTasks")
+  comments      Comment[] // Relação com comentários
 }
 
 model Task {
@@ -38,4 +38,16 @@ model Task {
   updatedAt   DateTime @updatedAt
   assignee    User     @relation("AssigneeTasks", fields: [assigneeId], references: [id])
   createdBy   User     @relation("CreatedTasks", fields: [createdById], references: [id])
+  comments    Comment[] // Relação com comentários
+}
+
+// Novo model para os comentários
+model Comment {
+  id        Int      @id @default(autoincrement())
+  text      String
+  createdAt DateTime @default(now())
+  taskId    Int
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
 }

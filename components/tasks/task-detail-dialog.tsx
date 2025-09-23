@@ -1,24 +1,35 @@
 // components/tasks/task-detail-dialog.tsx
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Calendar, User, Clock, Tag, Edit, MessageSquare, Trash2 } from "lucide-react"
+import { Calendar, User, Clock, Tag, Edit, MessageSquare, Trash2, Send } from "lucide-react"
 import { EditTaskDialog } from "./edit-task-dialog"
 import { DeleteTaskDialog } from "./delete-task-dialog"
-import type { Task } from "@/lib/types"
+import type { Task, User as UserType } from "@/lib/auth"
+import { formatDistanceToNow } from "date-fns"
+import { ptBR } from "date-fns/locale"
+
+interface Comment {
+  id: number;
+  text: string;
+  createdAt: string;
+  author: {
+    name: string;
+    image?: string | null;
+  };
+}
 
 interface TaskDetailDialogProps {
   task: Task
   open: boolean
   onClose: () => void
   onUpdate: (task: Task) => void
-  // A prop onDelete não é mais necessária se vamos recarregar a página
   userRole: string
   userId: number
 }
@@ -26,9 +37,10 @@ interface TaskDetailDialogProps {
 export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, userId }: TaskDetailDialogProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [comment, setComment] = useState("")
+  const [newComment, setNewComment] = useState("")
+  const [comments, setComments] = useState<Comment[]>([])
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false)
   
-  // As funções getPriorityColor e getStatusColor permanecem as mesmas...
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "urgente": return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
@@ -48,6 +60,48 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
       default: return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
     }
   }
+
+  useEffect(() => {
+    if (open && task) {
+      fetchComments();
+    }
+  }, [open, task]);
+
+  const fetchComments = async () => {
+    if (!task) return;
+    try {
+      const response = await fetch(`/api/tasks/${task.id}/comments`);
+      const data = await response.json();
+      if (response.ok) {
+        setComments(data.comments);
+      }
+    } catch (error) {
+      console.error("Falha ao buscar comentários:", error);
+    }
+  };
+
+  const handleCommentSubmit = async () => {
+    if (!newComment.trim() || !task) return;
+    setIsSubmittingComment(true);
+    try {
+      const response = await fetch(`/api/tasks/${task.id}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: newComment }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setComments(prev => [...prev, data.comment]);
+        setNewComment("");
+      } else {
+        alert(data.error || "Falha ao adicionar comentário");
+      }
+    } catch (error) {
+      console.error("Erro ao adicionar comentário:", error);
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
 
   const handleStatusChange = async (newStatus: Task["status"]) => {
     try {
@@ -70,12 +124,10 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
     setIsEditing(false);
   };
 
-  // --- ALTERAÇÃO PRINCIPAL AQUI ---
-  // Esta função agora irá recarregar a página inteira
   const handleDeleteSuccess = () => {
     setIsDeleting(false);
     onClose();
-    window.location.reload(); // Recarrega a página para buscar a nova lista de tarefas
+    window.location.reload();
   };
 
   const canEditTask = () => {
@@ -87,7 +139,7 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <div className="flex items-start justify-between">
               <DialogTitle className="text-xl">{task.title}</DialogTitle>
@@ -106,8 +158,7 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
             </div>
           </DialogHeader>
 
-          {/* O resto do seu componente permanece exatamente o mesmo */}
-          <div className="space-y-6">
+          <div className="space-y-6 overflow-y-auto pr-6">
             <div className="flex items-center space-x-4">
                 <div className="space-y-2">
                     <label className="text-sm font-medium">Status</label>
@@ -201,20 +252,46 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
                 </div>
               </div>
             )}
-
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
+            
+            {/* Seção de Comentários */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium flex items-center gap-2">
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Adicionar Comentário</span>
+                Comentários ({comments.length})
+              </h3>
+              <div className="space-y-4">
+                {comments.map(comment => (
+                  <div key={comment.id} className="flex items-start space-x-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback>{comment.author.name.split(" ").map(n => n[0]).join("")}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium">{comment.author.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: ptBR })}
+                        </p>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{comment.text}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
+            </div>
+          </div>
+          
+          {/* Formulário para novo comentário */}
+          <div className="mt-auto pt-4 border-t">
+            <div className="relative">
               <Textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Adicionar um comentário..."
-                rows={3}
+                rows={2}
+                className="pr-12"
               />
-              <Button size="sm" disabled={!comment.trim()}>
-                Adicionar Comentário
+              <Button size="sm" onClick={handleCommentSubmit} disabled={!newComment.trim() || isSubmittingComment} className="absolute right-2 bottom-2">
+                <Send className="h-4 w-4" />
               </Button>
             </div>
           </div>

@@ -18,15 +18,14 @@ interface TaskCardProps {
 export function TaskCard({ task, onClick, userRole, userId, isDragging }: TaskCardProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging: isSortableDragging } = useSortable({
     id: task.id,
-    data: {
-        type: 'Task',
-        task, // Passa a tarefa inteira nos dados do evento
-    }
+    data: { type: 'Task', task },
   })
 
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
+    opacity: isDragging || isSortableDragging ? 0.8 : 1,
+    boxShadow: isDragging || isSortableDragging ? "0 10px 25px rgba(0,0,0,0.2)" : undefined,
   }
 
   const getPriorityColor = (priority: string) => {
@@ -41,19 +40,13 @@ export function TaskCard({ task, onClick, userRole, userId, isDragging }: TaskCa
 
   const isOverdue = new Date(task.dueDate) < new Date() && task.status !== "concluido"
 
-  if (isDragging) {
-    return (
-        <Card ref={setNodeRef} style={style} className="ring-2 ring-primary opacity-80" />
-    )
-  }
-
   return (
-    <Card 
-      ref={setNodeRef} 
-      style={style} 
-      {...attributes} 
-      {...listeners} 
-      className={`cursor-grab hover:shadow-md transition-shadow active:cursor-grabbing ${isSortableDragging ? 'opacity-50' : ''}`}
+    <Card
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={`cursor-grab hover:shadow-md transition-shadow active:cursor-grabbing`}
     >
       <div onClick={onClick} className="cursor-pointer">
         <CardContent className="p-4 space-y-3">
