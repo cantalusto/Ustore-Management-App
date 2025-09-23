@@ -1,5 +1,8 @@
+// app/api/tasks/[id]/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { getCurrentUser } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
@@ -84,5 +87,31 @@ export async function PATCH(
   } catch (error) {
     console.error("Erro ao atualizar tarefa:", error);
     return NextResponse.json({ error: "Erro ao atualizar tarefa" }, { status: 500 });
+  }
+}
+
+// DELETE (excluir tarefa)
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const user = await getCurrentUser();
+  if (!user || (user.role !== "admin" && user.role !== "manager")) {
+    return NextResponse.json({ error: "Permissões insuficientes" }, { status: 403 });
+  }
+
+  const taskId = parseInt(params.id, 10);
+  if (isNaN(taskId)) {
+    return NextResponse.json({ error: "ID inválido" }, { status: 400 });
+  }
+
+  try {
+    await prisma.task.delete({
+      where: { id: taskId },
+    });
+    return NextResponse.json({ success: true, message: "Tarefa excluída com sucesso." });
+  } catch (error) {
+    console.error("Erro ao excluir tarefa:", error);
+    return NextResponse.json({ error: "Falha ao excluir a tarefa." }, { status: 500 });
   }
 }
