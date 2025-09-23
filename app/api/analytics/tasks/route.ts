@@ -2,7 +2,8 @@
 
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
+import { subDays, format } from "date-fns";
 
 const prisma = new PrismaClient();
 
@@ -12,62 +13,99 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 403 });
   }
 
+  const { searchParams } = new URL(request.url);
+  const range = parseInt(searchParams.get("range")?.replace('d', '') || "30", 10);
+  const startDate = subDays(new Date(), range);
+
   try {
-    // Distribuição por Status
+    // --- DISTRIBUIÇÃO POR STATUS ---
     const statusDistributionRaw = await prisma.task.groupBy({
       by: ['status'],
       _count: { status: true },
+      where: { createdAt: { gte: startDate } },
     });
     const statusDistribution = statusDistributionRaw.map(item => ({
-        name: item.status.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        value: item._count.status,
-        color: { 'a-fazer': '#6b7280', 'em-progresso': '#3b82f6', 'revisao': '#f59e0b', 'concluido': '#10b981' }[item.status] || '#ccc'
+      name: item.status.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      value: item._count.status,
+      color: { 'a-fazer': '#6b7280', 'em-progresso': '#3b82f6', 'revisao': '#f59e0b', 'concluido': '#10b981' }[item.status] || '#ccc'
     }));
 
-    // Distribuição por Prioridade
+    // --- DISTRIBUIÇÃO POR PRIORIDADE ---
     const priorityDistributionRaw = await prisma.task.groupBy({
-        by: ['priority'],
-        _count: { priority: true }
+      by: ['priority'],
+      _count: { priority: true },
+      where: { createdAt: { gte: startDate } },
     });
     const priorityDistribution = priorityDistributionRaw.map(item => ({
-        name: item.priority.charAt(0).toUpperCase() + item.priority.slice(1),
-        value: item._count.priority
+      name: item.priority.charAt(0).toUpperCase() + item.priority.slice(1),
+      value: item._count.priority,
     }));
     
-    // Desempenho por Departamento
+    // --- DESEMPENHO POR DEPARTAMENTO ---
     const departmentStatsRaw = await prisma.user.findMany({
-        where: { department: { not: null } },
-        select: {
-            department: true,
-            assignedTasks: {
-                select: { status: true }
-            }
+      where: { department: { not: null } },
+      select: {
+        department: true,
+        assignedTasks: {
+          where: { createdAt: { gte: startDate } },
+          select: { status: true }
         }
+      }
     });
 
     const departmentStatsMap = new Map<string, { completed: number, pending: number }>();
     departmentStatsRaw.forEach(user => {
-        if (user.department) {
-            if (!departmentStatsMap.has(user.department)) {
-                departmentStatsMap.set(user.department, { completed: 0, pending: 0 });
-            }
-            const stats = departmentStatsMap.get(user.department)!;
-            user.assignedTasks.forEach(task => {
-                if (task.status === 'concluido') stats.completed++;
-                else stats.pending++;
-            });
+      if (user.department) {
+        if (!departmentStatsMap.has(user.department)) {
+          departmentStatsMap.set(user.department, { completed: 0, pending: 0 });
         }
+        const stats = departmentStatsMap.get(user.department)!;
+        user.assignedTasks.forEach(task => {
+          if (task.status === 'concluido') stats.completed++;
+          else stats.pending++;
+        });
+      }
     });
 
     const departmentStats = Array.from(departmentStatsMap.entries()).map(([department, stats]) => ({
-        department,
-        ...stats
+      department,
+      ...stats
     }));
+
+    // --- CÁLCULO DA TENDÊNCIA DE CONCLUSÃO ---
+    const tasksForTrend = await prisma.task.findMany({
+      where: { createdAt: { gte: startDate } },
+      select: { createdAt: true, status: true, updatedAt: true },
+    });
+
+    const trendData = new Map<string, { created: number, completed: number }>();
+
+    for (let i = 0; i < range; i++) {
+        const date = format(subDays(new Date(), i), 'dd/MM');
+        trendData.set(date, { created: 0, completed: 0 });
+    }
+
+    tasksForTrend.forEach(task => {
+        const createdDate = format(new Date(task.createdAt), 'dd/MM');
+        if (trendData.has(createdDate)) {
+            trendData.get(createdDate)!.created++;
+        }
+        if (task.status === 'concluido') {
+            const completedDate = format(new Date(task.updatedAt), 'dd/MM');
+            if (trendData.has(completedDate)) {
+                trendData.get(completedDate)!.completed++;
+            }
+        }
+    });
+    
+    const completionTrend = Array.from(trendData.entries())
+        .map(([date, data]) => ({ date, ...data }))
+        .reverse(); // Ordena do mais antigo para o mais recente
 
     const data = {
       statusDistribution,
       priorityDistribution,
-      completionTrend: [], // O cálculo de tendência requer mais lógica, deixado como exemplo
+      completionTrend,
       departmentStats,
     };
 
