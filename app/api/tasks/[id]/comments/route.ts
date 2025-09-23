@@ -24,6 +24,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       include: {
         author: {
           select: {
+            id: true, // Adicionado para obter o authorId
             name: true,
             image: true,
           },
@@ -67,6 +68,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       include: {
         author: {
             select: {
+                id: true,
                 name: true,
                 image: true,
             }
@@ -78,5 +80,30 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   } catch (error) {
     console.error("Falha ao criar comentário:", error);
     return NextResponse.json({ error: "Falha ao criar comentário." }, { status: 500 });
+  }
+}
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+
+  const { searchParams } = new URL(request.url);
+  const commentId = searchParams.get("commentId");
+  
+  if (!commentId || isNaN(parseInt(commentId))) return NextResponse.json({ error: "ID do comentário inválido" }, { status: 400 });
+
+  try {
+    const comment = await prisma.comment.findUnique({ where: { id: parseInt(commentId) } });
+    if (!comment) return NextResponse.json({ error: "Comentário não encontrado" }, { status: 404 });
+
+    // Apenas autor ou admin podem deletar
+    if (comment.authorId !== user.id && user.role !== "admin") {
+      return NextResponse.json({ error: "Não autorizado a deletar este comentário" }, { status: 403 });
+    }
+
+    await prisma.comment.delete({ where: { id: parseInt(commentId) } });
+    return NextResponse.json({ message: "Comentário deletado com sucesso" });
+  } catch (error) {
+    console.error("Erro ao deletar comentário:", error);
+    return NextResponse.json({ error: "Falha ao deletar comentário" }, { status: 500 });
   }
 }

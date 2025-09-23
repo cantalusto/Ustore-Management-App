@@ -18,6 +18,7 @@ import { ptBR } from "date-fns/locale"
 interface Comment {
   id: number;
   text: string;
+  authorId: number;
   createdAt: string;
   author: {
     name: string;
@@ -103,6 +104,24 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
     }
   };
 
+  const handleDeleteComment = async (commentId: number) => {
+    if (!confirm("Tem certeza que deseja apagar este comentário?")) return;
+
+    try {
+      const res = await fetch(`/api/tasks/${task.id}/comments?commentId=${commentId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setComments(prev => prev.filter(c => c.id !== commentId));
+      } else {
+        alert(data.error || "Falha ao deletar comentário");
+      }
+    } catch (error) {
+      console.error("Erro ao deletar comentário:", error);
+    }
+  };
+
   const handleStatusChange = async (newStatus: Task["status"]) => {
     try {
       const response = await fetch(`/api/tasks/${task.id}`, {
@@ -132,6 +151,10 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
 
   const canEditTask = () => {
     return userRole === "admin" || userRole === "manager" || task.createdBy === userId || task.assigneeId === userId
+  }
+
+  const canDeleteComment = (comment: Comment) => {
+    return userRole === "admin" || comment.authorId === userId;
   }
 
   const isOverdue = new Date(task.dueDate) < new Date() && task.status !== "concluido"
@@ -268,9 +291,16 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
                         <p className="text-sm font-medium">{comment.author.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: ptBR })}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-xs text-muted-foreground">
+                            {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: ptBR })}
+                          </p>
+                          {canDeleteComment(comment) && (
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteComment(comment.id)}>
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          )}
+                        </div>
                       </div>
                       <p className="text-sm text-muted-foreground">{comment.text}</p>
                     </div>
