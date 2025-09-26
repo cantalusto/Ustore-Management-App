@@ -54,8 +54,8 @@ Siga os passos abaixo para implementar esta solução inovadora em seu ambiente.
 
 1. **Clone o Repositório:**
 ```bash
-git clone https://github.com/cantalusto/ustore-system.git
-cd ustore-system
+git https://github.com/cantalusto/Ustore-Management-App
+cd Ustore-Management-App
 ```
 
 2. **Instale as Dependências:**
