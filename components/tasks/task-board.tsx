@@ -1,3 +1,4 @@
+// Mentoria/components/tasks/task-board.tsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -7,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { TaskColumn } from "./task-column"
 import { TaskDetailDialog } from "./task-detail-dialog"
 import { TaskFilters, type TaskFilters as TaskFiltersType } from "@/components/filters/task-filters"
-import type { Task, TeamMember } from "@/lib/types"
+import type { Task, TeamMember } from "@/lib/auth"
 import { TaskCard } from "./task-card"
 
 interface TaskBoardProps {
@@ -23,9 +24,10 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null)
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
   const [projects, setProjects] = useState<string[]>([])
+  const [departments, setDepartments] = useState<string[]>([]) // Adicionado
 
   const [filters, setFilters] = useState<TaskFiltersType>({
-    search: "", status: "", priority: "", assignee: "", project: "",
+    search: "", status: "", priority: "", assignee: "", project: "", department: "", // Adicionado
     dueDateFrom: undefined, dueDateTo: undefined, overdue: false,
   })
 
@@ -53,6 +55,14 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
         )
       ) as string[]
       setProjects(uniqueProjects)
+
+      // Adicionado para extrair departamentos únicos
+      const uniqueDepartments = Array.from(
+        new Set(
+          (data.tasks?.map((task: Task) => task.assigneeDepartment).filter((d: any): d is string => Boolean(d))) || []
+        )
+      ) as string[]
+      setDepartments(uniqueDepartments)
     } catch (error) { console.error("Falha ao buscar tarefas:", error) }
     finally { setLoading(false) }
   }
@@ -81,6 +91,7 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
     if (filters.priority) filtered = filtered.filter(task => task.priority === filters.priority)
     if (filters.assignee) filtered = filtered.filter(task => task.assigneeId.toString() === filters.assignee)
     if (filters.project) filtered = filtered.filter(task => task.project === filters.project)
+    if (filters.department) filtered = filtered.filter(task => task.assigneeDepartment === filters.department) // Adicionado
     if (filters.dueDateFrom) filtered = filtered.filter(task => new Date(task.dueDate) >= filters.dueDateFrom!)
     if (filters.dueDateTo) filtered = filtered.filter(task => new Date(task.dueDate) <= filters.dueDateTo!)
     if (filters.overdue) {
@@ -157,7 +168,7 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} sensors={sensors} collisionDetection={closestCorners}>
       <div className="mb-6">
-        <TaskFilters filters={filters} onFiltersChange={setFilters} teamMembers={teamMembers} projects={projects} />
+        <TaskFilters filters={filters} onFiltersChange={setFilters} teamMembers={teamMembers} projects={projects} departments={departments} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-start">

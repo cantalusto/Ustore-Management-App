@@ -1,4 +1,5 @@
 export interface Task {
+  assigneeDepartment: any
   id: number
   title: string
   description: string

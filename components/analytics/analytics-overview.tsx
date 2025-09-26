@@ -23,18 +23,51 @@ interface AnalyticsOverviewProps {
   userRole: string
 }
 
+interface MemberPerformance {
+    id: number;
+    name: string;
+    department: string;
+}
+
 export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
   const [stats, setStats] = useState<OverviewStats | null>(null)
-  const [timeRange, setTimeRange] = useState("30d")
   const [loading, setLoading] = useState(true)
+  const [timeRange, setTimeRange] = useState("30d")
+  const [departments, setDepartments] = useState<string[]>([])
+  const [allMembers, setAllMembers] = useState<MemberPerformance[]>([])
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('all')
+  const [selectedMember, setSelectedMember] = useState<string>('all')
+
+  useEffect(() => {
+    const fetchFilterData = async () => {
+      try {
+        const response = await fetch('/api/analytics/team-performance');
+        const data = await response.json();
+        if (data.members) {
+            setAllMembers(data.members);
+            const uniqueDepartments = [...new Set(data.members.map((m: MemberPerformance) => m.department))] as string[];
+            setDepartments(uniqueDepartments);
+        }
+      } catch (error) {
+        console.error("Failed to fetch filter data:", error);
+      }
+    };
+    fetchFilterData();
+  }, []);
 
   useEffect(() => {
     fetchOverviewStats()
-  }, [timeRange])
+  }, [timeRange, selectedDepartment, selectedMember])
 
   const fetchOverviewStats = async () => {
+    setLoading(true)
     try {
-      const response = await fetch(`/api/analytics/overview?range=${timeRange}`)
+      const params = new URLSearchParams()
+      params.append('range', timeRange)
+      if (selectedDepartment !== 'all') params.append('department', selectedDepartment)
+      if (selectedMember !== 'all') params.append('memberId', selectedMember)
+      
+      const response = await fetch(`/api/analytics/overview?${params.toString()}`)
       const data = await response.json()
       setStats(data.stats)
     } catch (error) {
@@ -60,7 +93,7 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
       value: stats.totalTasks.toString(),
       icon: CheckSquare,
       trend: stats.trends.tasks,
-      description: "no sistema",
+      description: "criadas no período",
     },
     {
       title: "Taxa de Conclusão",
@@ -74,7 +107,7 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
       value: stats.activeMembers.toString(),
       icon: Users,
       trend: stats.trends.members,
-      description: "com tarefas",
+      description: "no filtro",
     },
     {
       title: "Tarefas Atrasadas",
@@ -88,18 +121,38 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <h2 className="text-xl font-semibold">Visão Geral</h2>
-        <Select value={timeRange} onValueChange={setTimeRange}>
-          <SelectTrigger className="w-32">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="7d">7 dias</SelectItem>
-            <SelectItem value="30d">30 dias</SelectItem>
-            <SelectItem value="90d">90 dias</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="flex gap-2">
+          <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Departamento" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {departments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={selectedMember} onValueChange={setSelectedMember}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Membro" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {allMembers.map(m => <SelectItem key={m.id} value={m.id.toString()}>{m.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={timeRange} onValueChange={setTimeRange}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="7d">7 dias</SelectItem>
+              <SelectItem value="30d">30 dias</SelectItem>
+              <SelectItem value="90d">90 dias</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

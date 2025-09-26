@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, AlertTriangle } from "lucide-react"
-import type { Task } from "@/lib/types"
+import type { Task } from "@/lib/auth"
 
 interface DeleteTaskDialogProps {
   task: Task

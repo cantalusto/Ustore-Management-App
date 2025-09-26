@@ -5,7 +5,7 @@ import { CSS } from "@dnd-kit/utilities"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, User } from "lucide-react"
-import type { Task } from "@/lib/types"
+import type { Task } from "@/lib/auth"
 
 interface TaskCardProps {
   task: Task

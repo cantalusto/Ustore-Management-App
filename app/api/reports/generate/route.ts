@@ -9,10 +9,12 @@ const prisma = new PrismaClient();
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { type, format, dateRange, memberId } = body;
+    // Adiciona 'department' à desestruturação
+    const { type, format, dateRange, memberId, department } = body;
 
     if (format === "excel") {
-      return generateExcelReport(type, dateRange, memberId);
+      // Passa 'department' para a função de geração
+      return generateExcelReport(type, dateRange, memberId, department);
     }
 
     return NextResponse.json({ error: "Formato inválido" }, { status: 400 });
@@ -22,7 +24,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function generateExcelReport(type: string, dateRange: { from: string; to: string }, memberId: string | null) {
+async function generateExcelReport(type: string, dateRange: { from: string; to: string }, memberId: string | null, department: string | null) {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet("Relatório");
   const startDate = new Date(dateRange.from);
@@ -33,25 +35,29 @@ async function generateExcelReport(type: string, dateRange: { from: string; to: 
   worksheet.addRow([`Período: ${startDate.toLocaleDateString("pt-BR")} - ${endDate.toLocaleDateString("pt-BR")}`]);
   worksheet.addRow([]);
 
+  // Cria um filtro de usuário genérico
+  const userFilter: any = {};
+  if (department) userFilter.department = department;
+  if (memberId) userFilter.id = parseInt(memberId, 10);
+
   switch (type) {
     case "team-performance":
-      await generateTeamPerformanceExcel(worksheet, startDate, endDate);
+      await generateTeamPerformanceExcel(worksheet, startDate, endDate, userFilter);
       break;
     case "task-summary":
-      await generateTaskSummaryExcel(worksheet, startDate, endDate);
+      await generateTaskSummaryExcel(worksheet, startDate, endDate, userFilter);
       break;
     case "individual-performance":
+      // Este relatório específico ainda usa memberId diretamente
       await generateIndividualPerformanceExcel(worksheet, startDate, endDate, memberId);
       break;
     case "project-status":
-      await generateProjectStatusExcel(worksheet, startDate, endDate);
+      await generateProjectStatusExcel(worksheet, startDate, endDate, userFilter);
       break;
   }
 
   worksheet.getRow(1).font = { bold: true, size: 16 };
-  worksheet.columns.forEach(column => {
-    column.width = 25;
-  });
+  worksheet.columns.forEach(column => { column.width = 25; });
   
   const buffer = await workbook.xlsx.writeBuffer();
   return new NextResponse(buffer, {
@@ -62,8 +68,9 @@ async function generateExcelReport(type: string, dateRange: { from: string; to: 
   });
 }
 
-async function generateTeamPerformanceExcel(worksheet: ExcelJS.Worksheet, from: Date, to: Date) {
+async function generateTeamPerformanceExcel(worksheet: ExcelJS.Worksheet, from: Date, to: Date, userFilter: any) {
   const users = await prisma.user.findMany({
+    where: userFilter, // Aplica o filtro
     include: { assignedTasks: { where: { createdAt: { gte: from, lte: to } } } },
   });
   worksheet.addRow(["Nome", "Cargo", "Departamento", "Tarefas Atribuídas", "Tarefas Concluídas", "Taxa de Conclusão (%)"]);
@@ -75,14 +82,19 @@ async function generateTeamPerformanceExcel(worksheet: ExcelJS.Worksheet, from: 
   });
 }
 
-async function generateTaskSummaryExcel(worksheet: ExcelJS.Worksheet, from: Date, to: Date) {
+async function generateTaskSummaryExcel(worksheet: ExcelJS.Worksheet, from: Date, to: Date, userFilter: any) {
+  const taskWhere: any = { createdAt: { gte: from, lte: to } };
+  if (Object.keys(userFilter).length > 0) {
+    taskWhere.assignee = userFilter; // Filtra tarefas pelo responsável
+  }
+
   const tasks = await prisma.task.findMany({
-    where: { createdAt: { gte: from, lte: to } },
+    where: taskWhere,
     include: { assignee: true },
   });
   worksheet.addRow(["Título", "Status", "Prioridade", "Responsável", "Projeto", "Data de Vencimento"]);
   tasks.forEach(task => {
-    worksheet.addRow([task.title, task.status, task.priority, task.assignee.name, task.project, task.dueDate.toLocaleDateString('pt-BR')]);
+    worksheet.addRow([task.title, task.status, task.priority, task.assignee?.name || 'N/A', task.project, task.dueDate.toLocaleDateString('pt-BR')]);
   });
 }
 
@@ -104,8 +116,8 @@ async function generateIndividualPerformanceExcel(worksheet: ExcelJS.Worksheet, 
   const member = await prisma.user.findUnique({ where: { id: memberIdInt } });
   
   worksheet.addRow([`Relatório de Desempenho Individual: ${member?.name || 'Membro não encontrado'}`]);
-  worksheet.mergeCells('A1', 'E1');
-  worksheet.getCell('A1').font = { bold: true, size: 14 };
+  worksheet.mergeCells('A5', 'E5'); // Ajuste da linha para não sobrepor o cabeçalho
+  worksheet.getCell('A5').font = { bold: true, size: 14 };
   worksheet.addRow([]);
   worksheet.addRow(["Título", "Status", "Prioridade", "Projeto", "Data de Vencimento"]);
   
@@ -114,10 +126,14 @@ async function generateIndividualPerformanceExcel(worksheet: ExcelJS.Worksheet, 
   });
 }
 
-async function generateProjectStatusExcel(worksheet: ExcelJS.Worksheet, from: Date, to: Date) {
-    const tasks = await prisma.task.findMany({
-        where: { project: { not: null }, createdAt: { gte: from, lte: to } },
-    });
+async function generateProjectStatusExcel(worksheet: ExcelJS.Worksheet, from: Date, to: Date, userFilter: any) {
+    const taskWhere: any = { project: { not: null }, createdAt: { gte: from, lte: to } };
+    if (Object.keys(userFilter).length > 0) {
+      taskWhere.assignee = userFilter; // Filtra tarefas pelo responsável
+    }
+
+    const tasks = await prisma.task.findMany({ where: taskWhere });
+    
     const projectsMap = new Map<string, { total: number; completed: number }>();
     tasks.forEach(task => {
         if (task.project) {
@@ -129,6 +145,7 @@ async function generateProjectStatusExcel(worksheet: ExcelJS.Worksheet, from: Da
             if (task.status === 'concluido') project.completed++;
         }
     });
+
     worksheet.addRow(["Projeto", "Total de Tarefas", "Tarefas Concluídas", "Progresso (%)"]);
     projectsMap.forEach((data, name) => {
         const progress = data.total > 0 ? Math.round((data.completed / data.total) * 100) : 0;

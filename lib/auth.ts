@@ -2,12 +2,15 @@ import { cookies } from "next/headers"
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key"
 
+// ===================
+// Interfaces
+// ===================
 export interface User {
   id: number
   email: string
   role: "admin" | "manager" | "member"
   name: string
-  image?: string // Adicionar este campo opcional
+  image?: string // Campo opcional
 }
 
 export interface Task {
@@ -18,6 +21,7 @@ export interface Task {
   priority: "baixa" | "media" | "alta" | "urgente"
   assigneeId: number
   assigneeName: string
+  assigneeDepartment?: string // Campo opcional
   createdBy: number
   createdByName: string
   dueDate: string
@@ -30,12 +34,13 @@ export interface Task {
 export interface TeamMember {
   id: number
   name: string
-  email?: string // Campo opcional, pois nem sempre é necessário
-  role?: string // Campo opcional
+  email?: string // Opcional
+  role?: string  // Opcional
 }
 
-
-
+// ===================
+// Funções auxiliares
+// ===================
 export async function getCurrentUser(): Promise<User | null> {
   try {
     const cookieStore = await cookies()
@@ -64,6 +69,7 @@ export async function getCurrentUser(): Promise<User | null> {
 export function hasPermission(userRole: string, requiredRole: string): boolean {
   const roleHierarchy = { admin: 3, manager: 2, member: 1 }
   return (
-    roleHierarchy[userRole as keyof typeof roleHierarchy] >= roleHierarchy[requiredRole as keyof typeof roleHierarchy]
+    roleHierarchy[userRole as keyof typeof roleHierarchy] >=
+    roleHierarchy[requiredRole as keyof typeof roleHierarchy]
   )
 }

@@ -14,7 +14,7 @@ import { ptBR } from "date-fns/locale";
 import type { User } from "@/lib/auth";
 
 const reportTypes = [
-  { id: "team-performance", title: "Desempenho da Equipe", description: "Visão geral da produtividade da equipe.", icon: <FileText className="h-5 w-5" />, badge: "Popular" },
+  { id: "team-performance", title: "Desempenho do Departamento", description: "Visão geral da produtividade da equipe.", icon: <FileText className="h-5 w-5" />, badge: "Popular" },
   { id: "task-summary", title: "Resumo de Tarefas", description: "Detalhamento de tarefas por status e prioridade.", icon: <Table className="h-5 w-5" />, badge: "Detalhado" },
   { id: "individual-performance", title: "Desempenho Individual", description: "Métricas para um membro específico.", icon: <FileText className="h-5 w-5" />, badge: "Específico" },
   { id: "project-status", title: "Status dos Projetos", description: "Acompanhe o progresso em todos os projetos.", icon: <Table className="h-5 w-5" />, badge: "Gerencial" },
@@ -25,16 +25,24 @@ export function ReportsOverview() {
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),
   });
+  const [selectedDepartment, setSelectedDepartment] = useState<string>("all");
   const [selectedMember, setSelectedMember] = useState<string>("all");
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
   const [teamMembers, setTeamMembers] = useState<User[]>([]);
+  const [departments, setDepartments] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchMembers = async () => {
       try {
         const response = await fetch("/api/teams/members");
         const data = await response.json();
-        setTeamMembers(data.members || []);
+        const members = data.members || [];
+        setTeamMembers(members);
+        
+        // Derivar departamentos da lista de membros
+        const uniqueDepartments = [...new Set(members.map((m: User) => m.department).filter(Boolean))] as string[];
+        setDepartments(uniqueDepartments);
+
       } catch (error) {
         console.error("Falha ao buscar membros da equipe:", error);
       }
@@ -53,6 +61,7 @@ export function ReportsOverview() {
           type: reportType,
           format,
           dateRange,
+          department: selectedDepartment === "all" ? null : selectedDepartment,
           memberId: selectedMember === "all" ? null : selectedMember,
         }),
       });
@@ -87,8 +96,8 @@ export function ReportsOverview() {
           <CardDescription>Configure os filtros para seus relatórios.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
               <label className="text-sm font-medium mb-2 block">Intervalo de Datas</label>
                 <Popover>
                   <PopoverTrigger asChild>
@@ -110,18 +119,26 @@ export function ReportsOverview() {
                   </PopoverContent>
                 </Popover>
             </div>
-            <div className="flex-1">
-              <label className="text-sm font-medium mb-2 block">Membro da Equipe (para Relatório Individual)</label>
+            <div>
+                <label className="text-sm font-medium mb-2 block">Departamento</label>
+                <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                    <SelectTrigger><SelectValue placeholder="Selecione um depto" /></SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Todos os Departamentos</SelectItem>
+                        {departments.map((dep) => (
+                            <SelectItem key={dep} value={dep}>{dep}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-2 block">Membro da Equipe</label>
               <Select value={selectedMember} onValueChange={setSelectedMember}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione um membro" />
-                </SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Selecione um membro" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos os Membros</SelectItem>
                   {teamMembers.map((member) => (
-                    <SelectItem key={member.id} value={member.id.toString()}>
-                      {member.name}
-                    </SelectItem>
+                    <SelectItem key={member.id} value={member.id.toString()}>{member.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

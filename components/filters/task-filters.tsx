@@ -1,3 +1,4 @@
+// Mentoria/components/filters/task-filters.tsx
 "use client"
 
 import { useState } from "react"
@@ -18,6 +19,7 @@ export interface TaskFilters {
   priority: string
   assignee: string
   project: string
+  department: string // Adicionado
   dueDateFrom: Date | undefined
   dueDateTo: Date | undefined
   overdue: boolean
@@ -28,9 +30,10 @@ interface TaskFiltersProps {
   onFiltersChange: (filters: TaskFilters) => void
   teamMembers: Array<{ id: number; name: string }>
   projects: string[]
+  departments: string[] // Adicionado
 }
 
-export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }: TaskFiltersProps) {
+export function TaskFilters({ filters, onFiltersChange, teamMembers, projects, departments }: TaskFiltersProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   const updateFilter = (key: keyof TaskFilters, value: any) => {
@@ -44,6 +47,7 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
       priority: "",
       assignee: "",
       project: "",
+      department: "", // Adicionado
       dueDateFrom: undefined,
       dueDateTo: undefined,
       overdue: false,
@@ -57,6 +61,7 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
     if (filters.priority) count++
     if (filters.assignee) count++
     if (filters.project) count++
+    if (filters.department) count++ // Adicionado
     if (filters.dueDateFrom || filters.dueDateTo) count++
     if (filters.overdue) count++
     return count
@@ -139,6 +144,23 @@ export function TaskFilters({ filters, onFiltersChange, teamMembers, projects }:
                       {teamMembers.map((member) => (
                         <SelectItem key={member.id} value={member.id.toString()}>
                           {member.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="department">Departamento</Label>
+                  <Select value={filters.department} onValueChange={(value) => updateFilter("department", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o departamento" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os Departamentos</SelectItem>
+                      {departments.map((department) => (
+                        <SelectItem key={department} value={department}>
+                          {department}
                         </SelectItem>
                       ))}
                     </SelectContent>

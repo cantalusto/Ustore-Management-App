@@ -1,3 +1,4 @@
+// Mentoria/components/analytics/team-performance.tsx
 "use client"
 
 import { useState, useEffect } from "react"
@@ -5,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { TrendingUp, TrendingDown, Award, Target } from "lucide-react"
 
 interface MemberPerformance {
@@ -26,16 +28,28 @@ interface TeamPerformanceProps {
 export function TeamPerformance({ userRole }: TeamPerformanceProps) {
   const [members, setMembers] = useState<MemberPerformance[]>([])
   const [loading, setLoading] = useState(true)
+  const [departments, setDepartments] = useState<string[]>([])
+  const [allMembers, setAllMembers] = useState<MemberPerformance[]>([])
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('all')
+  const [selectedMember, setSelectedMember] = useState<string>('all')
 
   useEffect(() => {
     fetchTeamPerformance()
-  }, [])
+  }, [selectedDepartment, selectedMember])
 
   const fetchTeamPerformance = async () => {
     try {
-      const response = await fetch("/api/analytics/team-performance")
+      const params = new URLSearchParams()
+      if (selectedDepartment !== 'all') params.append('department', selectedDepartment)
+      if (selectedMember !== 'all') params.append('memberId', selectedMember)
+      const response = await fetch(`/api/analytics/team-performance?${params.toString()}`)
       const data = await response.json()
       setMembers(data.members || [])
+      if (allMembers.length === 0) {
+        setAllMembers(data.members || [])
+        const uniqueDepartments = [...new Set(data.members?.map((m: MemberPerformance) => m.department) || [])] as string[]
+        setDepartments(uniqueDepartments)
+      }
     } catch (error) {
       console.error("Falha ao buscar desempenho da equipe:", error)
     } finally {
@@ -47,59 +61,83 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">Carregando desempenho da equipe...</div>
+          <div className="text-center">Carregando desempenho...</div>
         </CardContent>
       </Card>
     )
   }
 
-  const topPerformer = members.reduce((prev, current) =>
+  const topPerformer = members.length > 0 ? members.reduce((prev, current) =>
     prev.completionRate > current.completionRate ? prev : current,
-  )
+  ) : null
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg flex items-center space-x-2">
-          <Award className="h-5 w-5" />
-          <span>Desempenho da Equipe</span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Destaque de Melhor Desempenho */}
-        <div className="bg-muted p-4 rounded-lg">
-          <div className="flex items-center space-x-3">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback>
-                {topPerformer.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <div className="flex items-center space-x-2">
-                <h4 className="font-medium">{topPerformer.name}</h4>
-                <Badge variant="secondary" className="bg-white text-black">
-                  Melhor Desempenho
-                </Badge>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {topPerformer.completionRate}% de taxa de conclusão • {topPerformer.department}
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-green-700">{topPerformer.completionRate}%</div>
-              <div className="text-xs text-muted-foreground">taxa de conclusão</div>
-            </div>
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-lg flex items-center space-x-2">
+            <Award className="h-5 w-5" />
+            <span>Desempenho por Departamento</span>
+          </CardTitle>
+          <div className="flex gap-2">
+            <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Departamento" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                {departments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={selectedMember} onValueChange={setSelectedMember}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Membro" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos</SelectItem>
+                {allMembers.map(m => <SelectItem key={m.id} value={m.id.toString()}>{m.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </div>
         </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {topPerformer && (
+          <div className="bg-muted p-4 rounded-lg">
+            <div className="flex items-center space-x-3">
+              <Avatar className="h-10 w-10">
+                <AvatarFallback>
+                  {topPerformer.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <div className="flex items-center space-x-2">
+                  <h4 className="font-medium">{topPerformer.name}</h4>
+                  <Badge variant="secondary" className="bg-white text-black">
+                    Melhor Desempenho
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {topPerformer.completionRate}% de taxa de conclusão • {topPerformer.department}
+                </p>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-green-700">{topPerformer.completionRate}%</div>
+                <div className="text-xs text-muted-foreground">taxa de conclusão</div>
+              </div>
+            </div>
+          </div>
+        )}
 
-        {/* Lista de Membros da Equipe */}
         <div className="space-y-4">
           <h4 className="font-medium flex items-center space-x-2">
             <Target className="h-4 w-4" />
-            <span>Todos os Membros da Equipe</span>
+            <span>
+              {selectedMember !== 'all' ? 'Desempenho Individual' : selectedDepartment !== 'all' ? `Membros de ${selectedDepartment}` : 'Todos os Membros'}
+            </span>
           </h4>
           {members.map((member) => (
             <div key={member.id} className="flex items-center space-x-4 p-3 border rounded-lg">

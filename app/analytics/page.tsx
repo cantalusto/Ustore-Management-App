@@ -1,3 +1,4 @@
+// Mentoria/app/analytics/page.tsx
 import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
@@ -30,7 +31,7 @@ export default async function AnalyticsPage() {
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview">Visão Geral</TabsTrigger>
               <TabsTrigger value="tasks">Análise de Tarefas</TabsTrigger>
-              <TabsTrigger value="team">Desempenho da Equipe</TabsTrigger>
+              <TabsTrigger value="team">Desempenho por Departamento</TabsTrigger> {/* Alterado */}
               <TabsTrigger value="projects">Progresso dos Projetos</TabsTrigger>
             </TabsList>
             <TabsContent value="overview" className="mt-6">

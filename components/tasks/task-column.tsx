@@ -4,7 +4,7 @@ import { useDroppable } from "@dnd-kit/core"
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TaskCard } from "./task-card"
-import type { Task } from "@/lib/types"
+import type { Task } from "@/lib/auth"
 
 interface TaskColumnProps {
   id: Task['status']

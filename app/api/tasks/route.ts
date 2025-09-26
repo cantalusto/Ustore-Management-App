@@ -1,4 +1,4 @@
-// app/api/tasks/route.ts
+// Mentoria/app/api/tasks/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
@@ -30,6 +30,7 @@ export async function GET() {
       ...task,
       dueDate: task.dueDate.toISOString().split('T')[0], // Formata a data
       assigneeName: task.assignee.name, // Adiciona o nome do responsável
+      assigneeDepartment: task.assignee.department, // Adicionado
       createdByName: task.createdBy.name, // Adiciona o nome do criador
       tags: task.tags ? task.tags.split(',') : [], // Converte a string de tags em um array
     }));

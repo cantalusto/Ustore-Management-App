@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
-import type { Task, TeamMember } from "@/lib/types"
+import type { Task, TeamMember } from "@/lib/auth"
 
 interface EditTaskDialogProps {
   task: Task | null

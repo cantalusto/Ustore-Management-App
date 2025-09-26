@@ -74,7 +74,6 @@ export function TeamFilters({ filters, onFiltersChange, departments }: TeamFilte
             <SelectItem value="all">Todos</SelectItem>
             <SelectItem value="active">Ativo</SelectItem>
             <SelectItem value="inactive">Inativo</SelectItem>
-            <SelectItem value="pending">Pendente</SelectItem>
           </SelectContent>
         </Select>
       </div>

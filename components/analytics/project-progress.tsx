@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Users, CheckSquare } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface ProjectData {
   id: number
@@ -23,17 +24,49 @@ interface ProjectProgressProps {
   userRole: string
 }
 
+interface MemberPerformance {
+    id: number;
+    name: string;
+    department: string;
+}
+
 export function ProjectProgress({ userRole }: ProjectProgressProps) {
   const [projects, setProjects] = useState<ProjectData[]>([])
   const [loading, setLoading] = useState(true)
+  const [departments, setDepartments] = useState<string[]>([])
+  const [allMembers, setAllMembers] = useState<MemberPerformance[]>([])
+  const [selectedDepartment, setSelectedDepartment] = useState<string>('all')
+  const [selectedMember, setSelectedMember] = useState<string>('all')
+
+  useEffect(() => {
+    const fetchFilterData = async () => {
+      try {
+        const response = await fetch('/api/analytics/team-performance');
+        const data = await response.json();
+        if (data.members) {
+            setAllMembers(data.members);
+            const uniqueDepartments = [...new Set(data.members.map((m: MemberPerformance) => m.department))] as string[];
+            setDepartments(uniqueDepartments);
+        }
+      } catch (error) {
+        console.error("Failed to fetch filter data:", error);
+      }
+    };
+    fetchFilterData();
+  }, []);
 
   useEffect(() => {
     fetchProjectProgress()
-  }, [])
+  }, [selectedDepartment, selectedMember])
 
   const fetchProjectProgress = async () => {
+    setLoading(true)
     try {
-      const response = await fetch("/api/analytics/projects")
+      const params = new URLSearchParams()
+      if (selectedDepartment !== 'all') params.append('department', selectedDepartment)
+      if (selectedMember !== 'all') params.append('memberId', selectedMember)
+
+      const response = await fetch(`/api/analytics/projects?${params.toString()}`)
       const data = await response.json()
       setProjects(data.projects || [])
     } catch (error) {
@@ -45,45 +78,33 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
 
   const translateStatus = (status: string) => {
     const statuses: { [key: string]: string } = {
-      "on-track": "Em dia",
-      "at-risk": "Em risco",
-      "delayed": "Atrasado",
+      "on-track": "Em dia", "at-risk": "Em risco", "delayed": "Atrasado",
     }
     return statuses[status] || status
   }
   
   const translatePriority = (priority: string) => {
     const priorities: { [key: string]: string } = {
-      "high": "Alta",
-      "medium": "Média",
-      "low": "Baixa",
+      "high": "Alta", "medium": "Média", "low": "Baixa",
     }
     return priorities[priority] || priority
   }
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "on-track":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-      case "at-risk":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-      case "delayed":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+      case "on-track": return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+      case "at-risk": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
+      case "delayed": return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+      default: return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
     }
   }
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "high":
-        return "bg-red-100 text-black dark:bg-red-100"
-      case "medium":
-        return "bg-yellow-100 text-black dark:bg-yellow-100"
-      case "low":
-        return "bg-green-100 text-black dark:bg-green-100"
-      default:
-        return "bg-gray-100 text-black dark:bg-gray-100"
+      case "high": return "bg-red-100 text-black dark:bg-red-100"
+      case "medium": return "bg-yellow-100 text-black dark:bg-yellow-100"
+      case "low": return "bg-green-100 text-black dark:bg-green-100"
+      default: return "bg-gray-100 text-black dark:bg-gray-100"
     }
   }
 
@@ -100,7 +121,29 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Progresso dos Projetos</CardTitle>
+        <div className="flex justify-between items-center">
+            <CardTitle className="text-lg">Progresso dos Projetos</CardTitle>
+            <div className="flex gap-2">
+                <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Departamento" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Todos</SelectItem>
+                        {departments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+                    </SelectContent>
+                </Select>
+                <Select value={selectedMember} onValueChange={setSelectedMember}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Membro" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Todos</SelectItem>
+                        {allMembers.map(m => <SelectItem key={m.id} value={m.id.toString()}>{m.name}</SelectItem>)}
+                    </SelectContent>
+                </Select>
+            </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {projects.map((project) => (
@@ -115,7 +158,6 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
                 <Badge className={getStatusColor(project.status)}>{translateStatus(project.status)}</Badge>
               </div>
             </div>
-
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Progresso</span>
@@ -123,13 +165,10 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
               </div>
               <Progress value={project.progress} className="h-2" />
             </div>
-
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div className="flex items-center space-x-2">
                 <CheckSquare className="h-4 w-4 text-muted-foreground" />
-                <span>
-                  {project.completedTasks}/{project.totalTasks} tarefas
-                </span>
+                <span>{project.completedTasks}/{project.totalTasks} tarefas</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Users className="h-4 w-4 text-muted-foreground" />

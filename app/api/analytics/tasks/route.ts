@@ -1,13 +1,13 @@
 // app/api/analytics/tasks/route.ts
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { PrismaClient } from "@prisma/client";
 import { subDays, format } from "date-fns";
 
 const prisma = new PrismaClient();
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const user = await getCurrentUser();
   if (!user || user.role === "member") {
     return NextResponse.json({ error: "Não autorizado" }, { status: 403 });
@@ -15,14 +15,29 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const range = parseInt(searchParams.get("range")?.replace('d', '') || "30", 10);
+  const department = searchParams.get('department');
+  const memberId = searchParams.get('memberId');
   const startDate = subDays(new Date(), range);
+
+  // Filtro genérico para tarefas
+  const taskWhere: any = {
+    createdAt: { gte: startDate },
+  };
+
+  const userFilter: any = {};
+  if (department) userFilter.department = department;
+  if (memberId) userFilter.id = parseInt(memberId);
+  
+  if (Object.keys(userFilter).length > 0) {
+    taskWhere.assignee = userFilter;
+  }
 
   try {
     // --- DISTRIBUIÇÃO POR STATUS ---
     const statusDistributionRaw = await prisma.task.groupBy({
       by: ['status'],
       _count: { status: true },
-      where: { createdAt: { gte: startDate } },
+      where: taskWhere,
     });
     const statusDistribution = statusDistributionRaw.map(item => ({
       name: item.status.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
@@ -34,7 +49,7 @@ export async function GET(request: Request) {
     const priorityDistributionRaw = await prisma.task.groupBy({
       by: ['priority'],
       _count: { priority: true },
-      where: { createdAt: { gte: startDate } },
+      where: taskWhere,
     });
     const priorityDistribution = priorityDistributionRaw.map(item => ({
       name: item.priority.charAt(0).toUpperCase() + item.priority.slice(1),
@@ -42,8 +57,12 @@ export async function GET(request: Request) {
     }));
     
     // --- DESEMPENHO POR DEPARTAMENTO ---
+    const departmentUserWhere: any = { department: { not: null } };
+    if (department) departmentUserWhere.department = department;
+    if (memberId) departmentUserWhere.id = parseInt(memberId);
+    
     const departmentStatsRaw = await prisma.user.findMany({
-      where: { department: { not: null } },
+      where: departmentUserWhere,
       select: {
         department: true,
         assignedTasks: {
@@ -74,12 +93,11 @@ export async function GET(request: Request) {
 
     // --- CÁLCULO DA TENDÊNCIA DE CONCLUSÃO ---
     const tasksForTrend = await prisma.task.findMany({
-      where: { createdAt: { gte: startDate } },
+      where: taskWhere,
       select: { createdAt: true, status: true, updatedAt: true },
     });
 
     const trendData = new Map<string, { created: number, completed: number }>();
-
     for (let i = 0; i < range; i++) {
         const date = format(subDays(new Date(), i), 'dd/MM');
         trendData.set(date, { created: 0, completed: 0 });
@@ -100,7 +118,7 @@ export async function GET(request: Request) {
     
     const completionTrend = Array.from(trendData.entries())
         .map(([date, data]) => ({ date, ...data }))
-        .reverse(); // Ordena do mais antigo para o mais recente
+        .reverse();
 
     const data = {
       statusDistribution,

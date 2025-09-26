@@ -330,7 +330,10 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
       
       {isEditing && (
         <EditTaskDialog
-          task={task}
+          task={{
+            ...task,
+            assigneeDepartment: (task as any).assigneeDepartment ?? ""
+          }}
           open={isEditing}
           onClose={() => setIsEditing(false)}
           onSuccess={handleUpdateSuccess}
