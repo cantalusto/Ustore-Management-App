@@ -13,27 +13,44 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 403 });
   }
 
-  const { searchParams } = new URL(request.url);
-  const range = parseInt(searchParams.get("range")?.replace('d', '') || "30", 10);
-  const department = searchParams.get('department');
-  const memberId = searchParams.get('memberId');
-  const startDate = subDays(new Date(), range);
-
-  // Filtro genérico para tarefas
-  const taskWhere: any = {
-    createdAt: { gte: startDate },
-  };
-
-  const userFilter: any = {};
-  if (department) userFilter.department = department;
-  if (memberId) userFilter.id = parseInt(memberId);
-  
-  if (Object.keys(userFilter).length > 0) {
-    taskWhere.assignee = userFilter;
-  }
-
   try {
+    const { searchParams } = new URL(request.url);
+    const range = parseInt(searchParams.get("range")?.replace('d', '') || "30", 10);
+    const department = searchParams.get('department');
+    const memberId = searchParams.get('memberId');
+    const startDate = subDays(new Date(), range);
+
+    // Objeto base para o filtro de tarefas
+    const taskWhere: any = {
+      createdAt: { gte: startDate },
+    };
+
+    // Objeto para o filtro de usuário
+    const userFilter: any = {};
+    if (department) userFilter.department = department;
+    if (memberId) userFilter.id = parseInt(memberId);
+
+    // ✅ CORREÇÃO: Lógica para evitar a junção ambígua
+    if (Object.keys(userFilter).length > 0) {
+      // 1. Primeiro, buscamos os IDs dos usuários que correspondem ao filtro
+      const users = await prisma.user.findMany({
+        where: userFilter,
+        select: { id: true },
+      });
+      const userIds = users.map(u => u.id);
+
+      // Se nenhum usuário for encontrado, não haverá tarefas para retornar
+      if (userIds.length === 0) {
+        // Retorna dados vazios para evitar erros
+        return NextResponse.json({ data: { statusDistribution: [], priorityDistribution: [], completionTrend: [], departmentStats: [] } });
+      }
+
+      // 2. Em seguida, filtramos as tarefas usando 'assigneeId' com a lista de IDs
+      taskWhere.assigneeId = { in: userIds };
+    }
+
     // --- DISTRIBUIÇÃO POR STATUS ---
+    // Agora esta consulta não é mais ambígua
     const statusDistributionRaw = await prisma.task.groupBy({
       by: ['status'],
       _count: { status: true },
