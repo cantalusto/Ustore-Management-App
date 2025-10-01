@@ -168,7 +168,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                   </span>
                 </div>
               </div>
-              <div className="px-3 py-2 border-b">
+              <div className="px-3 py-2 border-b lg:hidden">
                 <LanguageSwitcher />
               </div>
               <DropdownMenuItem asChild>
