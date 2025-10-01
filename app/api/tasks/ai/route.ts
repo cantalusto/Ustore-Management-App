@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Nenhum membro de equipe encontrado no banco de dados." }, { status: 500 });
     }
 
-    const { prompt } = await request.json();
+    const { prompt, language } = await request.json();
     if (!prompt) {
       return NextResponse.json({ error: "O prompt é obrigatório." }, { status: 400 });
     }
@@ -35,7 +35,34 @@ export async function POST(request: NextRequest) {
     const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const teamMemberList = teamMembersFromDB.map((m) => `- ${m.name}`).join("\n");
 
-    const aiPrompt = `
+    // Definir prompts baseados no idioma
+    const isEnglish = language === 'en';
+    
+    const aiPrompt = isEnglish ? `
+      You are an intelligent assistant for a task management system.
+      Your function is to create a task in pure JSON, without titles, explanations or markdown.
+      The JSON MUST have this structure:
+      {
+        "title": "string",
+        "description": "string (required)",
+        "priority": "'low' | 'medium' | 'high' | 'urgent'",
+        "assigneeName": "string (name of one of the team members)",
+        "dueDate": "string (in YYYY-MM-DD format, required)",
+        "project": "string (required)",
+        "tags": "string[] (minimum 3 tags related to the project, required)"
+      }
+      Available members for assignment:
+      ${teamMemberList}
+      Important rules:
+      - The description must be detailed.
+      - The project field must be filled but with a maximum of two words.
+      - There must be 3 tags related to the project.
+      - The date format must be strictly YYYY-MM-DD.
+      - If any of the required fields are missing, generate them automatically.
+      - Return only valid JSON.
+      Analyze the following user text and extract the task details:
+      Text: "${prompt}"
+    ` : `
       Você é um assistente inteligente para um sistema de gerenciamento de tarefas.
       Sua função é criar uma tarefa em JSON puro, sem títulos, explicações ou markdown.
       O JSON DEVE ter esta estrutura:
@@ -98,8 +125,22 @@ export async function POST(request: NextRequest) {
     if (isNaN(dueDate.getTime())) {
       return NextResponse.json({ error: `A IA retornou uma data inválida: '${taskData.dueDate}'.` }, { status: 500 });
     }
-    const allowedPriorities = ["low", "medium", "high", "urgent"];
-    const priority = allowedPriorities.includes(taskData.priority) ? taskData.priority : "medium";
+    
+    // Mapear prioridades baseado no idioma
+    let priority = "medium"; // padrão
+    if (isEnglish) {
+      const allowedPriorities = ["low", "medium", "high", "urgent"];
+      priority = allowedPriorities.includes(taskData.priority) ? taskData.priority : "medium";
+    } else {
+      // Mapear prioridades em português para inglês
+      const priorityMap: { [key: string]: string } = {
+        "baixa": "low",
+        "media": "medium", 
+        "alta": "high",
+        "urgente": "urgent"
+      };
+      priority = priorityMap[taskData.priority] || "medium";
+    }
 
     // Criação da Tarefa
     const newTask = await prisma.task.create({

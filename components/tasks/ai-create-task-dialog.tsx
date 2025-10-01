@@ -17,7 +17,7 @@ interface AiCreateTaskDialogProps {
 }
 
 export function AiCreateTaskDialog({ open, onClose, onSuccess }: AiCreateTaskDialogProps) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [prompt, setPrompt] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -33,7 +33,7 @@ export function AiCreateTaskDialog({ open, onClose, onSuccess }: AiCreateTaskDia
       const response = await fetch("/api/tasks/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+        body: JSON.stringify({ prompt, language }),
       })
 
       const data = await response.json()
