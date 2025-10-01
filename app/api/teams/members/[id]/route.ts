@@ -19,15 +19,15 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   if (isNaN(memberId)) {
     return NextResponse.json({ error: "ID de membro inválido" }, { status: 400 });
   }
-  
+
   // Um usuário só pode editar o próprio perfil (a menos que seja admin/manager)
   if (user.role !== 'admin' && user.role !== 'manager' && user.id !== memberId) {
-      return NextResponse.json({ error: "Permissões insuficientes" }, { status: 403 });
+    return NextResponse.json({ error: "Permissões insuficientes" }, { status: 403 });
   }
 
   try {
     const updates = await request.json();
-    
+
     // Se uma nova senha foi enviada, criptografa-a
     if (updates.password && updates.password.trim() !== "") {
       updates.password = await bcrypt.hash(updates.password, saltRounds);
@@ -49,6 +49,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
+<<<<<<< HEAD
 // Rota para DELETAR um membro
 export async function DELETE(
   request: Request,
@@ -56,7 +57,7 @@ export async function DELETE(
 ) {
   try {
     const user = await getCurrentUser();
-    
+
     if (!user) {
       return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
     }
@@ -114,3 +115,4 @@ export async function DELETE(
     return NextResponse.json({ error: "Falha ao deletar membro." }, { status: 500 });
   }
 }
+
