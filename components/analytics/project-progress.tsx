@@ -6,6 +6,7 @@ import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Users, CheckSquare } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useLanguage } from "@/contexts/language-context"
 
 interface ProjectData {
   id: number
@@ -31,6 +32,7 @@ interface MemberPerformance {
 }
 
 export function ProjectProgress({ userRole }: ProjectProgressProps) {
+  const { t } = useLanguage()
   const [projects, setProjects] = useState<ProjectData[]>([])
   const [loading, setLoading] = useState(true)
   const [departments, setDepartments] = useState<string[]>([])
@@ -116,7 +118,7 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">Carregando progresso dos projetos...</div>
+          <div className="text-center">{t('projects.loading')}</div>
         </CardContent>
       </Card>
     )
@@ -126,23 +128,23 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
-            <CardTitle className="text-lg">Progresso dos Projetos</CardTitle>
+            <CardTitle className="text-lg">{t('projects.title')}</CardTitle>
             <div className="flex gap-2">
                 <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
                     <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Departamento" />
+                        <SelectValue placeholder={t('projects.department_filter')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">Todos</SelectItem>
+                        <SelectItem value="all">{t('projects.all_departments')}</SelectItem>
                         {departments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
                     </SelectContent>
                 </Select>
                 <Select value={selectedMember} onValueChange={setSelectedMember}>
                     <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Membro" />
+                        <SelectValue placeholder={t('projects.member_filter')} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">Todos</SelectItem>
+                        <SelectItem value="all">{t('projects.all_members')}</SelectItem>
                         {allMembers.map(m => <SelectItem key={m.id} value={m.id.toString()}>{m.name}</SelectItem>)}
                     </SelectContent>
                 </Select>
@@ -164,7 +166,7 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
             </div>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
-                <span>Progresso</span>
+                <span>{t('projects.progress')}</span>
                 <span>{project.progress}%</span>
               </div>
               <Progress value={project.progress} className="h-2" />
@@ -172,15 +174,15 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div className="flex items-center space-x-2">
                 <CheckSquare className="h-4 w-4 text-muted-foreground" />
-                <span>{project.completedTasks}/{project.totalTasks} tarefas</span>
+                <span>{project.completedTasks}/{project.totalTasks} {t('projects.tasks')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Users className="h-4 w-4 text-muted-foreground" />
-                <span>{project.teamMembers} membros</span>
+                <span>{project.teamMembers} {t('projects.members')}</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>Prazo: {new Date(project.dueDate).toLocaleDateString()}</span>
+                <span>{t('projects.deadline')}: {new Date(project.dueDate).toLocaleDateString()}</span>
               </div>
             </div>
           </div>
