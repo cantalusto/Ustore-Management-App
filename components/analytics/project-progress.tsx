@@ -78,14 +78,18 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
 
   const translateStatus = (status: string) => {
     const statuses: { [key: string]: string } = {
-      "on-track": "Em dia", "at-risk": "Em risco", "delayed": "Atrasado",
+      "on-track": t('projects.status.on_track'), 
+      "at-risk": t('projects.status.at_risk'), 
+      "delayed": t('projects.status.delayed'),
     }
     return statuses[status] || status
   }
   
   const translatePriority = (priority: string) => {
     const priorities: { [key: string]: string } = {
-      "high": "Alta", "medium": "Média", "low": "Baixa",
+      "high": t('tasks.priority.high'), 
+      "medium": t('tasks.priority.medium'), 
+      "low": t('tasks.priority.low'),
     }
     return priorities[priority] || priority
   }

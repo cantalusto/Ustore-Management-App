@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 
 // A interface TeamMember pode ser importada ou definida aqui
 interface TeamMember {
@@ -32,6 +33,7 @@ interface EditMemberDialogProps {
 }
 
 export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }: EditMemberDialogProps) {
+  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -75,10 +77,10 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
       if (response.ok) {
         onSuccess()
       } else {
-        setError(data.error || "Falha ao atualizar membro")
+        setError(data.error || t('teams.update_member_error'))
       }
     } catch (err) {
-      setError("Erro de rede. Por favor, tente novamente.")
+      setError(t('common.network_error'))
     } finally {
       setIsLoading(false)
     }
@@ -94,7 +96,7 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Editar Membro da Equipe</DialogTitle>
+          <DialogTitle>{t('teams.edit_member_title')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -105,61 +107,61 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">Nome Completo</Label>
+            <Label htmlFor="name">{t('profile.full_name')}</Label>
             <Input id="name" value={formData.name} onChange={(e) => handleChange("name", e.target.value)} required disabled={isLoading} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('common.email')}</Label>
             <Input id="email" type="email" value={formData.email} onChange={(e) => handleChange("email", e.target.value)} required disabled={isLoading} />
           </div>
 
           {/* 2. Adicionar o campo de senha no formulário */}
           <div className="space-y-2">
-            <Label htmlFor="password">Nova Senha (opcional)</Label>
-            <Input id="password" type="password" value={formData.password} onChange={(e) => handleChange("password", e.target.value)} placeholder="Deixe em branco para não alterar" disabled={isLoading} />
+            <Label htmlFor="password">{t('common.new_password')}</Label>
+            <Input id="password" type="password" value={formData.password} onChange={(e) => handleChange("password", e.target.value)} placeholder={t('teams.password_placeholder')} disabled={isLoading} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="role">Cargo</Label>
+            <Label htmlFor="role">{t('common.role')}</Label>
             <Select value={formData.role} onValueChange={(value) => handleChange("role", value)} disabled={!canEditRole}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="member">Membro</SelectItem>
-                <SelectItem value="manager">Gerente</SelectItem>
-                {userRole === "admin" && <SelectItem value="admin">Administrador</SelectItem>}
+                <SelectItem value="member">{t('teams.role_member')}</SelectItem>
+                <SelectItem value="manager">{t('teams.role_manager')}</SelectItem>
+                {userRole === "admin" && <SelectItem value="admin">{t('teams.role_admin')}</SelectItem>}
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="department">Departamento</Label>
+            <Label htmlFor="department">{t('common.department')}</Label>
             <Input id="department" value={formData.department} onChange={(e) => handleChange("department", e.target.value)} required disabled={isLoading} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Telefone</Label>
+            <Label htmlFor="phone">{t('teams.phone')}</Label>
             <Input id="phone" value={formData.phone} onChange={(e) => handleChange("phone", e.target.value)} disabled={isLoading} />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
+            <Label htmlFor="status">{t('teams.status')}</Label>
             <Select value={formData.status} onValueChange={(value) => handleChange("status", value)}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="active">Ativo</SelectItem>
-                <SelectItem value="inactive">Inativo</SelectItem>
+                <SelectItem value="active">{t('teams.status_active')}</SelectItem>
+                <SelectItem value="inactive">{t('teams.status_inactive')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Atualizar Membro
+              {t('teams.update_member_btn')}
             </Button>
           </div>
         </form>

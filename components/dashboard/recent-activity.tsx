@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { formatDistanceToNow } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { ptBR, enUS } from "date-fns/locale";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useLanguage } from "@/contexts/language-context";
 import type { Task } from "@/lib/auth"; // Reutilizando a interface
 
 interface ActivityTask extends Task {
@@ -18,6 +19,7 @@ interface ActivityTask extends Task {
 export function RecentActivity() {
   const [activities, setActivities] = useState<ActivityTask[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t, language } = useLanguage();
 
   useEffect(() => {
     const fetchRecentActivity = async () => {
@@ -40,18 +42,19 @@ export function RecentActivity() {
   }, []);
 
   const getActivityText = (task: ActivityTask) => {
-    const timeAgo = formatDistanceToNow(new Date(task.updatedAt), { addSuffix: true, locale: ptBR });
+    const locale = language === 'pt' ? ptBR : enUS;
+    const timeAgo = formatDistanceToNow(new Date(task.updatedAt), { addSuffix: true, locale });
     
     if (task.status === 'concluido' && (new Date(task.updatedAt).getTime() - new Date(task.createdAt).getTime()) > 1000) {
-      return { user: task.assigneeName, action: 'concluiu a tarefa', target: task.title, time: timeAgo };
+      return { user: task.assigneeName, action: t('dashboard.recent_activity.completed_task'), target: task.title, time: timeAgo };
     }
-    return { user: task.createdByName, action: 'criou a tarefa', target: task.title, time: timeAgo };
+    return { user: task.createdByName, action: t('dashboard.recent_activity.created_task'), target: task.title, time: timeAgo };
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Atividade Recente</CardTitle>
+        <CardTitle>{t('dashboard.recent_activity.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         {loading ? (
@@ -84,7 +87,7 @@ export function RecentActivity() {
                     </p>
                     <p className="text-xs text-muted-foreground">{activity.time}</p>
                     </div>
-                    <Badge variant="outline">Tarefa</Badge>
+                    <Badge variant="outline">{t('dashboard.recent_activity.task_badge')}</Badge>
                 </div>
                 )
             })}

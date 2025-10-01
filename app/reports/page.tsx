@@ -2,6 +2,7 @@ import { redirect } from "next/navigation"
 import { getCurrentUser } from "@/lib/auth"
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { ReportsOverview } from "@/components/reports/reports-overview"
+import { ReportsPageContent } from "@/components/reports/reports-page-content"
 
 export default async function ReportsPage() {
   const user = await getCurrentUser()
@@ -15,12 +16,7 @@ export default async function ReportsPage() {
       <DashboardHeader user={user} />
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Geração de Relatórios</h1>
-            <p className="text-muted-foreground mt-2">
-              Exporte dados detalhados sobre o desempenho da sua equipe e projetos.
-            </p>
-          </div>
+          <ReportsPageContent />
           <ReportsOverview />
         </div>
       </main>

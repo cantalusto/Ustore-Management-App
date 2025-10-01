@@ -23,7 +23,7 @@ export interface Task {
   title: string;
   description: string;
   status: "a-fazer" | "em-progresso" | "revisao" | "concluido";
-  priority: "baixa" | "media" | "alta" | "urgente";
+  priority: "low" | "medium" | "high" | "urgent";
   assigneeId: number;
   assigneeName: string;
   assigneeDepartment?: string;

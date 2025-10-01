@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Users, CheckSquare, Clock, TrendingUp } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useLanguage } from "@/contexts/language-context"
 
 interface DashboardStatsProps {
   userRole: string
@@ -20,6 +21,7 @@ interface StatsData {
 export function DashboardStats({ userRole }: DashboardStatsProps) {
   const [stats, setStats] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -57,31 +59,31 @@ export function DashboardStats({ userRole }: DashboardStatsProps) {
 
   const allStats = [
     {
-      title: "Total de Membros da Equipe",
+      title: t('dashboard.stats.total_members'),
       value: stats.totalMembers.toString(),
       icon: Users,
-      description: "Membros cadastrados",
+      description: t('dashboard.stats.members_registered'),
       visible: ["admin", "manager"],
     },
     {
-      title: "Tarefas Ativas",
+      title: t('dashboard.stats.active_tasks'),
       value: stats.activeTasks.toString(),
       icon: CheckSquare,
-      description: "Não concluídas",
+      description: t('dashboard.stats.not_completed'),
       visible: ["admin", "manager", "member"],
     },
     {
-      title: "Revisões Pendentes",
+      title: t('dashboard.stats.pending_reviews'),
       value: stats.pendingReviews.toString(),
       icon: Clock,
-      description: "Aguardando aprovação",
+      description: t('dashboard.stats.awaiting_approval'),
       visible: ["admin", "manager"],
     },
     {
-      title: "Performance da Equipe",
+      title: t('dashboard.stats.team_performance'),
       value: `${stats.completionRate}%`,
       icon: TrendingUp,
-      description: "Taxa de conclusão",
+      description: t('dashboard.stats.completion_rate'),
       visible: ["admin", "manager"],
     },
   ];

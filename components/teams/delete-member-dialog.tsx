@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, AlertTriangle } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 
 interface TeamMember {
   id: number
@@ -28,6 +29,7 @@ interface DeleteMemberDialogProps {
 export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteMemberDialogProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
+  const { t } = useLanguage()
 
   const handleDelete = async () => {
     setIsLoading(true)
@@ -45,10 +47,10 @@ export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteM
         // e ela é responsável por recarregar a página
         onSuccess() 
       } else {
-        setError(data.error || "Falha ao excluir membro")
+        setError(data.error || t('teams.delete_member_error'))
       }
     } catch (err) {
-      setError("Erro de rede. Por favor, tente novamente.")
+      setError(t('common.network_error'))
     } finally {
       setIsLoading(false)
     }
@@ -60,10 +62,10 @@ export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteM
         <DialogHeader>
           <div className="flex items-center space-x-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
-            <DialogTitle>Excluir Membro da Equipe</DialogTitle>
+            <DialogTitle>{t('teams.delete_member_title')}</DialogTitle>
           </div>
           <DialogDescription>
-            Você tem certeza que deseja excluir <strong>{member.name}</strong>? Esta ação não pode ser desfeita e todas as suas tarefas serão reatribuídas.
+            {t('teams.delete_member_description', { name: member.name })}
           </DialogDescription>
         </DialogHeader>
 
@@ -77,11 +79,11 @@ export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteM
         
         <DialogFooter className="pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button variant="destructive" onClick={handleDelete} disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Excluir Membro
+              {t('teams.delete_member_btn')}
             </Button>
         </DialogFooter>
       </DialogContent>

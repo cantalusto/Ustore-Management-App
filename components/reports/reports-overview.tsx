@@ -11,16 +11,18 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CalendarIcon, Download, FileText, Table } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useLanguage } from "@/contexts/language-context";
 import type { User } from "@/lib/auth";
 
-const reportTypes = [
-  { id: "team-performance", title: "Desempenho do Departamento", description: "Visão geral da produtividade da equipe.", icon: <FileText className="h-5 w-5" />, badge: "Popular" },
-  { id: "task-summary", title: "Resumo de Tarefas", description: "Detalhamento de tarefas por status e prioridade.", icon: <Table className="h-5 w-5" />, badge: "Detalhado" },
-  { id: "individual-performance", title: "Desempenho Individual", description: "Métricas para um membro específico.", icon: <FileText className="h-5 w-5" />, badge: "Específico" },
-  { id: "project-status", title: "Status dos Projetos", description: "Acompanhe o progresso em todos os projetos.", icon: <Table className="h-5 w-5" />, badge: "Gerencial" },
-];
-
 export function ReportsOverview() {
+  const { t, language } = useLanguage();
+  
+  const reportTypes = [
+    { id: "team-performance", title: t('reports.team_performance'), description: t('reports.team_performance_desc'), icon: <FileText className="h-5 w-5" />, badge: t('reports.badge.popular') },
+    { id: "task-summary", title: t('reports.task_summary'), description: t('reports.task_summary_desc'), icon: <Table className="h-5 w-5" />, badge: t('reports.badge.detailed') },
+    { id: "individual-performance", title: t('reports.individual_performance'), description: t('reports.individual_performance_desc'), icon: <FileText className="h-5 w-5" />, badge: t('reports.badge.specific') },
+    { id: "project-status", title: t('reports.project_status'), description: t('reports.project_status_desc'), icon: <Table className="h-5 w-5" />, badge: t('reports.badge.managerial') },
+  ];
   const [dateRange, setDateRange] = useState<{ from: Date; to: Date }>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),
@@ -44,7 +46,7 @@ export function ReportsOverview() {
         setDepartments(uniqueDepartments);
 
       } catch (error) {
-        console.error("Falha ao buscar membros da equipe:", error);
+        console.error(t('reports.fetch_members_error'), error);
       }
     };
     fetchMembers();
@@ -63,6 +65,7 @@ export function ReportsOverview() {
           dateRange,
           department: selectedDepartment === "all" ? null : selectedDepartment,
           memberId: selectedMember === "all" ? null : selectedMember,
+          language: language, // Adiciona o idioma atual
         }),
       });
 
@@ -71,18 +74,18 @@ export function ReportsOverview() {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `relatorio-${reportType}.xlsx`;
+        a.download = `${t('reports.report')}-${reportType}.xlsx`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
       } else {
         const errorData = await response.json();
-        alert(`Falha ao gerar o relatório: ${errorData.error || response.statusText}`);
+        alert(`${t('reports.generate_error')}: ${errorData.error || response.statusText}`);
       }
     } catch (error) {
-      console.error("Erro ao gerar relatório:", error);
-      alert("Falha ao gerar o relatório. Por favor, tente novamente.");
+      console.error(t('reports.generate_error_console'), error);
+      alert(t('reports.generate_retry'));
     } finally {
       setIsGenerating(null);
     }
@@ -92,20 +95,20 @@ export function ReportsOverview() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Configuração de Relatórios</CardTitle>
-          <CardDescription>Configure os filtros para seus relatórios.</CardDescription>
+          <CardTitle>{t('reports.configuration')}</CardTitle>
+          <CardDescription>{t('reports.configuration_desc')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Intervalo de Datas</label>
+              <label className="text-sm font-medium mb-2 block">{t('reports.date_range')}</label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-start text-left font-normal bg-transparent">
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {dateRange.from && dateRange.to
                         ? `${format(dateRange.from, "dd 'de' LLL, y", { locale: ptBR })} - ${format(dateRange.to, "dd 'de' LLL, y", { locale: ptBR })}`
-                        : "Selecione o intervalo"}
+                        : t('reports.select_range')}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -120,11 +123,11 @@ export function ReportsOverview() {
                 </Popover>
             </div>
             <div>
-                <label className="text-sm font-medium mb-2 block">Departamento</label>
+                <label className="text-sm font-medium mb-2 block">{t('teams.department_filter')}</label>
                 <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-                    <SelectTrigger><SelectValue placeholder="Selecione um depto" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder={t('teams.select_department')} /></SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">Todos os Departamentos</SelectItem>
+                        <SelectItem value="all">{t('teams.all_departments')}</SelectItem>
                         {departments.map((dep) => (
                             <SelectItem key={dep} value={dep}>{dep}</SelectItem>
                         ))}
@@ -132,11 +135,11 @@ export function ReportsOverview() {
                 </Select>
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">Membro da Equipe</label>
+              <label className="text-sm font-medium mb-2 block">{t('teams.member')}</label>
               <Select value={selectedMember} onValueChange={setSelectedMember}>
-                <SelectTrigger><SelectValue placeholder="Selecione um membro" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t('teams.select_member')} /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos os Membros</SelectItem>
+                  <SelectItem value="all">{t('teams.all_members')}</SelectItem>
                   {teamMembers.map((member) => (
                     <SelectItem key={member.id} value={member.id.toString()}>{member.name}</SelectItem>
                   ))}
@@ -171,7 +174,7 @@ export function ReportsOverview() {
                   className="flex-1"
                 >
                   <Download className="mr-2 h-4 w-4" />
-                  {isGenerating === `${report.id}-excel` ? "Gerando..." : "Exportar para Excel"}
+                  {isGenerating === `${report.id}-excel` ? t('reports.generating') : t('reports.export_excel')}
                 </Button>
               </div>
             </CardContent>

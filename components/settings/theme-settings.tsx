@@ -4,8 +4,10 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun, Monitor } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 
 export function ThemeSettings() {
+  const { t } = useLanguage()
   const [theme, setTheme] = useState<"light" | "dark" | "system">("system")
 
   useEffect(() => {
@@ -36,12 +38,12 @@ export function ThemeSettings() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Aparência</CardTitle>
-        <CardDescription>Escolha a aparência do aplicativo.</CardDescription>
+        <CardTitle>{t('settings.title')}</CardTitle>
+        <CardDescription>{t('settings.theme_description')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <h3 className="text-sm font-medium text-foreground mb-3">Tema</h3>
+          <h3 className="text-sm font-medium text-foreground mb-3">{t('settings.theme')}</h3>
           <div className="grid grid-cols-3 gap-3">
             <Button
               variant={theme === "light" ? "default" : "outline"}
@@ -49,7 +51,7 @@ export function ThemeSettings() {
               className="flex flex-col items-center space-y-2 h-auto py-4"
             >
               <Sun className="h-5 w-5" />
-              <span className="text-sm">Claro</span>
+              <span className="text-sm">{t('settings.light')}</span>
             </Button>
             <Button
               variant={theme === "dark" ? "default" : "outline"}
@@ -57,7 +59,7 @@ export function ThemeSettings() {
               className="flex flex-col items-center space-y-2 h-auto py-4"
             >
               <Moon className="h-5 w-5" />
-              <span className="text-sm">Escuro</span>
+              <span className="text-sm">{t('settings.dark')}</span>
             </Button>
             <Button
               variant={theme === "system" ? "default" : "outline"}
@@ -65,14 +67,14 @@ export function ThemeSettings() {
               className="flex flex-col items-center space-y-2 h-auto py-4"
             >
               <Monitor className="h-5 w-5" />
-              <span className="text-sm">Sistema</span>
+              <span className="text-sm">{t('settings.system')}</span>
             </Button>
           </div>
         </div>
 
         <div className="pt-4 border-t border-border">
           <p className="text-sm text-muted-foreground">
-            O tema do sistema alternará automaticamente entre os modos claro e escuro com base nas configurações do seu dispositivo.
+            {t('settings.system_description')}
           </p>
         </div>
       </CardContent>

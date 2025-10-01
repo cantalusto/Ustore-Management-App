@@ -3,6 +3,7 @@
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 
 export interface TeamFilters {
   search: string
@@ -18,6 +19,7 @@ interface TeamFiltersProps {
 }
 
 export function TeamFilters({ filters, onFiltersChange, departments }: TeamFiltersProps) {
+  const { t } = useLanguage()
   const updateFilter = (key: keyof TeamFilters, value: string) => {
     onFiltersChange({ ...filters, [key]: value === "all" ? "" : value })
   }
@@ -28,7 +30,7 @@ export function TeamFilters({ filters, onFiltersChange, departments }: TeamFilte
       <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
-          placeholder="Pesquisar membros da equipe..."
+          placeholder={t('teams.search_placeholder')}
           value={filters.search}
           onChange={(e) => updateFilter("search", e.target.value)}
           className="pl-10"
@@ -40,23 +42,23 @@ export function TeamFilters({ filters, onFiltersChange, departments }: TeamFilte
         {/* Cargo */}
         <Select value={filters.role || "all"} onValueChange={(value) => updateFilter("role", value)}>
           <SelectTrigger className="w-full sm:w-32">
-            <SelectValue placeholder="Cargo" />
+            <SelectValue placeholder={t('teams.role_filter')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="admin">Admin</SelectItem>
-            <SelectItem value="manager">Gerente</SelectItem>
-            <SelectItem value="member">Membro</SelectItem>
+            <SelectItem value="all">{t('teams.all_roles')}</SelectItem>
+            <SelectItem value="admin">{t('common.roles.admin')}</SelectItem>
+            <SelectItem value="manager">{t('common.roles.manager')}</SelectItem>
+            <SelectItem value="member">{t('common.roles.member')}</SelectItem>
           </SelectContent>
         </Select>
 
         {/* Departamento */}
         <Select value={filters.department || "all"} onValueChange={(value) => updateFilter("department", value)}>
           <SelectTrigger className="w-full sm:w-40">
-            <SelectValue placeholder="Departamento" />
+            <SelectValue placeholder={t('teams.department_filter')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="all">{t('teams.all_departments')}</SelectItem>
             {departments.map((dept) => (
               <SelectItem key={dept} value={dept}>
                 {dept}
@@ -68,12 +70,12 @@ export function TeamFilters({ filters, onFiltersChange, departments }: TeamFilte
         {/* Status */}
         <Select value={filters.status || "all"} onValueChange={(value) => updateFilter("status", value)}>
           <SelectTrigger className="w-full sm:w-32">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t('teams.status_filter')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="active">Ativo</SelectItem>
-            <SelectItem value="inactive">Inativo</SelectItem>
+            <SelectItem value="all">{t('teams.all_roles')}</SelectItem>
+            <SelectItem value="active">{t('common.status.active')}</SelectItem>
+            <SelectItem value="inactive">{t('common.status.inactive')}</SelectItem>
           </SelectContent>
         </Select>
       </div>

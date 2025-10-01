@@ -98,8 +98,8 @@ export async function POST(request: NextRequest) {
     if (isNaN(dueDate.getTime())) {
       return NextResponse.json({ error: `A IA retornou uma data inválida: '${taskData.dueDate}'.` }, { status: 500 });
     }
-    const allowedPriorities = ["baixa", "media", "alta", "urgente"];
-    const priority = allowedPriorities.includes(taskData.priority) ? taskData.priority : "media";
+    const allowedPriorities = ["low", "medium", "high", "urgent"];
+    const priority = allowedPriorities.includes(taskData.priority) ? taskData.priority : "medium";
 
     // Criação da Tarefa
     const newTask = await prisma.task.create({

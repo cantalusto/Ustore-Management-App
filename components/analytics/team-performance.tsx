@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { TrendingUp, TrendingDown, Award, Target } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 
 interface MemberPerformance {
   id: number
@@ -26,6 +27,7 @@ interface TeamPerformanceProps {
 }
 
 export function TeamPerformance({ userRole }: TeamPerformanceProps) {
+  const { t } = useLanguage()
   const [members, setMembers] = useState<MemberPerformance[]>([])
   const [loading, setLoading] = useState(true)
   const [departments, setDepartments] = useState<string[]>([])
@@ -51,7 +53,7 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
         setDepartments(uniqueDepartments)
       }
     } catch (error) {
-      console.error("Falha ao buscar desempenho da equipe:", error)
+      console.error(t('teams.fetch_error'), error)
     } finally {
       setLoading(false)
     }
@@ -61,7 +63,7 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">Carregando desempenho...</div>
+          <div className="text-center">{t('teams.loading')}</div>
         </CardContent>
       </Card>
     )
@@ -77,24 +79,24 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
         <div className="flex justify-between items-center">
           <CardTitle className="text-lg flex items-center space-x-2">
             <Award className="h-5 w-5" />
-            <span>Desempenho por Departamento</span>
+            <span>{t('teams.performance_title')}</span>
           </CardTitle>
           <div className="flex gap-2">
             <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Departamento" />
+                <SelectValue placeholder={t('teams.department_filter')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="all">{t('teams.all_departments')}</SelectItem>
                 {departments.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
               </SelectContent>
             </Select>
             <Select value={selectedMember} onValueChange={setSelectedMember}>
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Membro" />
+                <SelectValue placeholder={t('teams.all_members')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
+                <SelectItem value="all">{t('teams.all_members')}</SelectItem>
                 {allMembers.map(m => <SelectItem key={m.id} value={m.id.toString()}>{m.name}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -117,16 +119,16 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
                 <div className="flex items-center space-x-2">
                   <h4 className="font-medium">{topPerformer.name}</h4>
                   <Badge variant="secondary" className="bg-white text-black">
-                    Melhor Desempenho
+                    {t('teams.best_performance')}
                   </Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  {topPerformer.completionRate}% de taxa de conclusão • {topPerformer.department}
+                  {topPerformer.completionRate}% {t('teams.completion_rate')} • {topPerformer.department}
                 </p>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-green-700">{topPerformer.completionRate}%</div>
-                <div className="text-xs text-muted-foreground">taxa de conclusão</div>
+                <div className="text-xs text-muted-foreground">{t('teams.completion_rate')}</div>
               </div>
             </div>
           </div>
@@ -136,7 +138,7 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
           <h4 className="font-medium flex items-center space-x-2">
             <Target className="h-4 w-4" />
             <span>
-              {selectedMember !== 'all' ? 'Desempenho Individual' : selectedDepartment !== 'all' ? `Membros de ${selectedDepartment}` : 'Todos os Membros'}
+              {selectedMember !== 'all' ? t('teams.individual_performance') : selectedDepartment !== 'all' ? t('teams.department_members', { department: selectedDepartment }) : t('teams.all_members_performance')}
             </span>
           </h4>
           {members.map((member) => (
@@ -168,14 +170,14 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
                       <span className="text-sm font-medium">{member.completionRate}%</span>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {member.tasksCompleted}/{member.tasksAssigned} tarefas
+                      {member.tasksCompleted}/{member.tasksAssigned} {t('teams.tasks_completed')}
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span>Taxa de Conclusão</span>
+                    <span>{t('teams.completion_rate_label')}</span>
                     <span>{member.completionRate}%</span>
                   </div>
                   <Progress value={member.completionRate} className="h-2" />

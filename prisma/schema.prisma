@@ -3,28 +3,28 @@ generator client {
 }
 
 datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  email         String   @unique
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
   name          String
   password      String
   role          String
   department    String?
   phone         String?
   image         String?
-  joinDate      DateTime @default(now())
-  status        String   @default("active")
-  assignedTasks Task[]   @relation("AssigneeTasks")
-  createdTasks  Task[]   @relation("CreatedTasks")
-  comments      Comment[] // Relação com comentários
+  joinDate      DateTime  @default(now())
+  status        String    @default("active")
+  comments      Comment[]
+  assignedTasks Task[]    @relation("AssigneeTasks")
+  createdTasks  Task[]    @relation("CreatedTasks")
 }
 
 model Task {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
   description String?
   status      String
@@ -34,20 +34,19 @@ model Task {
   dueDate     DateTime
   project     String?
   tags        String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  assignee    User     @relation("AssigneeTasks", fields: [assigneeId], references: [id])
-  createdBy   User     @relation("CreatedTasks", fields: [createdById], references: [id])
-  comments    Comment[] // Relação com comentários
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  comments    Comment[]
+  assignee    User      @relation("AssigneeTasks", fields: [assigneeId], references: [id])
+  createdBy   User      @relation("CreatedTasks", fields: [createdById], references: [id])
 }
 
-// Novo model para os comentários
 model Comment {
   id        Int      @id @default(autoincrement())
-  text      String
-  createdAt DateTime @default(now())
   taskId    Int
-  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
   authorId  Int
+  text      String
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, Sparkles } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 
 interface AiCreateTaskDialogProps {
   open: boolean
@@ -16,6 +17,7 @@ interface AiCreateTaskDialogProps {
 }
 
 export function AiCreateTaskDialog({ open, onClose, onSuccess }: AiCreateTaskDialogProps) {
+  const { t } = useLanguage()
   const [prompt, setPrompt] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -39,10 +41,10 @@ export function AiCreateTaskDialog({ open, onClose, onSuccess }: AiCreateTaskDia
       if (response.ok) {
         onSuccess()
       } else {
-        setError(data.error || "Falha ao gerar a tarefa.")
+        setError(data.error || t('tasks.ai_create_error_generate'))
       }
     } catch (err) {
-      setError("Erro de rede. Verifique sua conexão e tente novamente.")
+      setError(t('tasks.ai_create_error_network'))
     } finally {
       setIsLoading(false)
     }
@@ -54,12 +56,12 @@ export function AiCreateTaskDialog({ open, onClose, onSuccess }: AiCreateTaskDia
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <Sparkles className="mr-2 h-5 w-5 text-yellow-500" />
-            Criar Tarefa com Inteligência Artificial
+            {t('tasks.ai_create_title')}
           </DialogTitle>
           <DialogDescription>
-            Descreva a tarefa que você quer criar em linguagem natural. A IA irá extrair os detalhes para você.
+            {t('tasks.ai_create_description')}
             <br />
-            Ex: "Criar tarefa para Johan Liebert sobre o novo logo para 10/10/2010, prioridade alta."
+            {t('tasks.ai_create_example')}
           </DialogDescription>
         </DialogHeader>
 
@@ -72,7 +74,7 @@ export function AiCreateTaskDialog({ open, onClose, onSuccess }: AiCreateTaskDia
 
           <Textarea
             id="ai-prompt"
-            placeholder="Digite os detalhes da sua tarefa aqui..."
+            placeholder={t('tasks.ai_create_placeholder')}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             rows={5}
@@ -82,11 +84,11 @@ export function AiCreateTaskDialog({ open, onClose, onSuccess }: AiCreateTaskDia
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={isLoading || !prompt.trim()}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Gerar Tarefa
+              {t('tasks.ai_create_generate')}
             </Button>
           </DialogFooter>
         </form>

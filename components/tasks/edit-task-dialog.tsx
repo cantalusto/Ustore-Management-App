@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
 import type { Task, TeamMember } from "@/lib/auth"
+import { useLanguage } from "@/contexts/language-context"
 
 interface EditTaskDialogProps {
   task: Task | null
@@ -22,6 +23,8 @@ interface EditTaskDialogProps {
 }
 
 export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialogProps) {
+  const { t } = useLanguage()
+  
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -112,7 +115,7 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Editar Tarefa</DialogTitle>
+          <DialogTitle>{t('tasks.edit_title')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -123,7 +126,7 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="title">Título da Tarefa</Label>
+            <Label htmlFor="title">{t('tasks.title_label')}</Label>
             <Input
               id="title"
               value={formData.title}
@@ -134,7 +137,7 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
+            <Label htmlFor="description">{t('tasks.description_label')}</Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -146,25 +149,25 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="priority">Prioridade</Label>
+              <Label htmlFor="priority">{t('tasks.priority_label')}</Label>
               <Select value={formData.priority} onValueChange={v => handleChange("priority", v)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="baixa">Baixa</SelectItem>
-                  <SelectItem value="media">Média</SelectItem>
-                  <SelectItem value="alta">Alta</SelectItem>
-                  <SelectItem value="urgente">Urgente</SelectItem>
+                  <SelectItem value="low">{t('tasks.priority.low')}</SelectItem>
+                        <SelectItem value="medium">{t('tasks.priority.medium')}</SelectItem>
+                        <SelectItem value="high">{t('tasks.priority.high')}</SelectItem>
+                        <SelectItem value="urgent">{t('tasks.priority.urgent')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="assignee">Atribuir a</Label>
+              <Label htmlFor="assignee">{t('tasks.assignee_label')}</Label>
               <Select value={formData.assigneeId} onValueChange={v => handleChange("assigneeId", v)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione um membro" />
+                  <SelectValue placeholder={t('tasks.assignee_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {teamMembers.map(member => (
@@ -178,7 +181,7 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dueDate">Data de Vencimento</Label>
+            <Label htmlFor="dueDate">{t('tasks.due_date_label')}</Label>
             <Input
               id="dueDate"
               type="date"
@@ -190,34 +193,34 @@ export function EditTaskDialog({ task, open, onClose, onSuccess }: EditTaskDialo
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="project">Projeto</Label>
+            <Label htmlFor="project">{t('tasks.project_label')}</Label>
             <Input
               id="project"
               value={formData.project}
               onChange={e => handleChange("project", e.target.value)}
-              placeholder="ex: Redesenho do site"
+              placeholder={t('tasks.project_placeholder')}
               disabled={isLoading}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tags">Tags (separadas por vírgula)</Label>
+            <Label htmlFor="tags">{t('tasks.tags_label')}</Label>
             <Input
               id="tags"
               value={formData.tags}
               onChange={e => handleChange("tags", e.target.value)}
-              placeholder="ex: frontend, urgente, bug"
+              placeholder={t('tasks.tags_placeholder')}
               disabled={isLoading}
             />
           </div>
 
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-              Cancelar
+              {t('tasks.cancel_button')}
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Salvar Alterações
+              {t('tasks.save_changes_button')}
             </Button>
           </div>
         </form>

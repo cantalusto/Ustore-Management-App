@@ -10,6 +10,7 @@ import { TaskDetailDialog } from "./task-detail-dialog"
 import { TaskFilters, type TaskFilters as TaskFiltersType } from "@/components/filters/task-filters"
 import type { Task, TeamMember } from "@/lib/auth"
 import { TaskCard } from "./task-card"
+import { useLanguage } from "@/contexts/language-context"
 
 interface TaskBoardProps {
   userRole: string
@@ -17,6 +18,7 @@ interface TaskBoardProps {
 }
 
 export function TaskBoard({ userRole, userId }: TaskBoardProps) {
+  const { t } = useLanguage()
   const [tasks, setTasks] = useState<Task[]>([])
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const [filteredTasks, setFilteredTasks] = useState<Task[]>([])
@@ -63,7 +65,7 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
         )
       ) as string[]
       setDepartments(uniqueDepartments)
-    } catch (error) { console.error("Falha ao buscar tarefas:", error) }
+    } catch (error) { console.error(t('tasks.fetch_error'), error) }
     finally { setLoading(false) }
   }
 
@@ -72,7 +74,7 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
       const response = await fetch("/api/teams/members")
       const data = await response.json()
       setTeamMembers(data.members?.map((m: any) => ({ id: m.id, name: m.name })) || [])
-    } catch (error) { console.error("Falha ao buscar membros da equipe:", error) }
+    } catch (error) { console.error(t('tasks.team_members_error'), error) }
   }
 
   const applyFilters = () => {
@@ -153,17 +155,17 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
         body: JSON.stringify({ status: newStatus }),
       })
       if (!response.ok) fetchTasks()
-    } catch (error) { console.error("Falha ao atualizar status da tarefa:", error); fetchTasks() }
+    } catch (error) { console.error(t('tasks.update_error'), error); fetchTasks() }
   }
 
   const columns = [
-    { id: "a-fazer", title: "A Fazer" },
-    { id: "em-progresso", title: "Em Progresso" },
-    { id: "revisao", title: "Revisão" },
-    { id: "concluido", title: "Concluído" },
+    { id: "a-fazer", title: t('tasks.status.todo') },
+    { id: "em-progresso", title: t('tasks.status.in_progress') },
+    { id: "revisao", title: t('tasks.status.review') },
+    { id: "concluido", title: t('tasks.status.done') },
   ]
 
-  if (loading) return <Card><CardContent className="p-6 text-center">Carregando tarefas...</CardContent></Card>
+  if (loading) return <Card><CardContent className="p-6 text-center">{t('tasks.loading')}</CardContent></Card>
 
   return (
     <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} sensors={sensors} collisionDetection={closestCorners}>

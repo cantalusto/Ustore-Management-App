@@ -9,8 +9,10 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 
 export function LoginForm() {
+  const { t } = useLanguage()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -34,10 +36,10 @@ export function LoginForm() {
       if (response.ok) {
         window.location.href = "/dashboard"
       } else {
-        setError(data.error || "Falha no login")
+        setError(data.error || t('auth.login_error'))
       }
     } catch (err) {
-      setError("Erro de rede. Por favor, tente novamente.")
+      setError(t('auth.network_error'))
     } finally {
       setIsLoading(false)
     }
@@ -53,7 +55,7 @@ export function LoginForm() {
 
       <div className="space-y-2">
         {/* 1. Adicionar className para a cor do texto */}
-        <Label htmlFor="email" className="text-gray-600">E-mail</Label>
+        <Label htmlFor="email" className="text-gray-600">{t('auth.email')}</Label>
         <Input
           id="email"
           type="email"
@@ -66,7 +68,7 @@ export function LoginForm() {
 
       <div className="space-y-2">
         {/* 2. Adicionar className para a cor do texto */}
-        <Label htmlFor="password" className="text-gray-600">Senha</Label>
+        <Label htmlFor="password" className="text-gray-600">{t('auth.password')}</Label>
         <Input
           id="password"
           type="password"
@@ -79,7 +81,7 @@ export function LoginForm() {
 
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Entrar
+        {t('auth.login')}
       </Button>
     </form>
   )

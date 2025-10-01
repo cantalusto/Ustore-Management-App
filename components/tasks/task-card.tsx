@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, User } from "lucide-react"
 import type { Task } from "@/lib/auth"
+import { useLanguage } from "@/contexts/language-context"
 
 interface TaskCardProps {
   task: Task
@@ -16,6 +17,7 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ task, onClick, userRole, userId, isDragging }: TaskCardProps) {
+  const { t } = useLanguage()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging: isSortableDragging } = useSortable({
     id: task.id,
     data: { type: 'Task', task },
@@ -30,12 +32,16 @@ export function TaskCard({ task, onClick, userRole, userId, isDragging }: TaskCa
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "urgente": return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
-      case "alta": return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
-      case "media": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
-      case "baixa": return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+      case "urgent": return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+      case "high": return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+      case "medium": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+      case "low": return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
       default: return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
     }
+  }
+
+  const getPriorityLabel = (priority: string) => {
+    return t(`tasks.priority.${priority}`)
   }
 
   const isOverdue = new Date(task.dueDate) < new Date() && task.status !== "concluido"
@@ -54,7 +60,7 @@ export function TaskCard({ task, onClick, userRole, userId, isDragging }: TaskCa
             <div className="flex items-start justify-between">
               <h4 className="font-medium text-sm leading-tight">{task.title}</h4>
               <Badge className={getPriorityColor(task.priority)} variant="secondary">
-                {task.priority}
+                {getPriorityLabel(task.priority)}
               </Badge>
             </div>
             {task.description && <p className="text-xs text-muted-foreground line-clamp-2">{task.description}</p>}

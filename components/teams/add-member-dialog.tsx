@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 
 interface AddMemberDialogProps {
   open: boolean
@@ -20,6 +21,7 @@ interface AddMemberDialogProps {
 }
 
 export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogProps) {
+  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -48,10 +50,10 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
       if (response.ok) {
         onSuccess()
       } else {
-        setError(data.error || "Falha ao adicionar membro")
+        setError(data.error || t('teams.add_member_error'))
       }
     } catch (err) {
-      setError("Erro de rede. Por favor, tente novamente.")
+      setError(t('common.network_error'))
     } finally {
       setIsLoading(false)
     }
@@ -65,7 +67,7 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Adicionar Membro da Equipe</DialogTitle>
+          <DialogTitle>{t('teams.add_member_title')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -76,7 +78,7 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">Nome Completo</Label>
+            <Label htmlFor="name">{t('profile.full_name')}</Label>
             <Input
               id="name"
               value={formData.name}
@@ -87,7 +89,7 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('common.email')}</Label>
             <Input
               id="email"
               type="email"
@@ -99,7 +101,7 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password">{t('common.password')}</Label>
             <Input
               id="password"
               type="password"
@@ -111,21 +113,21 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="role">Cargo</Label>
+            <Label htmlFor="role">{t('common.role')}</Label>
             <Select value={formData.role} onValueChange={(value) => handleChange("role", value)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="member">Membro</SelectItem>
-                <SelectItem value="manager">Gerente</SelectItem>
-                <SelectItem value="admin">Administrador</SelectItem>
+                <SelectItem value="member">{t('teams.role_member')}</SelectItem>
+                <SelectItem value="manager">{t('teams.role_manager')}</SelectItem>
+                <SelectItem value="admin">{t('teams.role_admin')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="department">Departamento</Label>
+            <Label htmlFor="department">{t('common.department')}</Label>
             <Input
               id="department"
               value={formData.department}
@@ -136,7 +138,7 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="phone">Telefone (Opcional)</Label>
+            <Label htmlFor="phone">{t('teams.phone_optional')}</Label>
             <Input
               id="phone"
               value={formData.phone}
@@ -147,11 +149,11 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
 
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Adicionar Membro
+              {t('teams.add_member_btn')}
             </Button>
           </div>
         </form>

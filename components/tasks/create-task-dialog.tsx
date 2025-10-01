@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2 } from "lucide-react"
+import { useLanguage } from "@/contexts/language-context"
 
 interface TeamMember {
   id: number
@@ -27,10 +28,11 @@ interface CreateTaskDialogProps {
 }
 
 export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateTaskDialogProps) {
+  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    priority: "media",
+    priority: "medium",
     assigneeId: "",
     dueDate: "",
     project: "",
@@ -97,7 +99,7 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Criar Nova Tarefa</DialogTitle>
+          <DialogTitle>{t('tasks.create_title')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -108,7 +110,7 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="title">Título da Tarefa</Label>
+            <Label htmlFor="title">{t('tasks.title_label')}</Label>
             <Input
               id="title"
               value={formData.title}
@@ -119,7 +121,7 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Descrição</Label>
+            <Label htmlFor="description">{t('tasks.description_label')}</Label>
             <Textarea
               id="description"
               value={formData.description}
@@ -131,25 +133,25 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="priority">Prioridade</Label>
+              <Label htmlFor="priority">{t('tasks.priority_label')}</Label>
               <Select value={formData.priority} onValueChange={(value) => handleChange("priority", value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="baixa">Baixa</SelectItem>
-                  <SelectItem value="media">Média</SelectItem>
-                  <SelectItem value="alta">Alta</SelectItem>
-                  <SelectItem value="urgente">Urgente</SelectItem>
+                  <SelectItem value="low">{t('tasks.priority.low')}</SelectItem>
+                        <SelectItem value="medium">{t('tasks.priority.medium')}</SelectItem>
+                        <SelectItem value="high">{t('tasks.priority.high')}</SelectItem>
+                        <SelectItem value="urgent">{t('tasks.priority.urgent')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="assignee">Atribuir a</Label>
+              <Label htmlFor="assignee">{t('tasks.assignee_label')}</Label>
               <Select value={formData.assigneeId} onValueChange={(value) => handleChange("assigneeId", value)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Selecione um membro" />
+                  <SelectValue placeholder={t('tasks.assignee_placeholder')} />
                 </SelectTrigger>
                 <SelectContent>
                   {teamMembers.map((member) => (
@@ -163,7 +165,7 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="dueDate">Data de Vencimento</Label>
+            <Label htmlFor="dueDate">{t('tasks.due_date_label')}</Label>
             <Input
               id="dueDate"
               type="date"
@@ -175,34 +177,34 @@ export function CreateTaskDialog({ open, onClose, onSuccess, userRole }: CreateT
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="project">Projeto</Label>
+            <Label htmlFor="project">{t('tasks.project_label')}</Label>
             <Input
               id="project"
               value={formData.project}
               onChange={(e) => handleChange("project", e.target.value)}
-              placeholder="ex: Redesenho do site"
+              placeholder={t('tasks.project_placeholder')}
               disabled={isLoading}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tags">Tags (separadas por vírgula)</Label>
+            <Label htmlFor="tags">{t('tasks.tags_label')}</Label>
             <Input
               id="tags"
               value={formData.tags}
               onChange={(e) => handleChange("tags", e.target.value)}
-              placeholder="ex: frontend, urgente, bug"
+              placeholder={t('tasks.tags_placeholder')}
               disabled={isLoading}
             />
           </div>
 
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-              Cancelar
+              {t('tasks.cancel_button')}
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Criar Tarefa
+              {t('tasks.create_button')}
             </Button>
           </div>
         </form>

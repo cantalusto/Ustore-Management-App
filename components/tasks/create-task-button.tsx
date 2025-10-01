@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import { CreateTaskDialog } from "./create-task-dialog"
+import { useLanguage } from "@/contexts/language-context"
 
 interface CreateTaskButtonProps {
   userRole: string
@@ -11,12 +12,13 @@ interface CreateTaskButtonProps {
 
 export function CreateTaskButton({ userRole }: CreateTaskButtonProps) {
   const [showDialog, setShowDialog] = useState(false)
+  const { t } = useLanguage()
 
   return (
     <>
       <Button onClick={() => setShowDialog(true)}>
         <Plus className="mr-2 h-4 w-4" />
-        Criar Tarefa
+        {t('tasks.create')}
       </Button>
 
       <CreateTaskDialog

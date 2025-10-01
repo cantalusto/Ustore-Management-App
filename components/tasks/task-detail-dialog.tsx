@@ -13,7 +13,8 @@ import { EditTaskDialog } from "./edit-task-dialog"
 import { DeleteTaskDialog } from "./delete-task-dialog"
 import type { Task, User as UserType } from "@/lib/auth"
 import { formatDistanceToNow } from "date-fns"
-import { ptBR } from "date-fns/locale"
+import { ptBR, enUS } from "date-fns/locale"
+import { useLanguage } from "@/contexts/language-context"
 
 interface Comment {
   id: number;
@@ -36,6 +37,7 @@ interface TaskDetailDialogProps {
 }
 
 export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, userId }: TaskDetailDialogProps) {
+  const { t, language } = useLanguage()
   const [isEditing, setIsEditing] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [newComment, setNewComment] = useState("")
@@ -44,12 +46,16 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
   
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case "urgente": return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
-      case "alta": return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
-      case "media": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
-      case "baixa": return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+      case "urgent": return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+      case "high": return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+      case "medium": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+      case "low": return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
       default: return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
     }
+  }
+
+  const getPriorityLabel = (priority: string) => {
+    return t(`tasks.priority.${priority}`)
   }
 
   const getStatusColor = (status: string) => {
@@ -60,6 +66,16 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
       case "concluido": return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
       default: return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
     }
+  }
+
+  const getStatusLabel = (status: string) => {
+    const statusMap: { [key: string]: string } = {
+      "a-fazer": "todo",
+      "em-progresso": "in_progress", 
+      "revisao": "review",
+      "concluido": "done"
+    }
+    return t(`tasks.status.${statusMap[status] || status}`)
   }
 
   useEffect(() => {
@@ -77,7 +93,7 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
         setComments(data.comments);
       }
     } catch (error) {
-      console.error("Falha ao buscar comentários:", error);
+      console.error(t('tasks.comments_fetch_error'), error);
     }
   };
 
@@ -95,17 +111,17 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
         setComments(prev => [...prev, data.comment]);
         setNewComment("");
       } else {
-        alert(data.error || "Falha ao adicionar comentário");
+        alert(data.error || t('tasks.add_comment_error'));
       }
     } catch (error) {
-      console.error("Erro ao adicionar comentário:", error);
+      console.error(t('tasks.add_comment_network_error'), error);
     } finally {
       setIsSubmittingComment(false);
     }
   };
 
   const handleDeleteComment = async (commentId: number) => {
-    if (!confirm("Tem certeza que deseja apagar este comentário?")) return;
+    if (!confirm(t('tasks.confirm_delete_comment'))) return;
 
     try {
       const res = await fetch(`/api/tasks/${task.id}/comments?commentId=${commentId}`, {
@@ -115,10 +131,10 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
       if (res.ok) {
         setComments(prev => prev.filter(c => c.id !== commentId));
       } else {
-        alert(data.error || "Falha ao deletar comentário");
+        alert(data.error || t('tasks.delete_comment_error'));
       }
     } catch (error) {
-      console.error("Erro ao deletar comentário:", error);
+      console.error(t('tasks.delete_comment_network_error'), error);
     }
   };
 
@@ -134,7 +150,7 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
         onUpdate(data.task);
       }
     } catch (error) {
-      console.error("Falha ao atualizar o status da tarefa:", error)
+      console.error(t('tasks.update_status_error'), error)
     }
   }
   
@@ -184,32 +200,32 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
           <div className="space-y-6 overflow-y-auto pr-6">
             <div className="flex items-center space-x-4">
                 <div className="space-y-2">
-                    <label className="text-sm font-medium">Status</label>
+                    <label className="text-sm font-medium">{t('tasks.detail.status')}</label>
                     {canEditTask() ? (
                     <Select value={task.status} onValueChange={handleStatusChange}>
                         <SelectTrigger className="w-32">
                         <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                        <SelectItem value="a-fazer">A Fazer</SelectItem>
-                        <SelectItem value="em-progresso">Em Progresso</SelectItem>
-                        <SelectItem value="revisao">Revisão</SelectItem>
-                        <SelectItem value="concluido">Concluído</SelectItem>
+                        <SelectItem value="a-fazer">{t('tasks.status.todo')}</SelectItem>
+                        <SelectItem value="em-progresso">{t('tasks.status.in_progress')}</SelectItem>
+                        <SelectItem value="revisao">{t('tasks.status.review')}</SelectItem>
+                        <SelectItem value="concluido">{t('tasks.status.done')}</SelectItem>
                         </SelectContent>
                     </Select>
                     ) : (
-                    <Badge className={getStatusColor(task.status)}>{task.status.replace("-", " ")}</Badge>
+                    <Badge className={getStatusColor(task.status)}>{getStatusLabel(task.status)}</Badge>
                     )}
                 </div>
                 <div className="space-y-2">
-                    <label className="text-sm font-medium">Prioridade</label>
-                    <Badge className={getPriorityColor(task.priority)}>{task.priority}</Badge>
+                    <label className="text-sm font-medium">{t('tasks.detail.priority')}</label>
+                    <Badge className={getPriorityColor(task.priority)}>{getPriorityLabel(task.priority)}</Badge>
                 </div>
             </div>
 
             {task.description && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Descrição</label>
+                <label className="text-sm font-medium">{t('tasks.detail.description')}</label>
                 <p className="text-sm text-muted-foreground bg-muted p-3 rounded-md">{task.description}</p>
               </div>
             )}
@@ -218,7 +234,7 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
               <div className="space-y-3">
                 <div className="flex items-center space-x-2 text-sm">
                   <User className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">Atribuído a:</span>
+                  <span className="font-medium">{t('tasks.assigned_to')}:</span>
                   <div className="flex items-center space-x-2">
                     <Avatar className="h-6 w-6">
                       <AvatarFallback className="text-xs">
@@ -231,7 +247,7 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
 
                 <div className="flex items-center space-x-2 text-sm">
                   <User className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">Criado por:</span>
+                  <span className="font-medium">{t('tasks.created_by')}:</span>
                   <span>{task.createdByName}</span>
                 </div>
               </div>
@@ -239,18 +255,18 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
               <div className="space-y-3">
                 <div className={`flex items-center space-x-2 text-sm ${isOverdue ? "text-red-600" : ""}`}>
                   <Calendar className="h-4 w-4" />
-                  <span className="font-medium">Data de vencimento:</span>
+                  <span className="font-medium">{t('tasks.due_date')}:</span>
                   <span>{new Date(task.dueDate).toLocaleDateString()}</span>
                   {isOverdue && (
                     <Badge variant="destructive" className="text-xs">
-                      Atrasado
+                      {t('tasks.overdue')}
                     </Badge>
                   )}
                 </div>
 
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   <Clock className="h-4 w-4" />
-                  <span className="font-medium">Criado em:</span>
+                  <span className="font-medium">{t('tasks.created_at')}:</span>
                   <span>{new Date(task.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
@@ -258,7 +274,7 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
 
             {task.project && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">Projeto:</span>
+                <span className="text-sm font-medium">{t('tasks.project')}:</span>
                 <Badge variant="outline">{task.project}</Badge>
               </div>
             )}
@@ -280,7 +296,7 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
             <div className="space-y-4">
               <h3 className="text-sm font-medium flex items-center gap-2">
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
-                Comentários ({comments.length})
+                {t('tasks.comments')} ({comments.length})
               </h3>
               <div className="space-y-4">
                 {comments.map(comment => (
@@ -293,7 +309,10 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
                         <p className="text-sm font-medium">{comment.author.name}</p>
                         <div className="flex items-center gap-2">
                           <p className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true, locale: ptBR })}
+                            {formatDistanceToNow(new Date(comment.createdAt), { 
+                              addSuffix: true, 
+                              locale: language === 'pt' ? ptBR : enUS 
+                            })}
                           </p>
                           {canDeleteComment(comment) && (
                             <Button variant="ghost" size="icon" onClick={() => handleDeleteComment(comment.id)}>
@@ -316,7 +335,7 @@ export function TaskDetailDialog({ task, open, onClose, onUpdate, userRole, user
               <Textarea
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Adicionar um comentário..."
+                placeholder={t('tasks.detail.add_comment')}
                 rows={2}
                 className="pr-12"
               />

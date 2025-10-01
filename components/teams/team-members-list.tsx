@@ -10,6 +10,9 @@ import { MoreHorizontal, Mail, Phone, Edit, Trash2 } from "lucide-react"
 import { EditMemberDialog } from "./edit-member-dialog"
 import { DeleteMemberDialog } from "./delete-member-dialog"
 import { TeamFilters, type TeamFilters as TeamFiltersType } from "@/components/filters/team-filters"
+import { useLanguage } from "@/contexts/language-context"
+import { format } from "date-fns"
+import { ptBR, enUS } from "date-fns/locale"
 
 interface TeamMember {
   id: number
@@ -27,6 +30,7 @@ interface TeamMembersListProps {
 }
 
 export function TeamMembersList({ userRole }: TeamMembersListProps) {
+  const { t, language } = useLanguage()
   const [members, setMembers] = useState<TeamMember[]>([])
   const [filteredMembers, setFilteredMembers] = useState<TeamMember[]>([])
   const [loading, setLoading] = useState(true)
@@ -59,7 +63,7 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
       const uniqueDepartments = [...new Set(data.members?.map((member: TeamMember) => member.department) || [])]
       setDepartments(uniqueDepartments as string[])
     } catch (error) {
-      console.error("Falha ao buscar membros:", error)
+      console.error(t('teams.fetch_error'), error)
     } finally {
       setLoading(false)
     }
@@ -129,20 +133,11 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
 
   // Funções de tradução
   const translateRole = (role: "admin" | "manager" | "member") => {
-    const roles = {
-      admin: "Administrador",
-      manager: "Gerente",
-      member: "Membro",
-    }
-    return roles[role] || role
+    return t(`common.roles.${role}`)
   }
 
   const translateStatus = (status: "active" | "inactive") => {
-    const statuses = {
-      active: "Ativo",
-      inactive: "Inativo",
-    }
-    return statuses[status] || status
+    return t(`common.status.${status}`)
   }
 
 
@@ -150,7 +145,7 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="text-center">Carregando membros da equipe...</div>
+          <div className="text-center">{t('teams.loading')}</div>
         </CardContent>
       </Card>
     )
@@ -192,13 +187,13 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
                       {canEditMember(member.role) && (
                         <DropdownMenuItem onClick={() => setEditingMember(member)}>
                           <Edit className="mr-2 h-4 w-4" />
-                          Editar
+                          {t('common.edit')}
                         </DropdownMenuItem>
                       )}
                       {canDeleteMember(member.role) && (
                         <DropdownMenuItem onClick={() => setDeletingMember(member)} className="text-destructive">
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Excluir
+                          {t('common.delete')}
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
@@ -221,7 +216,11 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
                 <Badge className={getRoleBadgeColor(member.role)}>{translateRole(member.role)}</Badge>
                 <Badge className={getStatusBadgeColor(member.status)}>{translateStatus(member.status)}</Badge>
               </div>
-              <p className="text-xs text-muted-foreground">Entrou em {member.joinDate}</p>
+              <p className="text-xs text-muted-foreground">
+                {t('teams.joined_on')} {format(new Date(member.joinDate), 'dd/MM/yyyy', { 
+                  locale: language === 'pt' ? ptBR : enUS 
+                })}
+              </p>
             </CardContent>
           </Card>
         ))}
@@ -230,7 +229,7 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
       {filteredMembers.length === 0 && !loading && (
         <Card>
           <CardContent className="p-6">
-            <div className="text-center text-muted-foreground">Nenhum membro da equipe encontrado com os filtros aplicados.</div>
+            <div className="text-center text-muted-foreground">{t('teams.no_members')}</div>
           </CardContent>
         </Card>
       )}

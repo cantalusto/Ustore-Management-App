@@ -11,13 +11,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Camera, Save, KeyRound } from "lucide-react"
 import type { User } from "@/lib/auth"
 import { Separator } from "@/components/ui/separator"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useLanguage } from "@/contexts/language-context";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ProfileFormProps {
   user: User
 }
 
 export function ProfileForm({ user }: ProfileFormProps) {
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({ name: user.name });
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -51,12 +53,12 @@ export function ProfileForm({ user }: ProfileFormProps) {
         });
         const result = await response.json();
         if (response.ok) {
-            setFeedback({ success: "Informações atualizadas com sucesso!", error: "" });
+            setFeedback({ success: t('profile.info_updated'), error: "" });
         } else {
-            setFeedback({ error: result.error || "Falha ao atualizar informações.", success: "" });
+            setFeedback({ error: result.error || t('profile.info_update_error'), success: "" });
         }
     } catch (err) {
-        setFeedback({ error: "Erro de rede. Tente novamente.", success: "" });
+        setFeedback({ error: t('profile.network_error'), success: "" });
     } finally {
         setIsLoadingInfo(false);
     }
@@ -68,7 +70,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
     setFeedback({ error: "", success: "" });
 
     if (passwordData.newPassword.length < 6) {
-        setFeedback({ error: "A nova senha deve ter pelo menos 6 caracteres.", success: "" });
+        setFeedback({ error: t('profile.password_min_length'), success: "" });
         setIsLoadingPassword(false);
         return;
     }
@@ -87,7 +89,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
             setFeedback({ error: result.error, success: "" });
         }
     } catch (err) {
-        setFeedback({ error: "Erro de rede. Tente novamente.", success: "" });
+        setFeedback({ error: t('profile.network_error'), success: "" });
     } finally {
         setIsLoadingPassword(false);
     }
@@ -100,8 +102,8 @@ export function ProfileForm({ user }: ProfileFormProps) {
     
       <Card>
         <CardHeader>
-          <CardTitle>Informações Pessoais</CardTitle>
-          <CardDescription>Atualize seu nome e foto de perfil.</CardDescription>
+          <CardTitle>{t('profile.title')}</CardTitle>
+          <CardDescription>{t('profile.update_info')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-center space-x-4">
@@ -121,41 +123,41 @@ export function ProfileForm({ user }: ProfileFormProps) {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="name">Nome Completo</Label>
+            <Label htmlFor="name">{t('profile.full_name')}</Label>
             <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} disabled={isLoadingInfo} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Endereço de E-mail</Label>
+            <Label htmlFor="email">{t('profile.email_address')}</Label>
             <Input id="email" type="email" value={user.email} disabled className="bg-muted" />
           </div>
         </CardContent>
         <CardFooter>
           <Button onClick={handleInfoSave} disabled={isLoadingInfo} className="w-full md:w-auto">
             <Save className="mr-2 h-4 w-4" />
-            {isLoadingInfo ? "Salvando..." : "Salvar Informações"}
+            {isLoadingInfo ? t('profile.saving') : t('profile.save_info')}
           </Button>
         </CardFooter>
       </Card>
 
       <Card>
         <CardHeader>
-            <CardTitle>Alterar Senha</CardTitle>
-            <CardDescription>Para alterar sua senha, informe a atual e a nova.</CardDescription>
+            <CardTitle>{t('profile.change_password')}</CardTitle>
+            <CardDescription>{t('profile.change_password_desc')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="currentPassword">Senha Atual</Label>
+              <Label htmlFor="currentPassword">{t('profile.current_password')}</Label>
               <Input id="currentPassword" type="password" value={passwordData.currentPassword} onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})} disabled={isLoadingPassword} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="newPassword">Nova Senha</Label>
+              <Label htmlFor="newPassword">{t('profile.new_password')}</Label>
               <Input id="newPassword" type="password" value={passwordData.newPassword} onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})} disabled={isLoadingPassword} />
             </div>
         </CardContent>
         <CardFooter>
           <Button onClick={handlePasswordChange} disabled={isLoadingPassword} className="w-full md:w-auto">
             <KeyRound className="mr-2 h-4 w-4" />
-            {isLoadingPassword ? "Alterando..." : "Alterar Senha"}
+            {isLoadingPassword ? t('profile.changing') : t('profile.change_password_btn')}
           </Button>
         </CardFooter>
       </Card>

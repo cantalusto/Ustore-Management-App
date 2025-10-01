@@ -7,6 +7,7 @@ import { TaskAnalytics } from "@/components/analytics/task-analytics"
 import { TeamPerformance } from "@/components/analytics/team-performance"
 import { ProjectProgress } from "@/components/analytics/project-progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { AnalyticsHeader, AnalyticsTabLabel } from "@/components/analytics/analytics-header"
 
 export default async function AnalyticsPage() {
   const user = await getCurrentUser()
@@ -20,19 +21,22 @@ export default async function AnalyticsPage() {
       <DashboardHeader user={user} />
       <main className="container mx-auto px-4 py-8">
         <div className="space-y-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Análises</h1>
-            <p className="text-muted-foreground mt-2">
-              Obtenha insights sobre o desempenho da sua equipe e o progresso dos projetos.
-            </p>
-          </div>
+          <AnalyticsHeader />
 
           <Tabs defaultValue="overview">
             <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-              <TabsTrigger value="tasks">Análise de Tarefas</TabsTrigger>
-              <TabsTrigger value="team">Desempenho por Departamento</TabsTrigger> {/* Alterado */}
-              <TabsTrigger value="projects">Progresso dos Projetos</TabsTrigger>
+              <TabsTrigger value="overview">
+                <AnalyticsTabLabel tabKey="overview" />
+              </TabsTrigger>
+              <TabsTrigger value="tasks">
+                <AnalyticsTabLabel tabKey="tasks" />
+              </TabsTrigger>
+              <TabsTrigger value="team">
+                <AnalyticsTabLabel tabKey="team" />
+              </TabsTrigger>
+              <TabsTrigger value="projects">
+                <AnalyticsTabLabel tabKey="projects" />
+              </TabsTrigger>
             </TabsList>
             <TabsContent value="overview" className="mt-6">
               <AnalyticsOverview userRole={user.role} />
