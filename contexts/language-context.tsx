@@ -18,7 +18,7 @@ const translations = {
     // App
     'app.title': 'Ustore',
     'app.subtitle': 'Gerenciamento de Equipes',
-    
+
     // Header/Navigation
     'nav.teams': 'Equipes',
     'nav.tasks': 'Tarefas',
@@ -27,7 +27,7 @@ const translations = {
     'nav.profile': 'Perfil',
     'nav.settings': 'Configurações',
     'nav.logout': 'Sair',
-    
+
     // Dashboard
     'dashboard.title': 'Dashboard',
     'dashboard.welcome': 'Bem-vindo',
@@ -48,7 +48,7 @@ const translations = {
     'dashboard.recent_activity.task_badge': 'Tarefa',
     'dashboard.recent_activity.created_task': 'criou a tarefa',
     'dashboard.recent_activity.completed_task': 'concluiu a tarefa',
-    
+
     // Tasks
     'tasks.title': 'Tarefas',
     'tasks.management_title': 'Gerenciamento de Tarefas',
@@ -77,7 +77,7 @@ const translations = {
     'tasks.created_at': 'Criado em:',
     'tasks.project': 'Projeto:',
     'tasks.overdue': 'Atrasado',
-    
+
     // Projects
     'projects.status.on_track': 'Em dia',
     'projects.status.at_risk': 'Em risco',
@@ -148,7 +148,7 @@ const translations = {
     'tasks.cancel_button': 'Cancelar',
     'tasks.create_button': 'Criar Tarefa',
     'tasks.save_changes_button': 'Salvar Alterações',
-    
+
     // Teams
     'teams.title': 'Gerenciamento de Equipes',
     'teams.description': 'Gerencie os membros da sua equipe e suas funções.',
@@ -164,6 +164,7 @@ const translations = {
     'teams.update_member_btn': 'Atualizar Membro',
     'teams.password_placeholder': 'Deixe em branco para não alterar',
     'teams.phone': 'Telefone',
+    'teams.password': 'Senha',
     'teams.status': 'Status',
     'teams.status_active': 'Ativo',
     'teams.status_inactive': 'Inativo',
@@ -197,7 +198,7 @@ const translations = {
     'teams.all_members_performance': 'Todos os Membros',
     'teams.tasks_completed': 'tarefas',
     'teams.completion_rate_label': 'Taxa de Conclusão',
-    
+
     // Analytics
     'analytics.title': 'Análises',
     'analytics.subtitle': 'Obtenha insights sobre o desempenho da sua equipe e o progresso dos projetos.',
@@ -230,7 +231,7 @@ const translations = {
     'analytics.time_range.7d': '7 dias',
     'analytics.time_range.30d': '30 dias',
     'analytics.time_range.90d': '90 dias',
-    
+
     // Reports
     'reports.title': 'Relatórios',
     'reports.subtitle': 'Exporte dados detalhados sobre o desempenho da sua equipe e projetos.',
@@ -252,7 +253,7 @@ const translations = {
     'reports.configuration': 'Configuração de Relatório',
     'reports.configuration_desc': 'Configure filtros para seus relatórios.',
     'reports.date_range': 'Intervalo de Datas',
-    
+
     // Report Excel Headers - Portuguese
     'reports.excel.main_title': 'Relatório do Sistema de Gestão de Equipes',
     'reports.excel.type': 'Tipo',
@@ -274,7 +275,7 @@ const translations = {
     'reports.excel.progress': 'Progresso (%)',
     'reports.excel.select_member': 'Por favor, selecione um membro para gerar este relatório.',
     'reports.excel.member_not_found': 'Membro não encontrado',
-    
+
     // Profile
     'profile.title': 'Perfil',
     'profile.update_info': 'Atualize seu nome e foto de perfil.',
@@ -289,7 +290,7 @@ const translations = {
     'profile.changing': 'Alterando...',
     'profile.change_password_btn': 'Alterar Senha',
     'profile.password_min_length': 'A nova senha deve ter pelo menos 6 caracteres.',
-    
+
     // Settings
     'settings.title': 'Configurações',
     'settings.theme': 'Tema',
@@ -298,25 +299,25 @@ const translations = {
     'settings.dark': 'Escuro',
     'settings.theme_description': 'Escolha a aparência do aplicativo.',
     'settings.system_description': 'O tema do sistema alternará automaticamente entre os modos claro e escuro com base nas configurações do seu dispositivo.',
-    
+
     // Auth
     'auth.email': 'E-mail',
     'auth.password': 'Senha',
     'auth.login': 'Entrar',
     'auth.login_error': 'Falha no login',
-     
-     // Common
-     'common.cancel': 'Cancelar',
-     'common.save': 'Salvar',
-     'common.save_changes': 'Salvar Alterações',
-     'common.name': 'Nome Completo',
-     'common.email': 'Email',
-     'common.password': 'Senha',
-     'common.new_password': 'Nova Senha (opcional)',
-     'common.role': 'Cargo',
-     'common.department': 'Departamento',
-     'common.select_department': 'Selecione um depto',
-     'common.select_member': 'Selecione um membro',
+
+    // Common
+    'common.cancel': 'Cancelar',
+    'common.save': 'Salvar',
+    'common.save_changes': 'Salvar Alterações',
+    'common.name': 'Nome Completo',
+    'common.email': 'Email',
+    'common.password': 'Senha',
+    'common.new_password': 'Nova Senha (opcional)',
+    'common.role': 'Cargo',
+    'common.department': 'Departamento',
+    'common.select_department': 'Selecione um depto',
+    'common.select_member': 'Selecione um membro',
     'common.delete': 'Excluir',
     'common.edit': 'Editar',
     'common.create': 'Criar',
@@ -325,14 +326,14 @@ const translations = {
     'common.loading': 'Carregando...',
     'common.error': 'Erro',
     'common.success': 'Sucesso',
-    
+
     // Common roles and status
     'common.roles.admin': 'Administrador',
-    'common.roles.manager': 'Gerente', 
+    'common.roles.manager': 'Gerente',
     'common.roles.member': 'Membro',
     'common.status.active': 'Ativo',
     'common.status.inactive': 'Inativo',
-    
+
     // Language
     'language.portuguese': 'Português',
     'language.english': 'English',
@@ -342,7 +343,7 @@ const translations = {
     // App
     'app.title': 'Ustore',
     'app.subtitle': 'Team Management',
-    
+
     // Header/Navigation
     'nav.teams': 'Teams',
     'nav.tasks': 'Tasks',
@@ -351,7 +352,7 @@ const translations = {
     'nav.profile': 'Profile',
     'nav.settings': 'Settings',
     'nav.logout': 'Logout',
-    
+
     // Dashboard
     'dashboard.title': 'Dashboard',
     'dashboard.welcome': 'Welcome',
@@ -372,7 +373,7 @@ const translations = {
     'dashboard.recent_activity.task_badge': 'Task',
     'dashboard.recent_activity.created_task': 'created the task',
     'dashboard.recent_activity.completed_task': 'completed the task',
-    
+
     // Tasks
     'tasks.title': 'Tasks',
     'tasks.management_title': 'Task Management',
@@ -412,7 +413,7 @@ const translations = {
     'tasks.project': 'Project:',
     'tasks.overdue': 'Overdue',
     'tasks.comments': 'Comments',
-    
+
     // Projects
     'projects.status.on_track': 'On Track',
     'projects.status.at_risk': 'At Risk',
@@ -482,7 +483,7 @@ const translations = {
     'tasks.cancel_button': 'Cancel',
     'tasks.create_button': 'Create Task',
     'tasks.save_changes_button': 'Save Changes',
-    
+
     // Teams
     'teams.title': 'Team Management',
     'teams.description': 'Manage your team members and their roles.',
@@ -492,6 +493,7 @@ const translations = {
     'teams.add_member_error': 'Failed to add member',
     'teams.add_member_btn': 'Add Member',
     'teams.phone_optional': 'Phone (Optional)',
+    'teams.password': 'Password',
     'teams.edit_member': 'Edit Member',
     'teams.edit_member_title': 'Edit Team Member',
     'teams.update_member_error': 'Failed to update member',
@@ -531,7 +533,7 @@ const translations = {
     'teams.all_members_performance': 'All Members',
     'teams.tasks_completed': 'tasks',
     'teams.completion_rate_label': 'Completion Rate',
-    
+
     // Analytics
     'analytics.title': 'Analytics',
     'analytics.subtitle': 'Get insights about your team performance and project progress.',
@@ -564,7 +566,7 @@ const translations = {
     'analytics.time_range.7d': '7 days',
     'analytics.time_range.30d': '30 days',
     'analytics.time_range.90d': '90 days',
-    
+
     // Reports
     'reports.title': 'Reports',
     'reports.subtitle': 'Export detailed data about your team performance and projects.',
@@ -592,7 +594,7 @@ const translations = {
     'reports.select_range': 'Select range',
     'reports.export_excel': 'Export to Excel',
     'reports.generating': 'Generating...',
-    
+
     // Report Excel Headers - English
     'reports.excel.main_title': 'Team Management System Report',
     'reports.excel.type': 'Type',
@@ -614,7 +616,7 @@ const translations = {
     'reports.excel.progress': 'Progress (%)',
     'reports.excel.select_member': 'Please select a member to generate this report.',
     'reports.excel.member_not_found': 'Member not found',
-    
+
     // Profile
     'profile.title': 'Profile',
     'profile.update_info': 'Update your name and profile picture.',
@@ -629,37 +631,37 @@ const translations = {
     'profile.changing': 'Changing...',
     'profile.change_password_btn': 'Change Password',
     'profile.password_min_length': 'New password must be at least 6 characters.',
-     'profile.info_updated': 'Information updated successfully!',
-     'profile.info_update_error': 'Failed to update information.',
-     'profile.network_error': 'Network error. Please try again.',
-    
+    'profile.info_updated': 'Information updated successfully!',
+    'profile.info_update_error': 'Failed to update information.',
+    'profile.network_error': 'Network error. Please try again.',
+
     // Settings
-     'settings.title': 'Settings',
-     'settings.theme': 'Theme',
-     'settings.system': 'System',
-     'settings.light': 'Light',
-     'settings.dark': 'Dark',
-     'settings.theme_description': 'Choose the app appearance.',
-     'settings.system_description': 'System theme will automatically switch between light and dark modes based on your device settings.',
-    
+    'settings.title': 'Settings',
+    'settings.theme': 'Theme',
+    'settings.system': 'System',
+    'settings.light': 'Light',
+    'settings.dark': 'Dark',
+    'settings.theme_description': 'Choose the app appearance.',
+    'settings.system_description': 'System theme will automatically switch between light and dark modes based on your device settings.',
+
     // Auth
-     'auth.email': 'Email',
-     'auth.password': 'Password',
-     'auth.login': 'Login',
-     'auth.login_error': 'Login failed',
-     'auth.network_error': 'Network error. Please try again.',
-     
-     // Common (additional keys)
-     'common.name': 'Full Name',
-     'common.email': 'Email',
-     'common.password': 'Password',
-     'common.new_password': 'New Password (optional)',
-     'common.role': 'Role',
-     'common.department': 'Department',
-     'common.select_department': 'Select a department',
-     'common.select_member': 'Select a member',
-     'common.save_changes': 'Save Changes',
-    
+    'auth.email': 'Email',
+    'auth.password': 'Password',
+    'auth.login': 'Login',
+    'auth.login_error': 'Login failed',
+    'auth.network_error': 'Network error. Please try again.',
+
+    // Common (additional keys)
+    'common.name': 'Full Name',
+    'common.email': 'Email',
+    'common.password': 'Password',
+    'common.new_password': 'New Password (optional)',
+    'common.role': 'Role',
+    'common.department': 'Department',
+    'common.select_department': 'Select a department',
+    'common.select_member': 'Select a member',
+    'common.save_changes': 'Save Changes',
+
     // Common
     'common.save': 'Save',
     'common.cancel': 'Cancel',
@@ -671,19 +673,19 @@ const translations = {
     'common.loading': 'Loading...',
     'common.error': 'Error',
     'common.success': 'Success',
-    
+
     // Common roles and status
     'common.roles.admin': 'Administrator',
     'common.roles.manager': 'Manager',
     'common.roles.member': 'Member',
     'common.status.active': 'Active',
     'common.status.inactive': 'Inactive',
-    
+
     // Roles (legacy - keeping for compatibility)
     'role.admin': 'Administrator',
     'role.manager': 'Manager',
     'role.member': 'Member',
-    
+
     // Language
     'language.portuguese': 'Português',
     'language.english': 'English',
@@ -713,14 +715,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const t = (key: string, params?: Record<string, string>): string => {
     let text = translations[language][key as keyof typeof translations[typeof language]] || key
-    
+
     // Se há parâmetros, substitui os placeholders
     if (params) {
       Object.keys(params).forEach(param => {
         text = text.replace(new RegExp(`\\{${param}\\}`, 'g'), params[param])
       })
     }
-    
+
     return text
   }
 

@@ -135,6 +135,16 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="password">{t('teams.password')}</Label>
+            <Input
+              id="password"
+              value={formData.password}
+              onChange={(e) => handleChange("password", e.target.value)}
+              disabled={isLoading}
+            />
+          </div>
+
           <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={isLoading} className="w-full sm:w-auto">
               {t('common.cancel')}
