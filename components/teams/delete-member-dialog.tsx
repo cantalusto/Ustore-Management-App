@@ -58,13 +58,13 @@ export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteM
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-w-[95vw] mx-auto">
         <DialogHeader>
           <div className="flex items-center space-x-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
-            <DialogTitle>{t('teams.delete_member_title')}</DialogTitle>
+            <DialogTitle className="text-lg sm:text-xl">{t('teams.delete_member_title')}</DialogTitle>
           </div>
-          <DialogDescription>
+          <DialogDescription className="text-sm sm:text-base">
             {t('teams.delete_member_description', { name: member.name })}
           </DialogDescription>
         </DialogHeader>
@@ -77,11 +77,11 @@ export function DeleteMemberDialog({ member, open, onClose, onSuccess }: DeleteM
           )}
         </div>
         
-        <DialogFooter className="pt-4">
-            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+        <DialogFooter className="pt-4 flex flex-col sm:flex-row gap-2 sm:space-x-2">
+            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading} className="w-full sm:w-auto">
               {t('common.cancel')}
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isLoading}>
+            <Button variant="destructive" onClick={handleDelete} disabled={isLoading} className="w-full sm:w-auto">
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {t('teams.delete_member_btn')}
             </Button>

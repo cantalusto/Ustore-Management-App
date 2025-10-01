@@ -127,11 +127,11 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <CardTitle className="text-lg">{t('projects.title')}</CardTitle>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
                 <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-full sm:w-[180px]">
                         <SelectValue placeholder={t('projects.department_filter')} />
                     </SelectTrigger>
                     <SelectContent>
@@ -140,7 +140,7 @@ export function ProjectProgress({ userRole }: ProjectProgressProps) {
                     </SelectContent>
                 </Select>
                 <Select value={selectedMember} onValueChange={setSelectedMember}>
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-full sm:w-[180px]">
                         <SelectValue placeholder={t('projects.member_filter')} />
                     </SelectTrigger>
                     <SelectContent>

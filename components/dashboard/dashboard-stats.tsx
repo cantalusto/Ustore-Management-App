@@ -41,7 +41,7 @@ export function DashboardStats({ userRole }: DashboardStatsProps) {
 
   if (loading || !stats) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
           <Card key={i}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -91,7 +91,7 @@ export function DashboardStats({ userRole }: DashboardStatsProps) {
   const visibleStats = allStats.filter((stat) => stat.visible.includes(userRole));
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       {visibleStats.map((stat, index) => (
         <Card key={index}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

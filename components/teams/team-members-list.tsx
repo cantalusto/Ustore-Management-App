@@ -157,13 +157,13 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
         <TeamFilters filters={filters} onFiltersChange={setFilters} departments={departments} />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {filteredMembers.map((member) => (
           <Card key={member.id} className="hover:shadow-md transition-shadow">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Avatar className="h-10 w-10">
+                <div className="flex items-center space-x-3 flex-1 min-w-0">
+                  <Avatar className="h-10 w-10 flex-shrink-0">
                     <AvatarFallback>
                       {member.name
                         .split(" ")
@@ -171,15 +171,15 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
                         .join("")}
                     </AvatarFallback>
                   </Avatar>
-                  <div>
-                    <CardTitle className="text-lg">{member.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{member.department}</p>
+                  <div className="min-w-0 flex-1">
+                    <CardTitle className="text-base sm:text-lg truncate">{member.name}</CardTitle>
+                    <p className="text-sm text-muted-foreground truncate">{member.department}</p>
                   </div>
                 </div>
                 {(canEditMember(member.role) || canDeleteMember(member.role)) && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
+                      <Button variant="ghost" className="h-8 w-8 p-0 flex-shrink-0">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -201,18 +201,18 @@ export function TeamMembersList({ userRole }: TeamMembersListProps) {
                 )}
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-2 sm:space-y-3">
               <div className="flex items-center space-x-2 text-sm">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-                <span>{member.email}</span>
+                <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="truncate">{member.email}</span>
               </div>
               {member.phone && (
                 <div className="flex items-center space-x-2 text-sm">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span>{member.phone}</span>
+                  <Phone className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                  <span className="truncate">{member.phone}</span>
                 </div>
               )}
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <Badge className={getRoleBadgeColor(member.role)}>{translateRole(member.role)}</Badge>
                 <Badge className={getStatusBadgeColor(member.status)}>{translateStatus(member.status)}</Badge>
               </div>

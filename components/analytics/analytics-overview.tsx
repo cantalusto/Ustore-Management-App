@@ -123,11 +123,11 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h2 className="text-xl font-semibold">{t('analytics.overview')}</h2>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder={t('teams.department_filter')} />
             </SelectTrigger>
             <SelectContent>
@@ -136,7 +136,7 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
             </SelectContent>
           </Select>
           <Select value={selectedMember} onValueChange={setSelectedMember}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder={t('teams.all_members')} />
             </SelectTrigger>
             <SelectContent>
@@ -145,7 +145,7 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
             </SelectContent>
           </Select>
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className="w-full sm:w-32">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

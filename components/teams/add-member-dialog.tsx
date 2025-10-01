@@ -65,9 +65,9 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-w-[95vw] mx-auto">
         <DialogHeader>
-          <DialogTitle>{t('teams.add_member_title')}</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">{t('teams.add_member_title')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -78,7 +78,7 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">{t('profile.full_name')}</Label>
+            <Label htmlFor="name">{t('common.name')}</Label>
             <Input
               id="name"
               value={formData.name}
@@ -101,21 +101,9 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">{t('common.password')}</Label>
-            <Input
-              id="password"
-              type="password"
-              value={formData.password}
-              onChange={(e) => handleChange("password", e.target.value)}
-              required
-              disabled={isLoading}
-            />
-          </div>
-
-          <div className="space-y-2">
             <Label htmlFor="role">{t('common.role')}</Label>
             <Select value={formData.role} onValueChange={(value) => handleChange("role", value)}>
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -147,11 +135,11 @@ export function AddMemberDialog({ open, onClose, onSuccess }: AddMemberDialogPro
             />
           </div>
 
-          <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-2 pt-4">
+            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading} className="w-full sm:w-auto">
               {t('common.cancel')}
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {t('teams.add_member_btn')}
             </Button>

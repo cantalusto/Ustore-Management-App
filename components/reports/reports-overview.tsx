@@ -95,20 +95,22 @@ export function ReportsOverview() {
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>{t('reports.configuration')}</CardTitle>
-          <CardDescription>{t('reports.configuration_desc')}</CardDescription>
+          <CardTitle className="text-lg sm:text-xl">{t('reports.configuration')}</CardTitle>
+          <CardDescription className="text-sm sm:text-base">{t('reports.configuration_desc')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label className="text-sm font-medium mb-2 block">{t('reports.date_range')}</label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal bg-transparent">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {dateRange.from && dateRange.to
-                        ? `${format(dateRange.from, "dd 'de' LLL, y", { locale: ptBR })} - ${format(dateRange.to, "dd 'de' LLL, y", { locale: ptBR })}`
-                        : t('reports.select_range')}
+                    <Button variant="outline" className="w-full justify-start text-left font-normal bg-transparent text-xs sm:text-sm">
+                      <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
+                      <span className="truncate">
+                        {dateRange.from && dateRange.to
+                          ? `${format(dateRange.from, "dd 'de' LLL, y", { locale: ptBR })} - ${format(dateRange.to, "dd 'de' LLL, y", { locale: ptBR })}`
+                          : t('reports.select_range')}
+                      </span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -125,7 +127,7 @@ export function ReportsOverview() {
             <div>
                 <label className="text-sm font-medium mb-2 block">{t('teams.department_filter')}</label>
                 <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-                    <SelectTrigger><SelectValue placeholder={t('teams.select_department')} /></SelectTrigger>
+                    <SelectTrigger className="w-full"><SelectValue placeholder={t('teams.select_department')} /></SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">{t('teams.all_departments')}</SelectItem>
                         {departments.map((dep) => (
@@ -137,7 +139,7 @@ export function ReportsOverview() {
             <div>
               <label className="text-sm font-medium mb-2 block">{t('teams.member')}</label>
               <Select value={selectedMember} onValueChange={setSelectedMember}>
-                <SelectTrigger><SelectValue placeholder={t('teams.select_member')} /></SelectTrigger>
+                <SelectTrigger className="w-full"><SelectValue placeholder={t('teams.select_member')} /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('teams.all_members')}</SelectItem>
                   {teamMembers.map((member) => (
@@ -150,19 +152,19 @@ export function ReportsOverview() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
         {reportTypes.map((report) => (
           <Card key={report.id} className="relative">
-            <CardHeader>
-                <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/10 rounded-lg">{report.icon}</div>
-                        <div>
-                            <CardTitle className="text-lg">{report.title}</CardTitle>
-                            <CardDescription className="mt-1">{report.description}</CardDescription>
+            <CardHeader className="pb-3 sm:pb-6">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">{report.icon}</div>
+                        <div className="min-w-0 flex-1">
+                            <CardTitle className="text-base sm:text-lg truncate">{report.title}</CardTitle>
+                            <CardDescription className="mt-1 text-sm">{report.description}</CardDescription>
                         </div>
                     </div>
-                    <Badge variant="secondary">{report.badge}</Badge>
+                    <Badge variant="secondary" className="self-start flex-shrink-0">{report.badge}</Badge>
                 </div>
             </CardHeader>
             <CardContent>
@@ -171,10 +173,12 @@ export function ReportsOverview() {
                   variant="outline"
                   onClick={() => handleGenerateReport(report.id, "excel")}
                   disabled={isGenerating === `${report.id}-excel` || (report.id === 'individual-performance' && selectedMember === 'all')}
-                  className="flex-1"
+                  className="flex-1 text-sm"
                 >
-                  <Download className="mr-2 h-4 w-4" />
-                  {isGenerating === `${report.id}-excel` ? t('reports.generating') : t('reports.export_excel')}
+                  <Download className="mr-2 h-4 w-4 flex-shrink-0" />
+                  <span className="truncate">
+                    {isGenerating === `${report.id}-excel` ? t('reports.generating') : t('reports.export_excel')}
+                  </span>
                 </Button>
               </div>
             </CardContent>

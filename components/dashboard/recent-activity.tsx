@@ -74,20 +74,20 @@ export function RecentActivity() {
             {activities.map((task) => {
                 const activity = getActivityText(task);
                 return (
-                <div key={task.id} className="flex items-center space-x-4">
-                    <Avatar className="h-8 w-8">
+                <div key={task.id} className="flex items-center space-x-2 sm:space-x-4">
+                    <Avatar className="h-8 w-8 flex-shrink-0">
                     <AvatarFallback>
                         {activity.user.split(" ").map((n) => n[0]).join("")}
                     </AvatarFallback>
                     </Avatar>
-                    <div className="flex-1 space-y-1">
+                    <div className="flex-1 space-y-1 min-w-0">
                     <p className="text-sm">
                         <span className="font-medium">{activity.user}</span> {activity.action}{" "}
-                        <span className="font-medium text-primary">{activity.target}</span>
+                        <span className="font-medium text-primary break-words">{activity.target}</span>
                     </p>
                     <p className="text-xs text-muted-foreground">{activity.time}</p>
                     </div>
-                    <Badge variant="outline">{t('dashboard.recent_activity.task_badge')}</Badge>
+                    <Badge variant="outline" className="flex-shrink-0 text-xs">{t('dashboard.recent_activity.task_badge')}</Badge>
                 </div>
                 )
             })}

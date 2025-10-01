@@ -12,10 +12,10 @@ export function TeamsPageContent({ user }: TeamsPageContentProps) {
   const { t } = useLanguage()
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">{t('teams.title')}</h1>
-        <p className="text-muted-foreground mt-2">{t('teams.description')}</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{t('teams.title')}</h1>
+        <p className="text-muted-foreground mt-2 text-sm sm:text-base">{t('teams.description')}</p>
       </div>
       {(user.role === "admin" || user.role === "manager") && <AddMemberButton />}
     </div>

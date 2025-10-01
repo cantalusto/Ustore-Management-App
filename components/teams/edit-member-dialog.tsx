@@ -94,9 +94,9 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-w-[95vw] mx-auto">
         <DialogHeader>
-          <DialogTitle>{t('teams.edit_member_title')}</DialogTitle>
+          <DialogTitle className="text-lg sm:text-xl">{t('teams.edit_member_title')}</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -125,7 +125,7 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
           <div className="space-y-2">
             <Label htmlFor="role">{t('common.role')}</Label>
             <Select value={formData.role} onValueChange={(value) => handleChange("role", value)} disabled={!canEditRole}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="member">{t('teams.role_member')}</SelectItem>
                 <SelectItem value="manager">{t('teams.role_manager')}</SelectItem>
@@ -147,7 +147,7 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
           <div className="space-y-2">
             <Label htmlFor="status">{t('teams.status')}</Label>
             <Select value={formData.status} onValueChange={(value) => handleChange("status", value)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="active">{t('teams.status_active')}</SelectItem>
                 <SelectItem value="inactive">{t('teams.status_inactive')}</SelectItem>
@@ -155,11 +155,11 @@ export function EditMemberDialog({ member, open, onClose, onSuccess, userRole }:
             </Select>
           </div>
 
-          <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-2 pt-4">
+            <Button type="button" variant="outline" onClick={onClose} disabled={isLoading} className="w-full sm:w-auto">
               {t('common.cancel')}
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {t('teams.update_member_btn')}
             </Button>

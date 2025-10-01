@@ -24,17 +24,17 @@ export default async function AnalyticsPage() {
           <AnalyticsHeader />
 
           <Tabs defaultValue="overview">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">
+            <TabsList className="grid w-full grid-cols-4 md:grid-cols-4 grid-cols-1 gap-2 md:gap-0 h-auto md:h-10">
+              <TabsTrigger value="overview" className="w-full">
                 <AnalyticsTabLabel tabKey="overview" />
               </TabsTrigger>
-              <TabsTrigger value="tasks">
+              <TabsTrigger value="tasks" className="w-full">
                 <AnalyticsTabLabel tabKey="tasks" />
               </TabsTrigger>
-              <TabsTrigger value="team">
+              <TabsTrigger value="team" className="w-full">
                 <AnalyticsTabLabel tabKey="team" />
               </TabsTrigger>
-              <TabsTrigger value="projects">
+              <TabsTrigger value="projects" className="w-full">
                 <AnalyticsTabLabel tabKey="projects" />
               </TabsTrigger>
             </TabsList>

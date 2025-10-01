@@ -14,7 +14,7 @@ export function LanguageSwitcher() {
         <Button 
           variant="ghost" 
           size="sm" 
-          className="h-8 w-8 p-0 text-white hover:bg-white/20"
+          className="h-8 w-8 p-0 text-muted-foreground hover:text-white hover:bg-black sm:text-white sm:hover:text-white sm:hover:bg-white/20"
           title={t('language.switch')}
         >
           <Languages className="h-4 w-4" />
@@ -27,7 +27,7 @@ export function LanguageSwitcher() {
           className="flex items-center justify-between cursor-pointer group"
         >
           <span>{language === 'pt' ? t('language.english') : t('language.portuguese')}</span>
-          <span className="text-xs text-muted-foreground group-hover:text-white transition-colors duration-200">
+          <span className="text-xs text-muted-foreground group-hover:text-white sm:text-white/70 sm:group-hover:text-white transition-colors duration-200">
             {language === 'pt' ? 'EN' : 'PT'}
           </span>
         </DropdownMenuItem>

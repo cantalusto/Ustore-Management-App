@@ -52,33 +52,33 @@ export function TaskCard({ task, onClick, userRole, userId, isDragging }: TaskCa
       style={style}
       {...attributes}
       {...listeners}
-      className={`cursor-grab hover:shadow-md transition-shadow active:cursor-grabbing`}
+      className={`cursor-grab shadow-lg hover:shadow-xl transition-shadow active:cursor-grabbing`}
     >
       <div onClick={onClick} className="cursor-pointer">
-        <CardContent className="p-4 space-y-3">
+        <CardContent className="p-3 sm:p-4 space-y-3">
           <div className="space-y-2">
-            <div className="flex items-start justify-between">
-              <h4 className="font-medium text-sm leading-tight">{task.title}</h4>
-              <Badge className={getPriorityColor(task.priority)} variant="secondary">
+            <div className="flex items-start justify-between gap-2">
+              <h4 className="font-medium text-sm leading-tight flex-1 min-w-0">{task.title}</h4>
+              <Badge className={`${getPriorityColor(task.priority)} text-xs flex-shrink-0`} variant="secondary">
                 {getPriorityLabel(task.priority)}
               </Badge>
             </div>
             {task.description && <p className="text-xs text-muted-foreground line-clamp-2">{task.description}</p>}
           </div>
 
-          <div className="flex items-center justify-between text-xs">
-            <div className="flex items-center space-x-1">
-              <User className="h-3 w-3" />
-              <span>{task.assigneeName}</span>
+          <div className="flex items-center justify-between text-xs gap-2">
+            <div className="flex items-center space-x-1 min-w-0 flex-1">
+              <User className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate">{task.assigneeName}</span>
             </div>
-            <div className={`flex items-center space-x-1 ${isOverdue ? "text-red-600" : "text-muted-foreground"}`}>
+            <div className={`flex items-center space-x-1 flex-shrink-0 ${isOverdue ? "text-red-600" : "text-muted-foreground"}`}>
               <Calendar className="h-3 w-3" />
-              <span>{new Date(task.dueDate).toLocaleDateString()}</span>
+              <span className="whitespace-nowrap">{new Date(task.dueDate).toLocaleDateString()}</span>
             </div>
           </div>
 
           {task.project && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs truncate max-w-full">
               {task.project}
             </Badge>
           )}

@@ -76,14 +76,14 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
   return (
     <Card>
       <CardHeader>
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <CardTitle className="text-lg flex items-center space-x-2">
             <Award className="h-5 w-5" />
             <span>{t('teams.performance_title')}</span>
           </CardTitle>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder={t('teams.department_filter')} />
               </SelectTrigger>
               <SelectContent>
@@ -92,7 +92,7 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
               </SelectContent>
             </Select>
             <Select value={selectedMember} onValueChange={setSelectedMember}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder={t('teams.all_members')} />
               </SelectTrigger>
               <SelectContent>
@@ -106,27 +106,29 @@ export function TeamPerformance({ userRole }: TeamPerformanceProps) {
       <CardContent className="space-y-6">
         {topPerformer && (
           <div className="bg-muted p-4 rounded-lg">
-            <div className="flex items-center space-x-3">
-              <Avatar className="h-10 w-10">
-                <AvatarFallback>
-                  {topPerformer.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="flex items-center space-x-2">
-                  <h4 className="font-medium">{topPerformer.name}</h4>
-                  <Badge variant="secondary" className="bg-white text-black">
-                    {t('teams.best_performance')}
-                  </Badge>
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-3">
+              <div className="flex items-center space-x-3 flex-1">
+                <Avatar className="h-10 w-10 flex-shrink-0">
+                  <AvatarFallback>
+                    {topPerformer.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2">
+                    <h4 className="font-medium truncate">{topPerformer.name}</h4>
+                    <Badge variant="secondary" className="bg-white text-black w-fit">
+                      {t('teams.best_performance')}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-muted-foreground truncate">
+                    {topPerformer.completionRate}% {t('teams.completion_rate')} • {topPerformer.department}
+                  </p>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {topPerformer.completionRate}% {t('teams.completion_rate')} • {topPerformer.department}
-                </p>
               </div>
-              <div className="text-right">
+              <div className="text-center sm:text-right flex-shrink-0">
                 <div className="text-2xl font-bold text-green-700">{topPerformer.completionRate}%</div>
                 <div className="text-xs text-muted-foreground">{t('teams.completion_rate')}</div>
               </div>

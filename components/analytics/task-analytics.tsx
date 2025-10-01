@@ -92,11 +92,11 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <h2 className="text-xl font-semibold">{t('analytics.task_analysis')}</h2>
-        <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h2 className="text-xl font-semibold">{t('analytics.tabs.tasks')}</h2>
+        <div className="flex flex-col sm:flex-row gap-2">
           <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder={t('teams.department_filter')} />
             </SelectTrigger>
             <SelectContent>
@@ -105,7 +105,7 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
             </SelectContent>
           </Select>
           <Select value={selectedMember} onValueChange={setSelectedMember}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder={t('teams.all_members')} />
             </SelectTrigger>
             <SelectContent>
@@ -114,40 +114,63 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
             </SelectContent>
           </Select>
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
+            <SelectTrigger className="w-full sm:w-32">
+              <SelectValue placeholder={t('analytics.time_range')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="7d">{t('analytics.time_range.7d')}</SelectItem>
+              <SelectItem value="7d">{t('analytics.last_7_days')}</SelectItem>
               <SelectItem value="30d">{t('analytics.time_range.30d')}</SelectItem>
-              <SelectItem value="90d">{t('analytics.time_range.90d')}</SelectItem>
+              <SelectItem value="90d">{t('analytics.last_90_days')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card>
-          <CardHeader><CardTitle className="text-lg">{t('analytics.status_distribution')}</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base sm:text-lg">{t('analytics.status_distribution')}</CardTitle></CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
-                <Pie data={data.statusDistribution} cx="50%" cy="50%" outerRadius={100} dataKey="value" label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                <Pie 
+                  data={data.statusDistribution} 
+                  cx="50%" 
+                  cy="50%" 
+                  outerRadius={70} 
+                  dataKey="value" 
+                  label={({ name, percent }: any) => percent > 0.05 ? `${name} ${(percent * 100).toFixed(0)}%` : ''}
+                  labelLine={false}
+                >
                   {data.statusDistribution.map((entry, index) => (<Cell key={`cell-${index}`} fill={entry.color} />))}
                 </Pie>
-                <Tooltip contentStyle={tooltipStyle} />
+                <Tooltip 
+                  contentStyle={tooltipStyle} 
+                  formatter={(value: any, name: any) => [`${value}`, name]}
+                />
+                <Legend 
+                  verticalAlign="bottom" 
+                  height={36}
+                  formatter={(value: any) => <span className="text-sm">{value}</span>}
+                />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader><CardTitle className="text-lg">{t('analytics.priority_distribution')}</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base sm:text-lg">{t('analytics.priority_distribution')}</CardTitle></CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={data.priorityDistribution}>
+              <BarChart data={data.priorityDistribution} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
+                <XAxis 
+                  dataKey="name" 
+                  angle={-45}
+                  textAnchor="end"
+                  height={60}
+                  interval={0}
+                  fontSize={12}
+                />
                 <YAxis />
                 <Tooltip contentStyle={tooltipStyle} cursor={{fill: 'rgba(200, 200, 200, 0.2)'}} />
                 <Bar dataKey="value" fill="#6366f1" name={t('analytics.quantity')} />
@@ -157,14 +180,21 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card>
-          <CardHeader><CardTitle className="text-lg">{t('analytics.completion_trend')}</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base sm:text-lg">{t('analytics.completion_trend')}</CardTitle></CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={data.completionTrend}>
+              <LineChart data={data.completionTrend} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
+                <XAxis 
+                  dataKey="date" 
+                  angle={-45}
+                  textAnchor="end"
+                  height={60}
+                  interval={0}
+                  fontSize={12}
+                />
                 <YAxis />
                 <Tooltip contentStyle={tooltipStyle} />
                 <Legend />
@@ -176,12 +206,19 @@ export function TaskAnalytics({ userRole }: TaskAnalyticsProps) {
         </Card>
 
         <Card>
-          <CardHeader><CardTitle className="text-lg">{t('analytics.department_performance')}</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base sm:text-lg">{t('analytics.department_performance')}</CardTitle></CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={data.departmentStats}>
+              <BarChart data={data.departmentStats} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="department" />
+                <XAxis 
+                  dataKey="department" 
+                  angle={-45}
+                  textAnchor="end"
+                  height={60}
+                  interval={0}
+                  fontSize={12}
+                />
                 <YAxis />
                 <Tooltip contentStyle={tooltipStyle} cursor={{fill: 'rgba(200, 200, 200, 0.2)'}} />
                 <Legend />
