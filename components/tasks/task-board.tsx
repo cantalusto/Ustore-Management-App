@@ -2,7 +2,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors, closestCorners } from "@dnd-kit/core"
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useSensor, useSensors, closestCenter, rectIntersection } from "@dnd-kit/core"
 import { arrayMove } from "@dnd-kit/sortable"
 import { Card, CardContent } from "@/components/ui/card"
 import { TaskColumn } from "./task-column"
@@ -116,6 +116,9 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
   const handleDragEnd = (event: DragEndEvent) => {
     setActiveTask(null)
     const { active, over } = event
+    
+    console.log('Drag end event:', { active: active.id, over: over?.id, overData: over?.data.current })
+    
     if (!over) return
     const activeId = active.id
     const overId = over.id
@@ -123,14 +126,21 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
 
     const isActiveTask = active.data.current?.type === 'Task'
     const isOverTask = over.data.current?.type === 'Task'
+    const isOverColumn = over.data.current?.type === 'Column'
+    
+    console.log('Drop types:', { isActiveTask, isOverTask, isOverColumn })
+    
     if (!isActiveTask) return
 
     const activeTask = tasks.find(t => t.id === activeId)
     if (!activeTask) return
 
+    // Se estamos arrastando sobre uma tarefa
     if (isOverTask) {
       const overTask = tasks.find(t => t.id === overId)
       if (!overTask) return
+      
+      // Se é a mesma coluna, apenas reordena
       if (activeTask.status === overTask.status) {
         setTasks(currentTasks => {
           const activeIndex = currentTasks.findIndex(t => t.id === activeId)
@@ -139,11 +149,23 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
         })
         return
       }
+      
+      // Se é coluna diferente, muda o status para a coluna da tarefa de destino
+      if (activeTask.status !== overTask.status) {
+        handleStatusChange(activeId as number, overTask.status)
+        return
+      }
     }
 
-    const isOverColumn = over.data.current?.type === 'Column'
-    const newStatus = isOverColumn ? over.id as Task['status'] : tasks.find(t => t.id === overId)?.status
-    if (newStatus && activeTask.status !== newStatus) handleStatusChange(activeId as number, newStatus)
+    // Se estamos arrastando sobre uma coluna (incluindo colunas vazias)
+    if (isOverColumn) {
+      const newStatus = overId as Task['status']
+      console.log('Dropping on column:', { currentStatus: activeTask.status, newStatus })
+      
+      if (activeTask.status !== newStatus) {
+        handleStatusChange(activeId as number, newStatus)
+      }
+    }
   }
 
   const handleStatusChange = async (taskId: number, newStatus: Task["status"]) => {
@@ -168,7 +190,7 @@ export function TaskBoard({ userRole, userId }: TaskBoardProps) {
   if (loading) return <Card><CardContent className="p-6 text-center">{t('tasks.loading')}</CardContent></Card>
 
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} sensors={sensors} collisionDetection={closestCorners}>
+    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} sensors={sensors} collisionDetection={rectIntersection}>
       <div className="mb-6">
         <TaskFilters filters={filters} onFiltersChange={setFilters} teamMembers={teamMembers} projects={projects} departments={departments} />
       </div>

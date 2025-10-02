@@ -16,7 +16,7 @@ interface TaskColumnProps {
 }
 
 export function TaskColumn({ id, title, tasks, onTaskClick, userRole, userId }: TaskColumnProps) {
-  const { setNodeRef } = useDroppable({
+  const { setNodeRef, isOver } = useDroppable({
     id,
     data: {
       type: 'Column',
@@ -35,7 +35,7 @@ export function TaskColumn({ id, title, tasks, onTaskClick, userRole, userId }: 
 
   return (
     <div ref={setNodeRef} className="h-full">
-      <Card className={`h-full ${getColumnColor()}`}>
+      <Card className={`h-full ${getColumnColor()} ${isOver ? 'ring-2 ring-blue-500 ring-opacity-50' : ''}`}>
         <CardHeader className="pb-3">
           <CardTitle className="text-lg flex items-center justify-between">
             {title}
@@ -44,11 +44,19 @@ export function TaskColumn({ id, title, tasks, onTaskClick, userRole, userId }: 
             </span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-3 min-h-[200px]">
           <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
             {tasks.length === 0 ? (
-              <div className="h-20 flex items-center justify-center">
-                <p className="text-sm text-muted-foreground text-center">Arraste tarefas para cá</p>
+              <div 
+                className={`h-full min-h-[150px] flex items-center justify-center border-2 border-dashed rounded-lg transition-all duration-200 ${
+                  isOver 
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/20' 
+                    : 'border-muted-foreground/20 hover:border-muted-foreground/40'
+                }`}
+              >
+                <p className="text-sm text-muted-foreground text-center">
+                  {isOver ? 'Solte a tarefa aqui' : 'Arraste tarefas para cá'}
+                </p>
               </div>
             ) : (
               tasks.map((task) => (
