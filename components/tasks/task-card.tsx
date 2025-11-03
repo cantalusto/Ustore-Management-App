@@ -62,9 +62,12 @@ export function TaskCard({ task, onClick, userRole, userId, isDragging }: TaskCa
       style={style}
       {...attributes}
       {...listeners}
-      className={`cursor-grab shadow-lg hover:shadow-2xl transition-all duration-200 hover:scale-[1.02] active:cursor-grabbing ${getPriorityBorder(task.priority)} border-2 hover:border-primary/50`}
+      className={`group cursor-grab shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.03] active:cursor-grabbing active:scale-95 ${getPriorityBorder(task.priority)} border-2 hover:border-primary/50 animate-scale-in relative overflow-hidden`}
     >
-      <div onClick={onClick} className="cursor-pointer">
+      {/* Shimmer effect on hover */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+      
+      <div onClick={onClick} className="cursor-pointer relative z-10">
         <CardContent className="p-3 sm:p-4 space-y-3">
           <div className="space-y-2">
             <div className="flex items-start justify-between gap-2">

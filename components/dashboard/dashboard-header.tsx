@@ -26,43 +26,52 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-[var(--accent)] text-white">
-      <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-4 flex items-center justify-between">
+    <header className="sticky top-0 z-50 border-b-2 border-border bg-gradient-to-r from-[var(--accent)] via-blue-900 to-[var(--accent)] text-white backdrop-blur-md shadow-xl">
+      {/* Animated border bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-orange-500 via-blue-500 to-orange-500 animate-shimmer" style={{ backgroundSize: '200% 100%' }} />
+      
+      <div className="container mx-auto px-2 sm:px-4 py-2 sm:py-4 flex items-center justify-between relative">
         {/* Logo */}
-        <div className="flex items-center space-x-2 sm:space-x-6">
+        <div className="flex items-center space-x-2 sm:space-x-6 animate-slide-in-left">
           <Link
             href="/dashboard"
-            className="flex items-center gap-1 sm:gap-2 text-lg sm:text-xl font-semibold text-white hover:text-orange-300 transition-colors"
+            className="group flex items-center gap-1 sm:gap-2 text-lg sm:text-xl font-semibold text-white hover:text-orange-300 transition-all duration-300 hover:scale-105"
           >
-            <Image src="/logo-ustore.png" alt="uStore Logo" width={60} height={40} className="sm:w-[80px] sm:h-[50px] object-contain" />
+            <div className="relative group-hover:animate-bounce-subtle">
+              <Image src="/logo-ustore.png" alt="uStore Logo" width={60} height={40} className="sm:w-[80px] sm:h-[50px] object-contain" />
+              <div className="absolute inset-0 bg-orange-400/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
             <div className="flex flex-col">
-              <span className="text-base sm:text-lg font-bold leading-tight">Ustore</span>
+              <span className="text-base sm:text-lg font-bold leading-tight bg-gradient-to-r from-white to-orange-200 bg-clip-text text-transparent">Ustore</span>
               <span className="text-xs -mt-1 leading-tight opacity-90 hidden sm:block">{t('app.subtitle')}</span>
             </div>
           </Link>
 
           {/* Navegação - oculta no mobile */}
-          <nav className="hidden lg:flex items-center space-x-4">
+          <nav className="hidden lg:flex items-center space-x-1">
             <Link
               href="/dashboard"
-              className="group flex-shrink-0 text-sm text-white/90 hover:text-orange-300 flex items-center space-x-1 transition-colors"
+              className="group relative px-3 py-2 text-sm text-white/90 hover:text-white flex items-center space-x-2 transition-all duration-300 rounded-lg hover:bg-white/10"
             >
-              <BarChart3 className="h-4 w-4 group-hover:text-orange-300" />
-              <span>{t('dashboard.title')}</span>
+              <BarChart3 className="h-4 w-4 group-hover:scale-110 transition-transform" />
+              <span className="font-medium">{t('dashboard.title')}</span>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
             </Link>
             <Link
               href="/teams"
-              className="group flex-shrink-0 text-sm text-white/90 hover:text-orange-300 flex items-center space-x-1 transition-colors"
+              className="group relative px-3 py-2 text-sm text-white/90 hover:text-white flex items-center space-x-2 transition-all duration-300 rounded-lg hover:bg-white/10"
             >
-              <Users className="h-4 w-4 group-hover:text-orange-300" />
-              <span>{t('nav.teams')}</span>
+              <Users className="h-4 w-4 group-hover:scale-110 transition-transform" />
+              <span className="font-medium">{t('nav.teams')}</span>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
             </Link>
             <Link
               href="/tasks"
-              className="group flex-shrink-0 text-sm text-white/90 hover:text-orange-300 flex items-center space-x-1 transition-colors"
+              className="group relative px-3 py-2 text-sm text-white/90 hover:text-white flex items-center space-x-2 transition-all duration-300 rounded-lg hover:bg-white/10"
             >
-              <CheckSquare className="h-4 w-4 group-hover:text-orange-300" />
-              <span>{t('nav.tasks')}</span>
+              <CheckSquare className="h-4 w-4 group-hover:scale-110 transition-transform" />
+              <span className="font-medium">{t('nav.tasks')}</span>
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
             </Link>
             {(user.role === "admin" || user.role === "manager") && (
               <Link

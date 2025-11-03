@@ -34,9 +34,12 @@ export function TaskColumn({ id, title, tasks, onTaskClick, userRole, userId }: 
   }
 
   return (
-    <div ref={setNodeRef} className="w-full">
-      <Card className={`${getColumnColor()} ${isOver ? 'ring-4 ring-blue-500 ring-opacity-50 shadow-2xl' : 'shadow-lg'}`}>
-        <CardHeader className="pb-3">
+    <div ref={setNodeRef} className="w-full animate-slide-in-up" style={{ animationDelay: `${id === 'a-fazer' ? '0ms' : id === 'em-progresso' ? '100ms' : id === 'revisao' ? '200ms' : '300ms'}` }}>
+      <Card className={`group transition-all duration-300 ${getColumnColor()} ${isOver ? 'ring-4 ring-blue-500 ring-opacity-50 shadow-2xl scale-105' : 'shadow-lg hover:shadow-xl'} relative overflow-hidden`}>
+        {/* Glow effect on hover */}
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-primary/10 rounded-lg blur opacity-0 group-hover:opacity-100 transition duration-500" />
+        
+        <CardHeader className="pb-3 relative z-10">
           <CardTitle className="text-lg flex items-center justify-between">
             {title}
             <span className="text-sm font-semibold bg-gradient-to-r from-primary to-primary/80 text-primary-foreground px-3 py-1 rounded-full shadow-sm">
