@@ -76,30 +76,32 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
             {(user.role === "admin" || user.role === "manager") && (
               <Link
                 href="/analytics"
-                className="group flex-shrink-0 text-sm text-white/90 hover:text-orange-300 flex items-center space-x-1 transition-colors"
+                className="group relative px-3 py-2 text-sm text-white/90 hover:text-white flex items-center space-x-2 transition-all duration-300 rounded-lg hover:bg-white/10"
               >
-                <TrendingUp className="h-4 w-4 group-hover:text-orange-300" />
-                <span>{t('nav.analytics')}</span>
+                <TrendingUp className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                <span className="font-medium">{t('nav.analytics')}</span>
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
               </Link>
             )}
             {(user.role === "admin" || user.role === "manager") && (
               <Link
                 href="/reports"
-                className="group flex-shrink-0 text-sm text-white/90 hover:text-orange-300 flex items-center space-x-1 transition-colors"
+                className="group relative px-3 py-2 text-sm text-white/90 hover:text-white flex items-center space-x-2 transition-all duration-300 rounded-lg hover:bg-white/10"
               >
-                <FileText className="h-4 w-4 group-hover:text-orange-300" />
-                <span>{t('nav.reports')}</span>
+                <FileText className="h-4 w-4 group-hover:scale-110 transition-transform" />
+                <span className="font-medium">{t('nav.reports')}</span>
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-orange-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left" />
               </Link>
             )}
           </nav>
         </div>
 
         {/* Usuário + Menu */}
-        <div className="flex items-center space-x-1 sm:space-x-4">
+        <div className="flex items-center space-x-1 sm:space-x-4 animate-slide-in-right">
           <div className="hidden sm:block">
             <LanguageSwitcher />
           </div>
-          <span className="text-xs sm:text-sm bg-white/20 text-white px-1 sm:px-2 py-1 rounded-md capitalize hidden sm:block">
+          <span className="text-xs sm:text-sm bg-gradient-to-r from-white/20 to-white/10 backdrop-blur-sm text-white px-2 sm:px-3 py-1.5 rounded-lg capitalize hidden sm:block border border-white/20 shadow-lg">
             {user.role}
           </span>
           
@@ -157,22 +159,26 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
           {/* Menu do Usuário */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-8 w-8 rounded-full text-white">
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback className="bg-white/20 text-white">
+              <Button variant="ghost" className="group relative h-10 w-10 rounded-full text-white hover:bg-white/10 transition-all duration-300 ring-2 ring-white/20 hover:ring-white/40 hover:scale-110">
+                <Avatar className="h-9 w-9 transition-transform group-hover:scale-105">
+                  <AvatarFallback className="bg-gradient-to-br from-orange-500 to-blue-600 text-white font-bold shadow-lg">
                     {user.name
                       .split(" ")
                       .map((n) => n[0])
                       .join("")}
                   </AvatarFallback>
                 </Avatar>
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-orange-400/20 to-blue-400/20 opacity-0 group-hover:opacity-100 transition-opacity blur-md" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end">
-              <div className="px-3 py-2 border-b">
+            <DropdownMenuContent className="w-64 animate-scale-in shadow-2xl border-2" align="end">
+              <div className="px-4 py-3 border-b bg-gradient-to-r from-primary/10 to-blue-500/10">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">{user.name}</span>
-                  <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded capitalize">
+                  <div>
+                    <p className="text-sm font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">{user.name}</p>
+                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                  </div>
+                  <span className="text-xs bg-gradient-to-r from-primary to-blue-600 text-white px-2.5 py-1 rounded-full capitalize font-semibold shadow-md">
                     {user.role}
                   </span>
                 </div>
@@ -181,20 +187,26 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
                 <LanguageSwitcher />
               </div>
               <DropdownMenuItem asChild>
-                <Link href="/profile" className="group flex items-center">
-                  <UserIcon className="mr-2 h-4 w-4 group-hover:text-white" />
-                  <span className="group-hover:text-white">{t('nav.profile')}</span>
+                <Link href="/profile" className="group flex items-center cursor-pointer hover:bg-gradient-to-r hover:from-blue-500 hover:to-blue-600 dark:hover:from-primary/10 dark:hover:to-blue-500/10 transition-all duration-200">
+                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 mr-3 group-hover:scale-110 transition-transform">
+                    <UserIcon className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="font-medium group-hover:text-white dark:group-hover:text-primary transition-colors">{t('nav.profile')}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/settings" className="group flex items-center">
-                  <Settings className="mr-2 h-4 w-4 group-hover:text-white" />
-                  <span className="group-hover:text-white">{t('nav.settings')}</span>
+                <Link href="/settings" className="group flex items-center cursor-pointer hover:bg-gradient-to-r hover:from-purple-500 hover:to-purple-600 dark:hover:from-primary/10 dark:hover:to-blue-500/10 transition-all duration-200">
+                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 mr-3 group-hover:scale-110 transition-transform">
+                    <Settings className="h-4 w-4 text-white" />
+                  </div>
+                  <span className="font-medium group-hover:text-white dark:group-hover:text-primary transition-colors">{t('nav.settings')}</span>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleLogout} className="group flex items-center">
-                <LogOut className="mr-2 h-4 w-4 group-hover:text-white" />
-                <span className="group-hover:text-white">{t('nav.logout')}</span>
+              <DropdownMenuItem onClick={handleLogout} className="group flex items-center cursor-pointer hover:bg-gradient-to-r hover:from-red-500 hover:to-red-600 dark:hover:from-red-950 dark:hover:to-red-900 transition-all duration-200 text-red-600 dark:text-red-400">
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-red-500 to-red-600 mr-3 group-hover:scale-110 transition-transform">
+                  <LogOut className="h-4 w-4 text-white" />
+                </div>
+                <span className="font-medium group-hover:text-white dark:group-hover:text-red-300 transition-colors">{t('nav.logout')}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

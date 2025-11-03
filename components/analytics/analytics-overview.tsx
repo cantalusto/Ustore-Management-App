@@ -123,11 +123,13 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h2 className="text-xl font-semibold">{t('analytics.overview')}</h2>
-        <div className="flex flex-col sm:flex-row gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-slide-in-down">
+        <h2 className="text-2xl font-semibold bg-gradient-to-r from-primary via-blue-600 to-purple-600 bg-clip-text text-transparent">
+          {t('analytics.overview')}
+        </h2>
+        <div className="flex flex-col sm:flex-row gap-2 animate-fade-in" style={{ animationDelay: '100ms' }}>
           <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-            <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px] hover:border-primary transition-colors">
               <SelectValue placeholder={t('teams.department_filter')} />
             </SelectTrigger>
             <SelectContent>
@@ -136,7 +138,7 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
             </SelectContent>
           </Select>
           <Select value={selectedMember} onValueChange={setSelectedMember}>
-            <SelectTrigger className="w-full sm:w-[180px]">
+            <SelectTrigger className="w-full sm:w-[180px] hover:border-primary transition-colors">
               <SelectValue placeholder={t('teams.all_members')} />
             </SelectTrigger>
             <SelectContent>
@@ -145,7 +147,7 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
             </SelectContent>
           </Select>
           <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-full sm:w-32">
+            <SelectTrigger className="w-full sm:w-32 hover:border-primary transition-colors">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -158,28 +160,46 @@ export function AnalyticsOverview({ userRole }: AnalyticsOverviewProps) {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {statCards.map((stat, index) => (
-          <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-              <stat.icon className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <div className="flex items-center space-x-1 text-xs">
-                {stat.trend >= 0 ? (
-                  <TrendingUp className={`h-3 w-3 ${stat.isNegative ? "text-red-500" : "text-green-500"}`} />
-                ) : (
-                  <TrendingDown className={`h-3 w-3 ${stat.isNegative ? "text-green-500" : "text-red-500"}`} />
-                )}
-                <span className={stat.trend >= 0 && !stat.isNegative ? "text-green-600" : "text-red-600"}>
-                  {Math.abs(stat.trend)}%
-                </span>
-                <span className="text-muted-foreground">{stat.description}</span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+        {statCards.map((stat, index) => {
+          const gradientColors = [
+            'from-blue-500 to-cyan-500',
+            'from-green-500 to-emerald-500',
+            'from-orange-500 to-red-500',
+            'from-purple-500 to-pink-500'
+          ]
+          
+          return (
+            <Card 
+              key={index}
+              className="animate-scale-in hover:-translate-y-1 transition-all duration-300 hover:shadow-xl border-2 hover:border-primary/50 relative overflow-hidden group"
+              style={{ animationDelay: `${(index + 2) * 100}ms` }}
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index]} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                <div className={`p-2 rounded-lg bg-gradient-to-br ${gradientColors[index]} bg-opacity-10 backdrop-blur-sm`}>
+                  <stat.icon className="h-4 w-4 text-foreground" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
+                  {stat.value}
+                </div>
+                <div className="flex items-center space-x-1 text-xs mt-2">
+                  {stat.trend >= 0 ? (
+                    <TrendingUp className={`h-3 w-3 ${stat.isNegative ? "text-red-500" : "text-green-500"}`} />
+                  ) : (
+                    <TrendingDown className={`h-3 w-3 ${stat.isNegative ? "text-green-500" : "text-red-500"}`} />
+                  )}
+                  <span className={stat.trend >= 0 && !stat.isNegative ? "text-green-600" : "text-red-600"}>
+                    {Math.abs(stat.trend)}%
+                  </span>
+                  <span className="text-muted-foreground">{stat.description}</span>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
     </div>
   )

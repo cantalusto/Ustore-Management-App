@@ -93,18 +93,23 @@ export function ReportsOverview() {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="animate-slide-in-down border-2 hover:border-primary/50 transition-all duration-300">
         <CardHeader>
-          <CardTitle className="text-lg sm:text-xl">{t('reports.configuration')}</CardTitle>
-          <CardDescription className="text-sm sm:text-base">{t('reports.configuration_desc')}</CardDescription>
+          <CardTitle className="text-xl sm:text-2xl bg-gradient-to-r from-primary via-blue-600 to-purple-600 bg-clip-text text-transparent">
+            {t('reports.configuration')}
+          </CardTitle>
+          <CardDescription className="text-sm sm:text-base flex items-center gap-2">
+            <span className="inline-block w-1 h-4 bg-gradient-to-b from-primary to-blue-600 rounded-full"></span>
+            {t('reports.configuration_desc')}
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
+            <div className="animate-fade-in" style={{ animationDelay: '100ms' }}>
               <label className="text-sm font-medium mb-2 block">{t('reports.date_range')}</label>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal bg-transparent text-xs sm:text-sm">
+                    <Button variant="outline" className="w-full justify-start text-left font-normal bg-transparent text-xs sm:text-sm hover:border-primary transition-colors">
                       <CalendarIcon className="mr-2 h-4 w-4 flex-shrink-0" />
                       <span className="truncate">
                         {dateRange.from && dateRange.to
@@ -124,10 +129,10 @@ export function ReportsOverview() {
                   </PopoverContent>
                 </Popover>
             </div>
-            <div>
+            <div className="animate-fade-in" style={{ animationDelay: '200ms' }}>
                 <label className="text-sm font-medium mb-2 block">{t('teams.department_filter')}</label>
                 <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
-                    <SelectTrigger className="w-full"><SelectValue placeholder={t('teams.select_department')} /></SelectTrigger>
+                    <SelectTrigger className="w-full hover:border-primary transition-colors"><SelectValue placeholder={t('teams.select_department')} /></SelectTrigger>
                     <SelectContent>
                         <SelectItem value="all">{t('teams.all_departments')}</SelectItem>
                         {departments.map((dep) => (
@@ -136,10 +141,10 @@ export function ReportsOverview() {
                     </SelectContent>
                 </Select>
             </div>
-            <div>
+            <div className="animate-fade-in" style={{ animationDelay: '300ms' }}>
               <label className="text-sm font-medium mb-2 block">{t('teams.member')}</label>
               <Select value={selectedMember} onValueChange={setSelectedMember}>
-                <SelectTrigger className="w-full"><SelectValue placeholder={t('teams.select_member')} /></SelectTrigger>
+                <SelectTrigger className="w-full hover:border-primary transition-colors"><SelectValue placeholder={t('teams.select_member')} /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">{t('teams.all_members')}</SelectItem>
                   {teamMembers.map((member) => (
@@ -153,37 +158,57 @@ export function ReportsOverview() {
       </Card>
 
       <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
-        {reportTypes.map((report) => (
-          <Card key={report.id} className="relative">
-            <CardHeader className="pb-3 sm:pb-6">
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">{report.icon}</div>
-                        <div className="min-w-0 flex-1">
-                            <CardTitle className="text-base sm:text-lg truncate">{report.title}</CardTitle>
-                            <CardDescription className="mt-1 text-sm">{report.description}</CardDescription>
-                        </div>
-                    </div>
-                    <Badge variant="secondary" className="self-start flex-shrink-0">{report.badge}</Badge>
+        {reportTypes.map((report, index) => {
+          const gradientColors = [
+            'from-blue-500 to-cyan-500',
+            'from-green-500 to-emerald-500',
+            'from-orange-500 to-red-500',
+            'from-purple-500 to-pink-500'
+          ]
+          
+          return (
+            <Card 
+              key={report.id} 
+              className="relative animate-scale-in hover:-translate-y-1 transition-all duration-300 hover:shadow-xl border-2 hover:border-primary/50 overflow-hidden group"
+              style={{ animationDelay: `${(index + 4) * 100}ms` }}
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${gradientColors[index]} opacity-0 group-hover:opacity-5 transition-opacity duration-300`}></div>
+              <CardHeader className="pb-3 sm:pb-6 relative">
+                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className={`p-3 bg-gradient-to-br ${gradientColors[index]} bg-opacity-10 rounded-lg flex-shrink-0 backdrop-blur-sm`}>
+                            {report.icon}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                              <CardTitle className="text-base sm:text-lg truncate bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent">
+                                {report.title}
+                              </CardTitle>
+                              <CardDescription className="mt-1 text-sm">{report.description}</CardDescription>
+                          </div>
+                      </div>
+                      <Badge variant="secondary" className={`self-start flex-shrink-0 bg-gradient-to-r ${gradientColors[index]} text-white border-0`}>
+                        {report.badge}
+                      </Badge>
+                  </div>
+              </CardHeader>
+              <CardContent className="relative">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => handleGenerateReport(report.id, "excel")}
+                    disabled={isGenerating === `${report.id}-excel` || (report.id === 'individual-performance' && selectedMember === 'all')}
+                    className="flex-1 text-sm hover:bg-gradient-to-r hover:from-primary hover:to-blue-600 hover:text-white transition-all duration-300 hover:scale-105 group/btn"
+                  >
+                    <Download className="mr-2 h-4 w-4 flex-shrink-0 group-hover/btn:animate-bounce" />
+                    <span className="truncate">
+                      {isGenerating === `${report.id}-excel` ? t('reports.generating') : t('reports.export_excel')}
+                    </span>
+                  </Button>
                 </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() => handleGenerateReport(report.id, "excel")}
-                  disabled={isGenerating === `${report.id}-excel` || (report.id === 'individual-performance' && selectedMember === 'all')}
-                  className="flex-1 text-sm"
-                >
-                  <Download className="mr-2 h-4 w-4 flex-shrink-0" />
-                  <span className="truncate">
-                    {isGenerating === `${report.id}-excel` ? t('reports.generating') : t('reports.export_excel')}
-                  </span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          )
+        })}
       </div>
     </div>
   );
